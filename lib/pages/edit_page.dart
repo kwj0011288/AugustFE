@@ -1,0 +1,420 @@
+import 'dart:convert';
+import 'dart:ui';
+import 'package:august/get_api/get_semester.dart';
+import 'package:august/pages/edit_search_page.dart';
+import 'package:august/pages/homepage.dart';
+import 'package:august/pages/manual_search_page.dart';
+import 'package:colorful_safe_area/colorful_safe_area.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import "package:flutter_feather_icons/flutter_feather_icons.dart";
+import 'package:flutter/material.dart' hide ModalBottomSheetRoute;
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import '../components/button.dart';
+import '../components/courseprovider.dart';
+import '../components/timetable.dart';
+import '../get_api/class.dart';
+import '../get_api/schedule.dart';
+
+class EditPage extends StatefulWidget {
+  final int? index;
+  final ScheduleList? newCourse;
+  ValueNotifier<List<ScheduleList>>? addedCoursesNotifier;
+  final String semester;
+
+  EditPage(
+      {Key? key,
+      this.index,
+      this.newCourse,
+      this.addedCoursesNotifier,
+      required this.semester})
+      : super(key: key);
+
+  @override
+  State<EditPage> createState() => _EditPageState();
+}
+
+class _EditPageState extends State<EditPage> {
+  List<ScheduleList> _courses = [];
+
+  Future<void> loadCourseDataAtIndex(int index) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? jsonString = prefs.getString('timetable');
+
+    if (jsonString != null) {
+      List<dynamic> coursesDataMapList = jsonDecode(jsonString);
+      if (index >= 0 && index < coursesDataMapList.length) {
+        List<dynamic> courseData = coursesDataMapList[index];
+
+        // Parsing and converting the data into List<ScheduleList>
+        List<ScheduleList> courses = (courseData as List)
+            .map((scheduleItem) => ScheduleList.fromJson(scheduleItem))
+            .toList();
+
+        // Update the _courses list with the newly loaded courses
+        _courses =
+            courses; // This will replace the existing _courses list with new data
+        // If you want to append the data instead of replacing, use _courses.addAll(courses);
+        print(
+            "course Info ${_courses.map((course) => course.toJson()).toList()}");
+        setState(() {}); // Call setState to update the UI if necessary
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.index != null) {
+      loadCourseDataAtIndex(widget.index!);
+    }
+    widget.addedCoursesNotifier?.addListener(_onCoursesAdded);
+    print("Listener added to addedCoursesNotifier");
+  }
+
+  Future<void> _updateCoursesFromLocalStorage(int index) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? jsonString = prefs.getString('timetable');
+
+    if (jsonString != null) {
+      List<dynamic> coursesDataMapList = jsonDecode(jsonString);
+      if (index >= 0 && index < coursesDataMapList.length) {
+        dynamic courseDataMap = coursesDataMapList[index];
+
+        if (courseDataMap is Map && courseDataMap.containsKey('courses')) {
+          List<dynamic> courseData = courseDataMap['courses'];
+
+          // Parsing and converting the data into List<ScheduleList>
+          List<ScheduleList> courses = (courseData as List)
+              .map((scheduleItem) => ScheduleList.fromJson(scheduleItem))
+              .toList();
+
+          // Update the specific index in _courses list
+          if (index < _courses.length) {
+            setState(() {
+              _courses[index] =
+                  courses[0]; // Replace data at index with new courses
+            });
+          } else {
+            // Handle the case where the index is out of range
+            print("Error: Index out of range");
+          }
+
+          print(
+              "Courses updated from local storage: ${_courses.map((course) => course.toJson()).toList()}");
+        } else {
+          print("Error: 'courses' key not found in timetable data");
+        }
+      } else {
+        // Handle the case where the index is out of range
+        print("Error: Index out of range");
+      }
+    }
+  }
+
+  Future<void> saveTimetableToLocalStorage(
+      List<List<ScheduleList>> newTimetable) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Load existing timetables from local storage
+    String? serializedExistingTimetables = prefs.getString('timetable');
+    List<Map<String, dynamic>> existingTimetables = [];
+
+    if (serializedExistingTimetables != null) {
+      List<dynamic> deserializedExistingTimetables =
+          jsonDecode(serializedExistingTimetables);
+      existingTimetables = deserializedExistingTimetables
+          .toList()
+          .map((timetableData) => timetableData as Map<String, dynamic>)
+          .toList();
+    }
+
+    // Ensure newTimetable is not empty before accessing its first element
+    if (newTimetable.isNotEmpty) {
+      // Process the new timetable
+      Map<String, dynamic> newTimetableData = {
+        'courses': newTimetable[0].map((course) => course.toJson()).toList(),
+      };
+
+      // Replace the timetable at index 0 with newTimetableData, if it exists
+      if (existingTimetables.isNotEmpty) {
+        existingTimetables[0] = newTimetableData;
+      } else {
+        // If no existing timetable, just add the new timetable
+        existingTimetables.add(newTimetableData);
+      }
+    } else {
+      print("Error: newTimetable is empty");
+      // Handle the error as appropriate
+    }
+
+    // Save the updated list of timetables to local storage
+    String serializedAllTimetables = jsonEncode(existingTimetables);
+    await prefs.setString('timetable', serializedAllTimetables);
+    print("Timetables saved successfully");
+  }
+//
+//
+//
+
+  void _onCourseSelected(ScheduleList newCourse) {
+    // Add the selected course to the _courses list
+    setState(() {
+      _courses.add(newCourse);
+    });
+  }
+
+  void _onCoursesAdded() {
+    var newCourses = widget.addedCoursesNotifier!.value;
+    print(
+        "Updated courses list: ${jsonEncode(newCourses.map((e) => e.toJson()).toList())}");
+    setState(() {
+      _courses = newCourses;
+    });
+  }
+
+  @override
+  void dispose() {
+    // Remove the listener
+    widget.addedCoursesNotifier?.removeListener(_onCoursesAdded);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    print(
+        "Building UI with courses: ${_courses.map((c) => c.toJson()).toList()}");
+    var provider = Provider.of<CoursesProvider>(context);
+    return Scaffold(
+      extendBody: true,
+      backgroundColor: Theme.of(context).colorScheme.background,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Theme.of(context).colorScheme.background,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 10, top: 8, bottom: 8),
+          child: GestureDetector(
+            onTap: () {
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
+              }
+            },
+            child: Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 5),
+                child: Center(
+                  child: Icon(
+                    Icons.arrow_back_ios,
+                    size: 15,
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        actions: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(right: 15, bottom: 13),
+                child: Button(
+                  buttonColor: Colors.blueAccent,
+                  textColor: Colors.white,
+                  text: 'Done',
+                  width: 70,
+                  height: 30,
+                  onTap: () async {
+                    List<List<ScheduleList>> copiedCoursesData =
+                        List.from(provider.selectedCoursesData);
+                    // await saveTimetableToLocalStorage(
+                    //     copiedCoursesData, widget.semester);
+
+                    _updateCoursesFromLocalStorage(widget.index ?? -1);
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomePage()
+
+                          // SchedulePage(
+                          //   selectedCoursesData: copiedCoursesData.isNotEmpty
+                          //       ? copiedCoursesData
+                          //       : [],
+                          //   semester: selectedRawSemester,
+                          // ),
+                          ),
+                    ).then(
+                      (_) {
+                        // Check if new courses have been added.
+                        if (provider.selectedCoursesData.length >
+                            copiedCoursesData.length) {
+                          for (int i = copiedCoursesData.length;
+                              i < provider.selectedCoursesData.length;
+                              i++) {
+                            for (var course
+                                in provider.selectedCoursesData[i]) {
+                              provider.addCourestoEdit(course);
+                            }
+                          }
+                        }
+                      },
+                    );
+                  },
+                  borderColor: Colors.blueAccent,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+      body: ColorfulSafeArea(
+        bottomColor: Colors.white.withOpacity(0),
+        overflowRules: OverflowRules.all(true),
+        child: Stack(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 20),
+                  child: Text(
+                    'Edit',
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Flexible(
+                  child: Consumer<CoursesProvider>(
+                    builder: (context, provider, child) {
+                      return SingleTimetable(
+                        courses: _courses,
+                        index: widget.index ?? -1,
+                        showEditButton: true,
+                        forceFixedTimeRange: true,
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: ClipRRect(
+        child: Stack(
+          children: [
+            Container(
+              height: MediaQuery.of(context).size.height * 0.18,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Theme.of(context)
+                        .colorScheme
+                        .primaryContainer
+                        .withOpacity(0.1),
+                    Theme.of(context)
+                        .colorScheme
+                        .primaryContainer
+                        .withOpacity(0.3),
+                    Theme.of(context)
+                        .colorScheme
+                        .primaryContainer
+                        .withOpacity(0.5),
+                    Theme.of(context)
+                        .colorScheme
+                        .primaryContainer
+                        .withOpacity(0.7),
+                    Theme.of(context)
+                        .colorScheme
+                        .primaryContainer
+                        .withOpacity(1.0),
+                    Theme.of(context).colorScheme.primaryContainer,
+                    Theme.of(context).colorScheme.primaryContainer,
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 50,
+              right: 40,
+              child: Container(
+                height: 70,
+                width: 70,
+                decoration: BoxDecoration(
+                  color: Colors.blueAccent,
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  icon: Icon(FeatherIcons.plus, size: 40),
+                  color: Colors.white,
+                  onPressed: _navigateToPage,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _navigateToPage() async {
+    var addedCoursesNotifier = ValueNotifier<List<ScheduleList>>([]);
+    if (widget.addedCoursesNotifier == null) {
+      widget.addedCoursesNotifier = ValueNotifier<List<ScheduleList>>([]);
+    }
+    showCupertinoModalBottomSheet<Map<String, dynamic>>(
+      topRadius: Radius.circular(30),
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            Navigator.pop(
+                context); // Close the bottom sheet when the area outside the sheet is tapped
+          },
+          child: NotificationListener<ScrollNotification>(
+            onNotification: (ScrollNotification notification) {
+              if (notification.metrics.pixels ==
+                  notification.metrics.maxScrollExtent) {
+                HapticFeedback.lightImpact();
+              }
+              return true;
+            },
+            child: DraggableScrollableSheet(
+              expand: false,
+              initialChildSize: 1,
+              maxChildSize: 1,
+              minChildSize: 1,
+              builder: (BuildContext context,
+                  ScrollController sheetScrollController) {
+                return GestureDetector(
+                    onTap:
+                        () {}, // Prevent the inner tap event from propagating to the outer GestureDetector
+                    child: EditSearchPage(
+                      addedCoursesNotifier: widget.addedCoursesNotifier!,
+                      semester: widget.semester,
+                      onCourseSelected: _onCourseSelected,
+                    ));
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+}

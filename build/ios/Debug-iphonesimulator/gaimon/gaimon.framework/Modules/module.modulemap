@@ -1,0 +1,11 @@
+framework module gaimon {
+  umbrella header "gaimon-umbrella.h"
+
+  export *
+  module * { export * }
+}
+
+module gaimon.Swift {
+  header "gaimon-Swift.h"
+  requires objc
+}
