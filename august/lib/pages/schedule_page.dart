@@ -140,9 +140,11 @@ class _SchedulePageState extends State<SchedulePage>
       await loadProfilePhoto();
       _listenForPhotoChanges();
       await initializePage(); // 모든 초기화 작업이 완료되면...
-      setState(() {
-        isLoading = false; // 로드 완료
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false; // 로드 완료
+        });
+      }
     });
     //   loadSemesterInfo();
     //   loadProfilePhoto();

@@ -30,18 +30,22 @@ String getSeasonFromSemester(String semester) {
 }
 
 String getOriginalSemester(String formattedSemester) {
-  // 정규 표현식을 사용하여 계절과 년도를 추출
+  // Check if the input is already in the desired "yearmonth" format (e.g., "202301")
+  RegExp numRegex = RegExp(r'^\d{6}$');
+  if (numRegex.hasMatch(formattedSemester)) {
+    return formattedSemester; // Return as is if already in the correct format
+  }
+
+  // Use regular expression to extract season and year from the formatted string
   RegExp regex = RegExp(r"(\w+) (\d+)");
   Match? match = regex.firstMatch(formattedSemester);
 
   if (match != null && match.groupCount >= 2) {
-    // 계절을 가져옴
+    // Extract season and year
     String season = match.group(1)!;
-
-    // 년도를 가져옴
     String year = match.group(2)!;
 
-    // 계절에 따라 월을 매핑
+    // Map season to month
     String month;
     switch (season) {
       case 'Spring':
@@ -60,7 +64,7 @@ String getOriginalSemester(String formattedSemester) {
         throw Exception("Invalid season format");
     }
 
-    // 원래의 학기 형식으로 반환 (예: "2023-01")
+    // Return the original semester format (e.g., "202301")
     return "$year$month";
   }
 

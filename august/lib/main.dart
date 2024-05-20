@@ -39,6 +39,7 @@ void main() async {
     email = await fetchUserEmail();
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('loadDone', false);
+    await prefs.setString('semester', preloadedSemesters.last);
   } else {
     preloadedSemesters = ["Error"];
     departments = ["Error"];
