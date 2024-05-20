@@ -80,12 +80,18 @@ class __GradeCalcPageState extends State<GradeCalcPage>
       List<String> jsonAssignments = assignment
           .map((assignment) => json.encode(assignment.toJson()))
           .toList();
-      print("Saving assignments: $jsonAssignments");
-      bool result = await prefs.setStringList(key, jsonAssignments);
-      print("Save result: $result");
-      return result;
+
+      // Save assignments
+      await prefs.setStringList(key, jsonAssignments);
+
+      // Save totalWeight and totalGpa
+      await prefs.setDouble('totalWeight_${widget.index}', totalWeight);
+      await prefs.setDouble('totalGpa_${widget.index}', totalGpa);
+
+      print("Assignments, totalWeight, and totalGpa saved");
+      return true;
     } catch (e) {
-      print("Error saving assignments: $e");
+      print("Error saving data: $e");
       return false;
     }
   }
@@ -104,6 +110,20 @@ class __GradeCalcPageState extends State<GradeCalcPage>
       });
     } else {
       print("No assignments found in local storage.");
+    }
+    totalWeight = prefs.getDouble('totalWeight_${widget.index}') ?? 0.0;
+    totalGpa = prefs.getDouble('totalGpa_${widget.index}') ?? 0.0;
+  }
+
+  Future<void> clearAssignments() async {
+    final prefs = await SharedPreferences.getInstance();
+    String key = 'course_assignments_${widget.index}';
+    bool result = await prefs.remove(key);
+    print("Clear assignments result: $result");
+    if (result) {
+      setState(() {
+        assignment = [];
+      });
     }
   }
 
@@ -134,6 +154,14 @@ class __GradeCalcPageState extends State<GradeCalcPage>
       assignment[index].grade = grade;
       saveAssignments();
     });
+  }
+
+  String formatAssignmentName(String name) {
+    List<String> words = name.split('');
+    if (words.length > 7) {
+      return words.take(6).join('') + '...';
+    }
+    return name;
   }
 
   Future<void> AssignmentList() async {
@@ -209,9 +237,8 @@ class __GradeCalcPageState extends State<GradeCalcPage>
                 GestureDetector(
                   onTap: () {
                     // Collecting input data and popping the modal with result
-                    Navigator.of(context).pop({
-                      'name': nameController.text,
-                    });
+                    Navigator.of(context).pop();
+                    addAssignment(Assignment(name: nameController.text));
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 18, horizontal: 15),
@@ -261,7 +288,6 @@ class __GradeCalcPageState extends State<GradeCalcPage>
           recalculateTotalGPA(); // Recalculate the total GPA after updating the grade
         });
       }
-      updateAssignmentGrade(index, result['grade']);
     }
   }
 
@@ -289,7 +315,8 @@ class __GradeCalcPageState extends State<GradeCalcPage>
                 Expanded(
                   child: CupertinoTextField(
                     controller: gradeController,
-                    placeholder: 'Grade of ${assignment[index].name}',
+                    placeholder:
+                        'Grade of ${formatAssignmentName(assignment[index].name)}',
                     placeholderStyle: TextStyle(
                       color: Theme.of(context).colorScheme.outline,
                     ),
@@ -319,6 +346,7 @@ class __GradeCalcPageState extends State<GradeCalcPage>
                     assignment[index].gradeButton = true;
                     // Collecting input data and popping the modal with result
                     recalculateTotalGPA();
+                    updateAssignmentGrade(index, gradeController.text);
                     Navigator.of(context).pop();
                   },
                   child: Container(
@@ -363,7 +391,6 @@ class __GradeCalcPageState extends State<GradeCalcPage>
         totalWeight =
             totalWeight - oldWeight + double.parse(assignment[index].weight);
       });
-      updateAssignmentWeight(index, result['weight']);
     }
   }
 
@@ -422,6 +449,7 @@ class __GradeCalcPageState extends State<GradeCalcPage>
                     assignment[index].weightButton = true;
                     // Collecting input data and popping the modal with result
                     recalculateTotalGPA();
+                    updateAssignmentWeight(index, weightController.text);
                     Navigator.of(context).pop();
                   },
                   child: Container(
@@ -645,6 +673,33 @@ class __GradeCalcPageState extends State<GradeCalcPage>
                         Spacer(),
                         GestureDetector(
                           onTap: () {
+                            clearAssignments();
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 5),
+                            child: Container(
+                              width: 80,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30),
+                                color: Colors.red,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  'Clear All',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 15),
+                        GestureDetector(
+                          onTap: () {
                             AssignmentList();
                           },
                           child: Padding(
@@ -677,184 +732,194 @@ class __GradeCalcPageState extends State<GradeCalcPage>
                   itemCount: assignment.length, // 과제의 총 개수
                   itemBuilder: (context, index) {
                     // 각 과제에 대한 정보를 표시
-                    return Slidable(
-                      key: ValueKey(assignment[index]),
-                      endActionPane: ActionPane(
-                        motion: const ScrollMotion(),
-                        dismissible: DismissiblePane(
-                          onDismissed: () {
-                            setState(() {
-                              assignment.removeAt(index);
-                            });
-                          },
-                        ),
-                        children: [
-                          SlidableAction(
-                            padding: EdgeInsets.only(bottom: 10),
-                            borderRadius: BorderRadius.circular(15),
-                            onPressed: (context) {
-                              removeAssignment(index);
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Slidable(
+                        key: ValueKey(assignment[index]),
+                        endActionPane: ActionPane(
+                          motion: const ScrollMotion(),
+                          dismissible: DismissiblePane(
+                            onDismissed: () {
                               setState(() {
                                 assignment.removeAt(index);
                               });
                             },
-                            backgroundColor: Color(0xFFFE4A49),
-                            foregroundColor: Colors.white,
-                            icon: Icons.delete,
-                            label: 'Delete',
                           ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: Container(
-                          height: 80,
-                          width: MediaQuery.of(context).size.width,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primary,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 15),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Assignment ${index + 1}',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        color: Colors.grey,
-                                        fontWeight: FontWeight.bold,
+                          children: [
+                            SizedBox(
+                              width: 10,
+                            ),
+                            SlidableAction(
+                              borderRadius: BorderRadius.circular(
+                                  10), // Smaller border radius for a more subtle effect
+                              onPressed: (context) {
+                                removeAssignment(index);
+                                setState(() {
+                                  assignment.removeAt(index);
+                                });
+                              },
+                              backgroundColor: Color(0xFFFE4A49),
+                              foregroundColor: Colors.white,
+                              icon: Icons.delete,
+                              label: 'Delete',
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 0),
+                          child: Container(
+                            height: 80,
+                            width: MediaQuery.of(context).size.width,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.primary,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Assignment ${index + 1}',
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.grey,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                    ),
-                                    Text(
-                                      assignment[index].name,
-                                      style: TextStyle(
-                                        fontSize: 25,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .outline,
-                                        fontWeight: FontWeight.bold,
+                                      Text(
+                                        formatAssignmentName(
+                                            assignment[index].name),
+                                        style: TextStyle(
+                                          fontSize: 25,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outline,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              GestureDetector(
-                                onTap: () => WeightList(
-                                    index), // 성적 업데이트 함수를 호출할 때 인덱스 전달
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 5),
-                                  child: Container(
-                                    width: 100, // 너비 조절
-                                    height: 60, // 높이 조절
-                                    decoration: BoxDecoration(
-                                      color: assignment[index].weightButton
-                                          ? Colors.white.withOpacity(0.3)
-                                          : tileColors[widget.index + 1],
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          'Weight',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color:
-                                                assignment[index].weightButton
-                                                    ? Theme.of(context)
-                                                        .colorScheme
-                                                        .outline
-                                                    : Colors.black,
-                                            fontWeight: FontWeight.bold,
+                                GestureDetector(
+                                  onTap: () => WeightList(
+                                      index), // 성적 업데이트 함수를 호출할 때 인덱스 전달
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 3),
+                                    child: Container(
+                                      width: 100, // 너비 조절
+                                      height: 60, // 높이 조절
+                                      decoration: BoxDecoration(
+                                        color: assignment[index].weightButton
+                                            ? Colors.white.withOpacity(0.3)
+                                            : tileColors[widget.index + 1],
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Weight',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color:
+                                                  assignment[index].weightButton
+                                                      ? Theme.of(context)
+                                                          .colorScheme
+                                                          .outline
+                                                      : Colors.black,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
-                                        ),
-                                        Text(
-                                          assignment[index].weight.toString() +
-                                              ' %',
-                                          style: TextStyle(
-                                            fontSize: 25,
-                                            color:
-                                                assignment[index].weightButton
-                                                    ? Theme.of(context)
-                                                        .colorScheme
-                                                        .outline
-                                                    : Colors.black,
-                                            fontWeight: FontWeight.bold,
+                                          Text(
+                                            assignment[index]
+                                                    .weight
+                                                    .toString() +
+                                                ' %',
+                                            style: TextStyle(
+                                              fontSize: 25,
+                                              color:
+                                                  assignment[index].weightButton
+                                                      ? Theme.of(context)
+                                                          .colorScheme
+                                                          .outline
+                                                      : Colors.black,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              SizedBox(width: 5),
-                              GestureDetector(
-                                onTap: () => GradeList(
-                                    index), // 성적 업데이트 함수를 호출할 때 인덱스 전달
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 5),
-                                  child: Container(
-                                    width: 120, // 너비 조절
-                                    height: 60, // 높이 조절
-                                    decoration: BoxDecoration(
-                                      color: assignment[index].gradeButton
-                                          ? Colors.white.withOpacity(0.3)
-                                          : tileColors[widget.index + 1],
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          'Grade',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: assignment[index].gradeButton
-                                                ? Theme.of(context)
-                                                    .colorScheme
-                                                    .outline
-                                                : Colors.black,
-                                            fontWeight: FontWeight.bold,
+                                SizedBox(width: 5),
+                                GestureDetector(
+                                  onTap: () => GradeList(
+                                      index), // 성적 업데이트 함수를 호출할 때 인덱스 전달
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 5),
+                                    child: Container(
+                                      width: 120, // 너비 조절
+                                      height: 60, // 높이 조절
+                                      decoration: BoxDecoration(
+                                        color: assignment[index].gradeButton
+                                            ? Colors.white.withOpacity(0.3)
+                                            : tileColors[widget.index + 1],
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Grade',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color:
+                                                  assignment[index].gradeButton
+                                                      ? Theme.of(context)
+                                                          .colorScheme
+                                                          .outline
+                                                      : Colors.black,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
-                                        ),
-                                        Text(
-                                          assignment[index].grade.toString() +
-                                              ' / 100',
-                                          style: TextStyle(
-                                            fontSize: 25,
-                                            color: assignment[index].gradeButton
-                                                ? Theme.of(context)
-                                                    .colorScheme
-                                                    .outline
-                                                : Colors.black,
-                                            fontWeight: FontWeight.bold,
+                                          Text(
+                                            assignment[index].grade.toString() +
+                                                ' / 100',
+                                            style: TextStyle(
+                                              fontSize: 25,
+                                              color:
+                                                  assignment[index].gradeButton
+                                                      ? Theme.of(context)
+                                                          .colorScheme
+                                                          .outline
+                                                      : Colors.black,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
-                                        ),
-                                      ], /* 
-                                       bool weightButton;
-  bool gradeButton;*/
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              SizedBox(width: 5),
-                            ],
+                                SizedBox(width: 5),
+                              ],
+                            ),
                           ),
                         ),
                       ),

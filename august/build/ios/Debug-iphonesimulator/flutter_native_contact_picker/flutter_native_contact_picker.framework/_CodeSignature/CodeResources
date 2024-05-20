@@ -38,7 +38,7 @@
 		</data>
 		<key>Modules/flutter_native_contact_picker.swiftmodule/arm64-apple-ios-simulator.swiftmodule</key>
 		<data>
-		6GWEKXljPJRyk+74kiwNiNnx1ys=
+		jI1lp3PHO2jLLRY4uJ5CHOZhnGs=
 		</data>
 		<key>Modules/flutter_native_contact_picker.swiftmodule/x86_64-apple-ios-simulator.abi.json</key>
 		<data>
@@ -50,7 +50,7 @@
 		</data>
 		<key>Modules/flutter_native_contact_picker.swiftmodule/x86_64-apple-ios-simulator.swiftmodule</key>
 		<data>
-		YD9bxO/gMWsWBeZAQZqliUkOQ4U=
+		2q2By0FCCeApBqRKIT6lR3mABqY=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -112,7 +112,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			IYvfwUc8TfPzlp76QEGY3JcTgOt+u/5QqcJwaywtMWI=
+			ShVGYxw+0YAOqc+4h25aAcQp5cjG/kTIc41CKuEWuQM=
 			</data>
 		</dict>
 		<key>Modules/flutter_native_contact_picker.swiftmodule/x86_64-apple-ios-simulator.abi.json</key>
@@ -133,7 +133,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			vp1T6jXHNHZZVKIYn07xLe/tIXp9Vtp5xj36QBGL4Wc=
+			yDV8nrY+L+Uxh5k3jZgSyK/5FGv1CMZ3VECVc/ujKOg=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>

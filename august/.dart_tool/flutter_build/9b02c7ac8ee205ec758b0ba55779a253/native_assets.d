@@ -1,0 +1,1 @@
+ /Users/Files/Project/august/AugustFE/august/.dart_tool/flutter_build/9b02c7ac8ee205ec758b0ba55779a253/native_assets.yaml: 

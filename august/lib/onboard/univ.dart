@@ -5,6 +5,7 @@ import 'package:august/get_api/get_univ.dart';
 import 'package:august/login/login.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -395,7 +396,10 @@ class _UnivPageState extends State<UnivPage> {
                                   ],
                                 )
                               : GestureDetector(
-                                  onTap: _saveAndClose,
+                                  onTap: () {
+                                    _saveAndClose();
+                                    HapticFeedback.mediumImpact();
+                                  },
                                   child: Container(
                                     padding:
                                         EdgeInsets.symmetric(horizontal: 30),

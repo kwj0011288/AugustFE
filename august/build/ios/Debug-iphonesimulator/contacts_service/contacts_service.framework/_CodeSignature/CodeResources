@@ -38,7 +38,7 @@
 		</data>
 		<key>Modules/contacts_service.swiftmodule/arm64-apple-ios-simulator.swiftmodule</key>
 		<data>
-		yVs6c9ZMp5UbYRkOGsf+GPDe2Es=
+		/pUB2oeM/IzlFUOIa6Az8BcVIEc=
 		</data>
 		<key>Modules/contacts_service.swiftmodule/x86_64-apple-ios-simulator.abi.json</key>
 		<data>
@@ -50,7 +50,7 @@
 		</data>
 		<key>Modules/contacts_service.swiftmodule/x86_64-apple-ios-simulator.swiftmodule</key>
 		<data>
-		BWf1Te2Gv1SbICsa9lCshWzealg=
+		bRz2MGStpAN6Z1vCmCOMrFkan2w=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -112,7 +112,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			51b0uVDy9OQxIEkTEukKysykCeuANmLZQFjf+Ml+9gE=
+			EuCNdrTOgqW4fRZjO25Bx0T0cmZC7LiibVZ8k600QSw=
 			</data>
 		</dict>
 		<key>Modules/contacts_service.swiftmodule/x86_64-apple-ios-simulator.abi.json</key>
@@ -133,7 +133,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			WsrI8vYjCflUJEOPbXHQrMW/izf3mas7/3vy9hZYQKo=
+			6UWQliuEFDX+21seodjnVeFHsFQwaog/oIVCI36kBOw=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>

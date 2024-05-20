@@ -8,7 +8,7 @@ import 'package:august/get_api/get_timetables.dart';
 import 'package:august/get_api/schedule.dart';
 import 'package:august/get_api/send_timetable.dart';
 import 'package:august/get_api/set_timetable_name.dart';
-import 'package:august/login/login.dart';
+import 'package:http/http.dart' as http;
 import 'package:august/onboard/profile.dart';
 import 'package:august/onboard/semester.dart';
 import 'package:august/pages/generate.dart';
@@ -106,16 +106,17 @@ class _SchedulePageState extends State<SchedulePage>
     });
   }
 
-  Future<Uint8List?> loadProfilePhoto() async {
+  Future<void> loadProfilePhoto() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    // Load name
+    // Load image
     String? base64Image = prefs.getString('contactPhoto');
+
     if (base64Image != null) {
       setState(() {
         profilePhoto = base64Decode(base64Image);
       });
     }
-
-    return null;
   }
 
   String formatSemester(String semester) {
@@ -136,11 +137,7 @@ class _SchedulePageState extends State<SchedulePage>
     isLoading = true;
     Future.delayed(Duration.zero, () async {
       await loadSemesterInfo();
-      loadProfilePhoto().then((imageData) {
-        setState(() {
-          profilePhoto = imageData;
-        });
-      });
+      await loadProfilePhoto();
       _listenForPhotoChanges();
       await initializePage(); // 모든 초기화 작업이 완료되면...
       setState(() {

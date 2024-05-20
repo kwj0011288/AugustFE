@@ -1,5 +1,6 @@
 import 'package:august/login/login.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:august/get_api/get_department.dart'; // Make sure this import is correct
@@ -350,7 +351,10 @@ class _MajorPageState extends State<MajorPage> {
                             ],
                           )
                         : GestureDetector(
-                            onTap: _saveAndClose,
+                            onTap: () {
+                              _saveAndClose();
+                              HapticFeedback.mediumImpact();
+                            },
                             child: Container(
                               padding: EdgeInsets.symmetric(horizontal: 30),
                               height: 55,

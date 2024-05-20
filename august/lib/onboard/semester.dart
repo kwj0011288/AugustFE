@@ -1,6 +1,7 @@
 import 'package:august/components/button.dart';
 import 'package:august/components/courseprovider.dart';
 import 'package:august/get_api/get_semester.dart';
+import 'package:august/pages/homepage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -372,7 +373,28 @@ class _SemesterPageState extends State<SemesterPage> {
                                   ],
                                 )
                               : GestureDetector(
-                                  onTap: _saveAndClose,
+                                  onTap: () {
+                                    _saveAndClose();
+                                    HapticFeedback.mediumImpact();
+                                    Navigator.pushReplacement(
+                                      context,
+                                      PageRouteBuilder(
+                                        pageBuilder: (context, animation,
+                                                secondaryAnimation) =>
+                                            HomePage(),
+                                        transitionsBuilder: (context, animation,
+                                            secondaryAnimation, child) {
+                                          return FadeTransition(
+                                            opacity: animation,
+                                            child: child,
+                                          );
+                                        },
+                                        transitionDuration: Duration(
+                                            milliseconds:
+                                                200), // Adjust the speed of the fade transition
+                                      ),
+                                    );
+                                  },
                                   child: Container(
                                     padding:
                                         EdgeInsets.symmetric(horizontal: 30),

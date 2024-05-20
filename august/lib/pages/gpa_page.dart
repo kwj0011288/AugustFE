@@ -226,7 +226,6 @@ class _GPAPageState extends State<GPAPage> {
     List<String> jsonCourses = prefs.getStringList('savedCourses') ?? [];
     if (jsonCourses.isNotEmpty) {
       setState(() {
-        // Overwrite courses if saved data is found
         courses = jsonCourses
             .map((jsonCourse) => Course.fromJson(json.decode(jsonCourse)))
             .toList();
@@ -234,8 +233,52 @@ class _GPAPageState extends State<GPAPage> {
     }
   }
 
+  // Convert letter grades to numeric values
+  double gradeToNumber(String letterGrade) {
+    switch (letterGrade) {
+      case 'A':
+        return 4.0;
+      case 'B+':
+        return 3.5;
+      case 'B':
+        return 3.0;
+      case 'C+':
+        return 2.5;
+      case 'C':
+        return 2.0;
+      case 'D':
+        return 1.0;
+      case 'F':
+        return 0.0;
+      default:
+        return 0.0; // Handle unknown grades
+    }
+  }
+
+// Calculate GPA
+  void calculateGPA() {
+    double totalPoints = 0;
+    int totalCredits = 0;
+
+    for (Course course in courses) {
+      double courseGrade = gradeToNumber(course.letterGrade);
+      totalPoints += courseGrade * course.credits;
+      totalCredits += course.credits;
+    }
+
+    if (totalCredits != 0) {
+      setState(() {
+        _newGPA = totalPoints / totalCredits;
+        _totalCredits = totalCredits;
+        // Format GPA to two decimal places
+        _newGPA = double.parse(_newGPA.toStringAsFixed(2));
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    calculateGPA();
     _totalCredits = courses.fold(0, (sum, course) => sum + course.credits);
     final theme = Theme.of(context);
     List<Color> tileColors =
@@ -374,6 +417,7 @@ class _GPAPageState extends State<GPAPage> {
                           if (letterGrade != null) {
                             setState(() {
                               courses[idx].letterGrade = letterGrade;
+                              saveCourses();
                             });
                           }
                         },
@@ -469,6 +513,7 @@ class _GPAPageState extends State<GPAPage> {
         ),
       ),
       bottomNavigationBar: Container(
+        color: Colors.transparent,
         child: Container(
           margin:
               const EdgeInsets.only(left: 15, right: 15, bottom: 30, top: 10),

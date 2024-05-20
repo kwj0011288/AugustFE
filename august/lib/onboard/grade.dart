@@ -400,7 +400,10 @@ class _GradePageState extends State<GradePage> {
                                   ],
                                 )
                               : GestureDetector(
-                                  onTap: _saveAndClose,
+                                  onTap: () {
+                                    _saveAndClose();
+                                    HapticFeedback.mediumImpact();
+                                  },
                                   child: Container(
                                     padding:
                                         EdgeInsets.symmetric(horizontal: 30),

@@ -224,7 +224,7 @@ class _HomePageState extends State<HomePage> {
               userDetails.institution?.nickname ?? 'Unknown',
           'department_fullname': userDetails.department?.fullName ?? 'Unknown',
           'department_nickname': userDetails.department?.nickname ?? 'Unknown',
-          'profileImage': userDetails.profileImage,
+          'contactPhoto': userDetails.profileImage,
           'yearInSchool': displayGrade, // 여기서 사용
           'dateJoined': userDetails.dateJoined,
         };

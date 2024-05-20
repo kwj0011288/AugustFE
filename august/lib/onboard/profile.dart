@@ -515,7 +515,10 @@ class _NamePageState extends State<NamePage> {
                                     ),
                                   )
                                 : GestureDetector(
-                                    onTap: _saveAndClose,
+                                    onTap: () {
+                                      _saveAndClose();
+                                      HapticFeedback.mediumImpact();
+                                    },
                                     child: Container(
                                       padding:
                                           EdgeInsets.symmetric(horizontal: 30),
