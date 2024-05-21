@@ -86,12 +86,14 @@ class _UnivPageState extends State<UnivPage> {
 
 // 'Done' 버튼이 클릭될 때 _saveInfo 호출
   Future<void> _saveAndClose() async {
-    _saveInfo();
+    checkAccessToken();
+    await _saveInfo();
     Map<String, dynamic> userInfo = {
       'fullname': _selectedSchoolFullname,
       'nickname': _selectedSchoolNickname,
       'id': _selectedSchoolIndex, // 사용자 정보에 id를 추가합니다.
     };
+    widget.onboard ? null : Navigator.pop(context, userInfo);
     int? userPk = await fetchUserPk();
 
     if (userPk == null) {
@@ -109,7 +111,6 @@ class _UnivPageState extends State<UnivPage> {
     }
 
     // 바로 다음 화면으로 넘어가거나 현재 화면을 닫음
-    widget.onboard ? null : Navigator.pop(context, userInfo);
   }
 
   void _onSchoolChanged(String? value) {

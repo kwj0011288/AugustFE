@@ -78,7 +78,8 @@ class _GradePageState extends State<GradePage> {
 
 // 'Done' 버튼이 클릭될 때 _saveInfo 호출
   Future<void> _saveAndClose() async {
-    _saveInfo();
+    checkAccessToken();
+    await _saveInfo();
     Map<String, dynamic> userInfo = {
       'grade': _selectGrade,
     };
@@ -100,6 +101,7 @@ class _GradePageState extends State<GradePage> {
       default:
         _sendGrade = ''; // 기본값 또는 오류 처리
     }
+    widget.onboard ? null : Navigator.pop(context, userInfo);
 
     int? userPk = await fetchUserPk();
 
@@ -116,8 +118,6 @@ class _GradePageState extends State<GradePage> {
         print('Failed to update Grade: $error');
       });
     }
-
-    widget.onboard ? null : Navigator.pop(context, userInfo);
   }
 
   void _oneGradeChanged(String? value) {

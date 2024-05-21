@@ -52,14 +52,13 @@ class _InitialPageState extends State<InitialPage> {
       final String? idToken = googleAuth?.idToken;
 
       if (googleUser == null || accessToken == null || idToken == null) {
-        print('Google 로그인이 사용자에 의해 취소되었거나 ID 토큰을 받아오는 데 실패했습니다.');
+        print(
+            'Google login was cancelled by the user or failed to receive ID token.');
         return;
       }
 
-      // 서버에 보내는 정보 출력
       String requestBody =
           jsonEncode({'access_token': accessToken, 'id_token': idToken});
-
       final response = await http.post(
         Uri.parse('http://augustapp.one/users/google/login/callback/'),
         headers: {'Content-Type': 'application/json'},
@@ -70,26 +69,25 @@ class _InitialPageState extends State<InitialPage> {
         final responseData = jsonDecode(response.body);
         final newAccessToken = responseData['access'];
         final newRefreshToken = responseData['refresh'];
-        final userPk = responseData['user']['id']; // 사용자 PK 추출
+        final userPk = responseData['user']['id']; // Extract user PK
 
-        // 토큰과 사용자 PK 저장
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('accessToken', newAccessToken);
         await prefs.setString('refreshToken', newRefreshToken);
-        await prefs.setInt(
-            'userPk', userPk); // SharedPreferences에는 setInt 메서드 사용
-        // 로그인 성공 후 페이지 전환 또는 다음 단계로 이동
+        await prefs.setInt('userPk', userPk);
+
+        startTokenRefreshTimer(); // Start token refresh timer after successful login
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (context) => HomePage(
                     departments: widget.departments,
                     preloadedSemesters: widget.preloadedSemesters,
-                  )), // 예시 페이지로 교체
+                  )),
         );
       } else {
         print('Server error: ${response.body}');
-        // 오류 처리, 팝업 띄우기
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -110,7 +108,6 @@ class _InitialPageState extends State<InitialPage> {
       }
     } catch (error) {
       print('Error logging in with Google: $error');
-      // 여기에도 팝업 띄우는 코드를 추가할 수 있습니다.
     }
   }
 

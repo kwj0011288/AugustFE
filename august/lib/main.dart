@@ -19,6 +19,7 @@ import 'get_api/class_grouping.dart';
 import 'get_api/get_semester.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:async';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,6 +33,7 @@ void main() async {
   String? email;
 
   if (isOnline) {
+    await checkAccessToken();
     // 앱 시작 시 항상 refreshToken을 사용하여 accessToken 갱신 시도
     await refreshToken();
     preloadedSemesters = await fetchAllSemesters();
@@ -45,10 +47,6 @@ void main() async {
     departments = ["Error"];
     email = "Error";
   }
-
-  // TimerService().startTimer(() {
-  //   autoRefreshToken();
-  // });
 
   // 앱 실행
   runApp(MyApp(

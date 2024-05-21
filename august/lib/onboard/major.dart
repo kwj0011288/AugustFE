@@ -81,9 +81,11 @@ class _MajorPageState extends State<MajorPage> {
   }
 
   Future<void> _saveAndClose() async {
+    checkAccessToken();
     _saveInfo();
     Map<String, dynamic> userInfo = {'major': _selectedMajorNickname};
 
+    widget.onboard ? null : Navigator.pop(context, userInfo);
     int? userPk = await fetchUserPk();
 
     if (userPk == null) {
@@ -100,9 +102,6 @@ class _MajorPageState extends State<MajorPage> {
       }).catchError((error) {
         print('Failed to update department: $error');
       });
-
-      // 사용자에게 다음 화면으로 진행하도록 허용
-      widget.onboard ? null : Navigator.pop(context, userInfo);
     } else {
       print('Invalid or missing major index');
       // 오류 처리 로직

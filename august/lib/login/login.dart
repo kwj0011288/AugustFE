@@ -43,6 +43,36 @@ Future<bool> checkLoginStatus() async {
   }
 }
 
+// Future<bool> refreshToken() async {
+//   final prefs = await SharedPreferences.getInstance();
+//   final refreshToken = prefs.getString('refreshToken');
+//   if (refreshToken == null) {
+//     print('No refresh token found');
+//     return false;
+//   }
+
+//   final response = await http.post(
+//     Uri.parse('http://augustapp.one/dj-rest-auth/token/refresh/'),
+//     headers: {'Content-Type': 'application/json'},
+//     body: jsonEncode({'refresh': refreshToken}),
+//   );
+
+//   if (response.statusCode == 200) {
+//     final responseData = jsonDecode(response.body);
+//     final newAccessToken = responseData['access'];
+//     // 서버에서 새로운 refreshToken을 반환하지 않는 경우 대비
+//     final newRefreshToken = responseData['refresh'] ?? refreshToken;
+
+//     await prefs.setString('accessToken', newAccessToken);
+//     await prefs.setString('refreshToken', newRefreshToken);
+//     print('Token refreshed successfully');
+//     return true;
+//   } else {
+//     print('Failed to refresh token');
+//     return false;
+//   }
+// }
+
 Future<bool> refreshToken() async {
   final prefs = await SharedPreferences.getInstance();
   final refreshToken = prefs.getString('refreshToken');
@@ -60,15 +90,47 @@ Future<bool> refreshToken() async {
   if (response.statusCode == 200) {
     final responseData = jsonDecode(response.body);
     final newAccessToken = responseData['access'];
-    // 서버에서 새로운 refreshToken을 반환하지 않는 경우 대비
-    final newRefreshToken = responseData['refresh'] ?? refreshToken;
+    final newRefreshToken = responseData['refresh'] ??
+        refreshToken; // Fallback to old refreshToken if not provided
 
     await prefs.setString('accessToken', newAccessToken);
     await prefs.setString('refreshToken', newRefreshToken);
     print('Token refreshed successfully');
     return true;
   } else {
-    print('Failed to refresh token');
+    print('Failed to refresh token, Status code: ${response.statusCode}');
+    return false;
+  }
+}
+
+Future<bool> checkAccessToken() async {
+  final prefs = await SharedPreferences.getInstance();
+  final accessToken = prefs.getString('accessToken');
+  if (accessToken == null) {
+    print('No access token found, attempting to refresh...');
+    return await refreshToken();
+  }
+
+  // Perform a test API call that requires authentication
+  final testResponse = await http.get(
+    Uri.parse(
+        'http://augustapp.one/dj-rest-auth/user/'), // Adjust the URL to your needs
+    headers: {
+      'Authorization': 'Bearer $accessToken',
+      'Content-Type': 'application/json',
+    },
+  );
+
+  if (testResponse.statusCode == 200) {
+    print('Access token is valid.');
+    return true;
+  } else if (testResponse.statusCode == 401) {
+    // If the token is expired or invalid, attempt to refresh it
+    print('Access token expired or invalid, attempting to refresh...');
+    return await refreshToken();
+  } else {
+    print(
+        'Failed to validate access token, Status code: ${testResponse.statusCode}');
     return false;
   }
 }
@@ -524,12 +586,13 @@ void startTokenRefreshTimer() {
       if (!refreshedSuccessfully) {
         // 토큰 갱신 실패 처리, 예를 들어 로그아웃
         logoutUser();
-        print('Token refresh failed.'); // Add this line
+
+        print('Token refresh failed.');
       } else {
-        print('Token refresh successful.'); // Add this line
+        print('Token refresh successful.');
       }
     }
-  }, interval: Duration(minutes: 15)); // 15분마다 토큰 갱신 시도
+  }, interval: Duration(minutes: 5)); // Adjusted to 5 minutes
 }
 
 Future<bool> checkIfRefreshTokenNeeded() async {

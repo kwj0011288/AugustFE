@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'package:august/components/button.dart';
@@ -8,6 +9,7 @@ import 'package:august/get_api/get_timetables.dart';
 import 'package:august/get_api/schedule.dart';
 import 'package:august/get_api/send_timetable.dart';
 import 'package:august/get_api/set_timetable_name.dart';
+import 'package:august/login/login.dart';
 import 'package:http/http.dart' as http;
 import 'package:august/onboard/profile.dart';
 import 'package:august/onboard/semester.dart';
@@ -72,6 +74,7 @@ class _SchedulePageState extends State<SchedulePage>
       PageController(viewportFraction: 0.8, keepPage: true);
   bool loadDone = false;
   bool isLoading = true;
+  Timer? _timer;
 
   void createScheduler(BuildContext context) {
     setState(() {
@@ -135,34 +138,41 @@ class _SchedulePageState extends State<SchedulePage>
   void initState() {
     super.initState();
     isLoading = true;
-    Future.delayed(Duration.zero, () async {
-      await loadSemesterInfo();
-      await loadProfilePhoto();
-      _listenForPhotoChanges();
-      await initializePage(); // 모든 초기화 작업이 완료되면...
-      if (mounted) {
-        setState(() {
-          isLoading = false; // 로드 완료
-        });
-      }
-    });
-    //   loadSemesterInfo();
-    //   loadProfilePhoto();
-    //   _listenForPhotoChanges();
-    //  initializePage();
+
     _dotIndicatorScrollController = ScrollController();
     _pageController = PageController();
-    // 이거
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
 
+    Future.delayed(Duration.zero, () async {
+      try {
+        await loadSemesterInfo();
+        await loadProfilePhoto();
+        _listenForPhotoChanges();
+        await initializePage();
+
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+          });
+        }
+      } catch (error) {
+        if (mounted) {
+          setState(() {
+            isLoading =
+                false; // Set loading false even on error to avoid endless loading
+          });
+        }
+        // Handle errors, perhaps log them or show a message
+      }
+    });
     if (widget.semester.isNotEmpty) {
       selectedValue = widget.semester;
     }
 
     //애니메이션
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 500),
-      vsync: this,
-    );
 
     _timetableCollection = widget.selectedCoursesData
         .map((courseList) => TimeTables(
@@ -177,6 +187,16 @@ class _SchedulePageState extends State<SchedulePage>
         profilePhoto = photoNotifier.photo;
       });
     }
+  }
+
+  @override
+  void dispose() {
+    _dotIndicatorScrollController.dispose();
+    _pageController.dispose();
+    _animationController.dispose();
+
+    // Unsubscribe or detach other listeners if any
+    super.dispose();
   }
 
   void _listenForPhotoChanges() {
@@ -513,7 +533,7 @@ class _SchedulePageState extends State<SchedulePage>
                   padding: EdgeInsets.all(15),
                   onSubmitted: (value) {
                     // 'Done' 버튼을 눌렀을 때의 동작
-
+                    checkAccessToken();
                     HapticFeedback.mediumImpact();
                     Navigator.of(context).pop(value);
                   },
@@ -986,6 +1006,7 @@ class _SchedulePageState extends State<SchedulePage>
                                                   ),
                                                   child: IconButton(
                                                     onPressed: () {
+                                                      checkAccessToken();
                                                       showDialog(
                                                         context: context,
                                                         builder: (BuildContext
@@ -1304,6 +1325,7 @@ class _SchedulePageState extends State<SchedulePage>
                                                     if (currentIndex <
                                                         _timetableCollection
                                                             .length) {
+                                                      checkAccessToken();
                                                       HapticFeedback
                                                           .mediumImpact();
                                                       setState(() {
@@ -1354,6 +1376,7 @@ class _SchedulePageState extends State<SchedulePage>
                                                     if (currentIndex <
                                                         _timetableCollection
                                                             .length) {
+                                                      checkAccessToken();
                                                       HapticFeedback
                                                           .mediumImpact();
                                                       Navigator.push(
@@ -1395,6 +1418,7 @@ class _SchedulePageState extends State<SchedulePage>
                                                     if (currentIndex <
                                                         _timetableCollection
                                                             .length) {
+                                                      checkAccessToken();
                                                       HapticFeedback
                                                           .mediumImpact();
 

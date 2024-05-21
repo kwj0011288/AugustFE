@@ -287,6 +287,7 @@ class _HomePageState extends State<HomePage> {
           duration: Duration(seconds: 1), // 페이드 인 지속 시간
           child: BottomBar(
             onIndexChanged: (index) {
+              checkAccessToken();
               setState(() {
                 _currentIndex = index;
               });

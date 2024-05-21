@@ -169,8 +169,22 @@ class _NamePageState extends State<NamePage> {
   }
 
   void _saveAndClose() async {
+    checkAccessToken();
     // 사용자 정보 업데이트 작업을 시작하지만 완료를 기다리지 않음
-    _saveInfo(); // 비동기로 저장 작업 시작
+    await _saveInfo(); // 비동기로 저장 작업 시작
+
+    String base64Image = '';
+    if (contactPhoto != null) {
+      base64Image = base64Encode(contactPhoto!);
+    }
+
+    Map<String, dynamic> userInfo = {
+      'name': _nameController.text,
+      'photo': base64Image,
+    };
+    // 업데이트 작업을 기다리지 않고 바로 화면 전환
+    widget.onboard ? null : Navigator.pop(context, userInfo);
+
     Provider.of<ProfilePhotoNotifier>(context, listen: false)
         .updatePhoto(contactPhoto);
     // Once the save process is complete, notify the parent widget.
@@ -190,17 +204,6 @@ class _NamePageState extends State<NamePage> {
         updatePhoto(userPk, file); // 비동기로 사진 업데이트 시작
       }
     }
-    String base64Image = '';
-    if (contactPhoto != null) {
-      base64Image = base64Encode(contactPhoto!);
-    }
-
-    Map<String, dynamic> userInfo = {
-      'name': _nameController.text,
-      'photo': base64Image,
-    };
-    // 업데이트 작업을 기다리지 않고 바로 화면 전환
-    widget.onboard ? null : Navigator.pop(context, userInfo);
   }
 
   @override

@@ -501,28 +501,30 @@ class __GradeCalcPageState extends State<GradeCalcPage>
   }
 
   String getLetterGrade(double grade) {
-    if (grade >= 90) {
+    if (grade >= 96) {
       return 'A+';
-    } else if (grade >= 85) {
+    } else if (grade >= 93) {
       return 'A';
-    } else if (grade >= 80) {
+    } else if (grade >= 90) {
       return 'A-';
-    } else if (grade >= 75) {
+    } else if (grade >= 87) {
       return 'B+';
-    } else if (grade >= 70) {
+    } else if (grade >= 83) {
       return 'B';
-    } else if (grade >= 65) {
+    } else if (grade >= 80) {
       return 'B-';
-    } else if (grade >= 60) {
+    } else if (grade >= 76) {
       return 'C+';
-    } else if (grade >= 55) {
+    } else if (grade >= 73) {
       return 'C';
-    } else if (grade >= 50) {
+    } else if (grade >= 70) {
       return 'C-';
-    } else if (grade >= 45) {
+    } else if (grade >= 66) {
       return 'D+';
-    } else if (grade >= 40) {
+    } else if (grade >= 63) {
       return 'D';
+    } else if (grade >= 60) {
+      return 'D-';
     } else {
       return 'F';
     }

@@ -1,6 +1,7 @@
 import 'package:august/components/button.dart';
 import 'package:august/components/courseprovider.dart';
 import 'package:august/get_api/get_semester.dart';
+import 'package:august/login/login.dart';
 import 'package:august/pages/homepage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -93,6 +94,7 @@ class _SemesterPageState extends State<SemesterPage> {
   }
 
   void _saveAndClose() {
+    checkAccessToken();
     _saveInfo();
     Map<String, dynamic> userInfo = {
       'semester': _selectSemester, // Use _selectSemester here

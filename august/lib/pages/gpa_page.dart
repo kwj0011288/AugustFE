@@ -236,18 +236,30 @@ class _GPAPageState extends State<GPAPage> {
   // Convert letter grades to numeric values
   double gradeToNumber(String letterGrade) {
     switch (letterGrade) {
+      case 'A+':
+        return 4.0;
       case 'A':
         return 4.0;
+      case 'A-':
+        return 3.7;
       case 'B+':
-        return 3.5;
+        return 3.3;
       case 'B':
         return 3.0;
+      case 'B-':
+        return 2.7;
       case 'C+':
-        return 2.5;
+        return 2.3;
       case 'C':
         return 2.0;
+      case 'C-':
+        return 1.7;
+      case 'D+':
+        return 1.3;
       case 'D':
         return 1.0;
+      case 'D-':
+        return 0.7;
       case 'F':
         return 0.0;
       default:
@@ -261,9 +273,11 @@ class _GPAPageState extends State<GPAPage> {
     int totalCredits = 0;
 
     for (Course course in courses) {
-      double courseGrade = gradeToNumber(course.letterGrade);
-      totalPoints += courseGrade * course.credits;
-      totalCredits += course.credits;
+      if (course.letterGrade != '??') {
+        double courseGrade = gradeToNumber(course.letterGrade);
+        totalPoints += courseGrade * course.credits;
+        totalCredits += course.credits;
+      }
     }
 
     if (totalCredits != 0) {
