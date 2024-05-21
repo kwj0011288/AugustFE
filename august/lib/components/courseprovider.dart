@@ -32,7 +32,12 @@ class CoursesProvider with ChangeNotifier {
 
 /* -------------------------only for editing page--------------------------- */
   List<ScheduleList> _courses = [];
+  List<ScheduleList> _addedCourseList = [];
+  List<int> _removedCourseList = [];
+
   List<ScheduleList> get courses => _courses;
+  List<ScheduleList> get addedCourseList => _addedCourseList;
+  List<int> get removedCourseList => _removedCourseList;
 
   void addCourseToCurrentTimetableforEditPage(ScheduleList course) {
     _courses.add(course);
@@ -48,6 +53,16 @@ class CoursesProvider with ChangeNotifier {
     _courses.removeWhere((course) => course.id == courseId);
     notifyListeners();
     // Optionally save the updated list to local storage or server
+  }
+
+  void additionalCourseforEditPage(ScheduleList course) {
+    _addedCourseList.add(course);
+    notifyListeners(); // Notifies listeners about the change.
+  }
+
+  void RemovedCourseforEditPage(int courseId) {
+    _removedCourseList.add(courseId);
+    notifyListeners(); // Notifies listeners about the change.
   }
 
 /* ---------------------below is for any other thing------------------------ */

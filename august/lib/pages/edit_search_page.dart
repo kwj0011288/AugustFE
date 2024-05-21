@@ -64,20 +64,11 @@ class _EditSearchPageState extends State<EditSearchPage>
     // Convert the selected course to a ScheduleList object
     ScheduleList newSchedule = convertCourseListToScheduleList(course);
 
-    // Print the details of the selected course
-    print("Selected course details: ${jsonEncode(newSchedule.toJson())}");
-
-    // Check if the course is already added, if not, add it
-    var currentCourses = widget.addedCoursesNotifier.value;
-    if (!currentCourses.contains(newSchedule)) {
-      currentCourses.add(newSchedule);
-      widget.addedCoursesNotifier.value =
-          List.from(currentCourses); // Update with the new list
-      widget.addedCoursesNotifier
-          .notifyListeners(); // Notify listeners of the change
-    }
     Provider.of<CoursesProvider>(context, listen: false)
         .addCourseToCurrentTimetableforEditPage(newSchedule);
+
+    Provider.of<CoursesProvider>(context, listen: false)
+        .additionalCourseforEditPage(newSchedule);
 
     widget.onCourseSelected(newSchedule);
     // Go back to the previous screen after selection
@@ -485,7 +476,6 @@ class _EditSearchPageState extends State<EditSearchPage>
                                   index: courseIndex,
                                   onPressed: (context) {
                                     _handleCourseSelection(course);
-
                                     //    addToGroup(context, section, course);
                                     // Navigator.pop(context);
                                   },

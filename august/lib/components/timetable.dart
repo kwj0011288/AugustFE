@@ -9,11 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../const/course_color.dart';
-import '../const/group_color.dart';
-import '../const/tile_color.dart';
-import '../get_api/class.dart';
-import '../pages/select_page.dart';
-import '../pages/wizard_page.dart';
+
 import 'button.dart';
 import 'courseprovider.dart';
 import 'package:card_swiper/card_swiper.dart';
@@ -166,7 +162,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
   void initState() {
     super.initState();
 
-    if (widget.courses.isEmpty) {
+    if (widget.courses.isEmpty || widget.forceFixedTimeRange) {
       earliestStartTime = Duration(hours: 7);
       latestEndTime = Duration(hours: 22);
     } else {
@@ -665,6 +661,10 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                             listen: false)
                                         .removeCourseFromTimetableforEditingPage(
                                             schedule.id!);
+                                    Provider.of<CoursesProvider>(context,
+                                            listen: false)
+                                        .RemovedCourseforEditPage(schedule.id!);
+
                                     Navigator.of(context).pop();
                                   } else {
                                     print('Error : course id is null');

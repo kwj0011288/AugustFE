@@ -65,6 +65,19 @@ class _EditPageState extends State<EditPage> {
     }
   }
 
+  Future<void> sendAddedOrRemovedCourse() async {
+    //added list
+    final provider = Provider.of<CoursesProvider>(context, listen: false);
+
+    List<int?> addedCourseIds =
+        provider.addedCourseList.map((course) => course.id).toList();
+
+    List<int?> removedCourseIds = provider.removedCourseList;
+    print("removed list $removedCourseIds");
+    print("added list $addedCourseIds");
+    //write a function to send the added or removed course to the server
+  }
+
   @override
   void initState() {
     super.initState();
@@ -317,14 +330,11 @@ class _EditPageState extends State<EditPage> {
               minChildSize: 1,
               builder: (BuildContext context,
                   ScrollController sheetScrollController) {
-                return GestureDetector(
-                    onTap:
-                        () {}, // Prevent the inner tap event from propagating to the outer GestureDetector
-                    child: EditSearchPage(
-                      addedCoursesNotifier: widget.addedCoursesNotifier!,
-                      semester: widget.semester,
-                      onCourseSelected: _onCourseSelected,
-                    ));
+                return EditSearchPage(
+                  addedCoursesNotifier: widget.addedCoursesNotifier!,
+                  semester: widget.semester,
+                  onCourseSelected: _onCourseSelected,
+                );
               },
             ),
           ),
