@@ -152,7 +152,6 @@ class _SchedulePageState extends State<SchedulePage>
         await loadProfilePhoto();
         _listenForPhotoChanges();
         await initializePage();
-
         if (mounted) {
           setState(() {
             isLoading = false;
@@ -161,13 +160,12 @@ class _SchedulePageState extends State<SchedulePage>
       } catch (error) {
         if (mounted) {
           setState(() {
-            isLoading =
-                false; // Set loading false even on error to avoid endless loading
+            isLoading = false;
           });
         }
-        // Handle errors, perhaps log them or show a message
       }
     });
+
     if (widget.semester.isNotEmpty) {
       selectedValue = widget.semester;
     }
@@ -182,7 +180,7 @@ class _SchedulePageState extends State<SchedulePage>
         .toList();
     final photoNotifier =
         Provider.of<ProfilePhotoNotifier>(context, listen: false);
-    if (photoNotifier.photo != null) {
+    if (photoNotifier.photo != null && mounted) {
       setState(() {
         profilePhoto = photoNotifier.photo;
       });
@@ -191,11 +189,10 @@ class _SchedulePageState extends State<SchedulePage>
 
   @override
   void dispose() {
+    _timer?.cancel(); // Cancel the timer if it is active
     _dotIndicatorScrollController.dispose();
     _pageController.dispose();
     _animationController.dispose();
-
-    // Unsubscribe or detach other listeners if any
     super.dispose();
   }
 
@@ -203,9 +200,11 @@ class _SchedulePageState extends State<SchedulePage>
     final photoNotifier =
         Provider.of<ProfilePhotoNotifier>(context, listen: false);
     photoNotifier.addListener(() {
-      setState(() {
-        profilePhoto = photoNotifier.photo;
-      });
+      if (mounted) {
+        setState(() {
+          profilePhoto = photoNotifier.photo;
+        });
+      }
     });
   }
 
@@ -291,18 +290,6 @@ class _SchedulePageState extends State<SchedulePage>
   Future<void> saveTimetableToLocalStorage() async {
     try {
       if (_timetableCollection.isNotEmpty) {
-        List<ScheduleList> firstTimetableCourses =
-            _timetableCollection[0].coursesData[0];
-        int totalCredits = getTotalCredits(firstTimetableCourses);
-
-        // Save the total credits along with the courses
-        Map<String, dynamic> firstTimetableData = {
-          'courses': firstTimetableCourses
-              .map((scheduleItem) => scheduleItem.toJson())
-              .toList(),
-          'totalCredits': totalCredits,
-        };
-
         List<List<Map<String, dynamic>>> coursesDataMapList =
             _timetableCollection
                 .map((timeTable) => timeTable.coursesData[0]

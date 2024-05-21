@@ -54,12 +54,12 @@ class _EditPageState extends State<EditPage> {
             .map((scheduleItem) => ScheduleList.fromJson(scheduleItem))
             .toList();
 
-        // Update the _courses list with the newly loaded courses
-        _courses =
-            courses; // This will replace the existing _courses list with new data
-        // If you want to append the data instead of replacing, use _courses.addAll(courses);
+        // Use Provider to update the courses in the provider
+        Provider.of<CoursesProvider>(context, listen: false)
+            .setCoursesforEditingPage(courses);
+
         print(
-            "course Info ${_courses.map((course) => course.toJson()).toList()}");
+            "course Info ${courses.map((course) => course.toJson()).toList()}");
         setState(() {}); // Call setState to update the UI if necessary
       }
     }
@@ -75,96 +75,15 @@ class _EditPageState extends State<EditPage> {
     print("Listener added to addedCoursesNotifier");
   }
 
-  Future<void> _updateCoursesFromLocalStorage(int index) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? jsonString = prefs.getString('timetable');
-
-    if (jsonString != null) {
-      List<dynamic> coursesDataMapList = jsonDecode(jsonString);
-      if (index >= 0 && index < coursesDataMapList.length) {
-        dynamic courseDataMap = coursesDataMapList[index];
-
-        if (courseDataMap is Map && courseDataMap.containsKey('courses')) {
-          List<dynamic> courseData = courseDataMap['courses'];
-
-          // Parsing and converting the data into List<ScheduleList>
-          List<ScheduleList> courses = (courseData as List)
-              .map((scheduleItem) => ScheduleList.fromJson(scheduleItem))
-              .toList();
-
-          // Update the specific index in _courses list
-          if (index < _courses.length) {
-            setState(() {
-              _courses[index] =
-                  courses[0]; // Replace data at index with new courses
-            });
-          } else {
-            // Handle the case where the index is out of range
-            print("Error: Index out of range");
-          }
-
-          print(
-              "Courses updated from local storage: ${_courses.map((course) => course.toJson()).toList()}");
-        } else {
-          print("Error: 'courses' key not found in timetable data");
-        }
-      } else {
-        // Handle the case where the index is out of range
-        print("Error: Index out of range");
-      }
-    }
-  }
-
-  Future<void> saveTimetableToLocalStorage(
-      List<List<ScheduleList>> newTimetable) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    // Load existing timetables from local storage
-    String? serializedExistingTimetables = prefs.getString('timetable');
-    List<Map<String, dynamic>> existingTimetables = [];
-
-    if (serializedExistingTimetables != null) {
-      List<dynamic> deserializedExistingTimetables =
-          jsonDecode(serializedExistingTimetables);
-      existingTimetables = deserializedExistingTimetables
-          .toList()
-          .map((timetableData) => timetableData as Map<String, dynamic>)
-          .toList();
-    }
-
-    // Ensure newTimetable is not empty before accessing its first element
-    if (newTimetable.isNotEmpty) {
-      // Process the new timetable
-      Map<String, dynamic> newTimetableData = {
-        'courses': newTimetable[0].map((course) => course.toJson()).toList(),
-      };
-
-      // Replace the timetable at index 0 with newTimetableData, if it exists
-      if (existingTimetables.isNotEmpty) {
-        existingTimetables[0] = newTimetableData;
-      } else {
-        // If no existing timetable, just add the new timetable
-        existingTimetables.add(newTimetableData);
-      }
-    } else {
-      print("Error: newTimetable is empty");
-      // Handle the error as appropriate
-    }
-
-    // Save the updated list of timetables to local storage
-    String serializedAllTimetables = jsonEncode(existingTimetables);
-    await prefs.setString('timetable', serializedAllTimetables);
-    print("Timetables saved successfully");
-  }
-//
-//
-//
-
   void _onCourseSelected(ScheduleList newCourse) {
     // Add the selected course to the _courses list
     setState(() {
       _courses.add(newCourse);
     });
+
+    var provider = Provider.of<CoursesProvider>(context, listen: false);
+    provider.addCourseToCurrentTimetable(newCourse);
+    print("Success: Course added to current timetable");
   }
 
   void _onCoursesAdded() {
@@ -185,8 +104,6 @@ class _EditPageState extends State<EditPage> {
 
   @override
   Widget build(BuildContext context) {
-    print(
-        "Building UI with courses: ${_courses.map((c) => c.toJson()).toList()}");
     var provider = Provider.of<CoursesProvider>(context);
     return Scaffold(
       extendBody: true,
@@ -239,8 +156,6 @@ class _EditPageState extends State<EditPage> {
                         List.from(provider.selectedCoursesData);
                     // await saveTimetableToLocalStorage(
                     //     copiedCoursesData, widget.semester);
-
-                    _updateCoursesFromLocalStorage(widget.index ?? -1);
 
                     Navigator.push(
                       context,
@@ -299,7 +214,7 @@ class _EditPageState extends State<EditPage> {
                   child: Consumer<CoursesProvider>(
                     builder: (context, provider, child) {
                       return SingleTimetable(
-                        courses: _courses,
+                        courses: provider.courses,
                         index: widget.index ?? -1,
                         showEditButton: true,
                         forceFixedTimeRange: true,

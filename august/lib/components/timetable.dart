@@ -660,6 +660,11 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                             listen: false)
                                         .removeCourse(
                                             widget.index, schedule.id!);
+
+                                    Provider.of<CoursesProvider>(context,
+                                            listen: false)
+                                        .removeCourseFromTimetableforEditingPage(
+                                            schedule.id!);
                                     Navigator.of(context).pop();
                                   } else {
                                     print('Error : course id is null');

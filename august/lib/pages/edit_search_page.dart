@@ -76,6 +76,9 @@ class _EditSearchPageState extends State<EditSearchPage>
       widget.addedCoursesNotifier
           .notifyListeners(); // Notify listeners of the change
     }
+    Provider.of<CoursesProvider>(context, listen: false)
+        .addCourseToCurrentTimetableforEditPage(newSchedule);
+
     widget.onCourseSelected(newSchedule);
     // Go back to the previous screen after selection
     Navigator.pop(context);
@@ -482,6 +485,7 @@ class _EditSearchPageState extends State<EditSearchPage>
                                   index: courseIndex,
                                   onPressed: (context) {
                                     _handleCourseSelection(course);
+
                                     //    addToGroup(context, section, course);
                                     // Navigator.pop(context);
                                   },

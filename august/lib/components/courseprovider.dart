@@ -30,6 +30,28 @@ class CoursesProvider with ChangeNotifier {
   var boxColor = CourseColor;
   int currentColorIndex = 0;
 
+/* -------------------------only for editing page--------------------------- */
+  List<ScheduleList> _courses = [];
+  List<ScheduleList> get courses => _courses;
+
+  void addCourseToCurrentTimetableforEditPage(ScheduleList course) {
+    _courses.add(course);
+    notifyListeners(); // Notifies listeners about the change.
+  }
+
+  void setCoursesforEditingPage(List<ScheduleList> newCourses) {
+    _courses = newCourses;
+    notifyListeners(); // Notifies listeners about the update.
+  }
+
+  void removeCourseFromTimetableforEditingPage(int courseId) {
+    _courses.removeWhere((course) => course.id == courseId);
+    notifyListeners();
+    // Optionally save the updated list to local storage or server
+  }
+
+/* ---------------------below is for any other thing------------------------ */
+
   int get currentPageIndex {
     // _selectedCoursesData가 비어 있지 않은 경우에만 currentPageIndex 반환
     if (_selectedCoursesData.isNotEmpty) {
