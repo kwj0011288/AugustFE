@@ -8,13 +8,10 @@ import 'package:august/get_api/edit_timetable.dart';
 import 'package:august/get_api/get_semester.dart';
 import 'package:august/get_api/get_timetables.dart';
 import 'package:august/get_api/schedule.dart';
-import 'package:august/get_api/send_timetable.dart';
 import 'package:august/get_api/set_timetable_name.dart';
 import 'package:august/login/login.dart';
-import 'package:http/http.dart' as http;
 import 'package:august/onboard/profile.dart';
 import 'package:august/onboard/semester.dart';
-import 'package:august/pages/generate.dart';
 import 'package:august/pages/gpa_page.dart';
 import 'package:august/pages/homepage.dart';
 import 'package:august/pages/search_page.dart';
@@ -78,24 +75,16 @@ class _SchedulePageState extends State<SchedulePage>
   Timer? _timer;
   List<int> timetableOrder = [];
   int serverIndex = 0;
+
   void createScheduler(BuildContext context) {
     setState(() {
-      // Ensure there's at least one element in selectedCoursesData before accessing
-      if (widget.selectedCoursesData.isNotEmpty) {
-        var courseData =
-            widget.selectedCoursesData[0]; // Accessing the first element safely
+      var courseData =
+          widget.selectedCoursesData[0]; // Accessing the first element safely
 
-        _timetableCollection.add(TimeTables(
-            coursesData: [courseData], pageController: _pageController));
-
-        // It seems you're trying to add the same courseData back to selectedCoursesData?
-        // This will just duplicate the entry. Ensure this is intended.
-        widget.selectedCoursesData.add(courseData);
-        saveTimetableToLocalStorage(); // Saving timetable
-      } else {
-        // Handle the case when selectedCoursesData is empty
-        // Maybe show an error message or a prompt to select a course first.
-      }
+      _timetableCollection.add(TimeTables(
+          coursesData: [courseData], pageController: _pageController));
+      widget.selectedCoursesData.add(courseData);
+      saveTimetableToLocalStorage(); // Saving timetable
     });
   }
 
@@ -644,23 +633,6 @@ class _SchedulePageState extends State<SchedulePage>
                             builder: (context, currentIndexProvider, child) {
                               int currentIndex =
                                   currentIndexProvider.currentIndex;
-/* 
-  final String timetableName =
-                                  _timetableCollection[currentIndex].name! ??
-                                      "Schedule";
-
-                              String displayedName;
-                              if (timetableName == "Schedule") {
-                                // Include index only when the name is "Schedule"
-                                displayedName =
-                                    "$timetableName ${currentIndex + 1}";
-                              } else {
-                                // Truncate the name if it's longer than 15 characters and don't include the index
-                                displayedName = timetableName.length > 15
-                                    ? '${timetableName.substring(0, 12)}...'
-                                    : timetableName;
-                              }
-*/
                               return Row(
                                 children: [
                                   GestureDetector(
@@ -856,32 +828,8 @@ class _SchedulePageState extends State<SchedulePage>
                         ),
                       ),
                     ),
-
-                    // Padding(
-                    //   padding: const EdgeInsets.only(right: 10, top: 15),
-                    //   child: Container(
-                    //     width: 120.0, // 원하는 크기 설정
-                    //     height: 50.0, // 원하는 크기 설정
-                    //     decoration: BoxDecoration(
-                    //         color: Theme.of(context).colorScheme.primary,
-                    //         borderRadius: BorderRadius.circular(30)),
-                    //     child: Center(
-                    //         child: TextButton(
-                    //       child: Text(
-                    //         'Feedback',
-                    //         style: TextStyle(
-                    //             color: Theme.of(context).colorScheme.outline,
-                    //             fontSize: 20,
-                    //             fontWeight: FontWeight.bold),
-                    //       ),
-                    //       onPressed: _launchURL,
-                    //     )),
-                    //   ),
-                    // ),
                   ],
                 ),
-                //    SizedBox(height: 20),
-
                 Expanded(
                   child: Stack(
                     children: [
@@ -906,7 +854,6 @@ class _SchedulePageState extends State<SchedulePage>
                             currentCourses.forEach((course) {
                               //print('Course ID: ${course.id}');
                             });
-                            print('-------');
                           }
                           if (value >= 7 &&
                               value < _timetableCollection.length) {
@@ -1226,55 +1173,7 @@ class _SchedulePageState extends State<SchedulePage>
                                     padding: const EdgeInsets.only(top: 7),
                                     child: Row(
                                       children: [
-                                        // Padding(
-                                        //   padding:
-                                        //       const EdgeInsets.only(left: 15),
-                                        //   child: GestureDetector(
-                                        //     onTap: () =>
-                                        //         _editTimetableName(index),
-                                        //     child: Row(
-                                        //       children: [
-                                        //         Row(
-                                        //           children: [
-                                        //             // if (index == 0)
-                                        //             //   Icon(
-                                        //             //     FeatherIcons.home,
-                                        //             //     size: 20,
-                                        //             //   ),
-                                        //             // SizedBox(width: 5),
-                                        //             Text(
-                                        //               _timetableCollection[
-                                        //                           index]
-                                        //                       .name ??
-                                        //                   "Option ${index + 1}",
-                                        //               style: TextStyle(
-                                        //                 fontSize: 18,
-                                        //                 fontWeight:
-                                        //                     FontWeight.bold,
-                                        //               ),
-                                        //             ),
-                                        //           ],
-                                        //         ),
-                                        //       ],
-                                        //     ),
-                                        //   ),
-                                        // ),
-
                                         Spacer(),
-                                        // Padding(
-                                        //   padding:
-                                        //       const EdgeInsets.only(right: 0),
-                                        //   child: Text(
-                                        //     '$totalCredits Credits',
-                                        //     style: TextStyle(
-                                        //         fontSize: 15,
-                                        //         fontWeight: FontWeight.bold,
-                                        //         color: Colors.grey),
-                                        //   ),
-                                        // ),
-
-                                        // GPAButton("Calculate GPA", Colors.grey,
-                                        //     () {}),
                                         SizedBox(width: 10),
                                         Padding(
                                           padding:
