@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:ui';
+import 'package:august/get_api/edit_timetable.dart';
 import 'package:august/get_api/get_semester.dart';
 import 'package:august/pages/edit_search_page.dart';
 import 'package:august/pages/homepage.dart';
@@ -73,9 +74,16 @@ class _EditPageState extends State<EditPage> {
         provider.addedCourseList.map((course) => course.id).toList();
 
     List<int?> removedCourseIds = provider.removedCourseList;
+
+    for (int? courseId in removedCourseIds) {
+      removeCourse(widget.semester, widget.index!, courseId!);
+    }
+    addCourses(widget.semester, widget.index!, addedCourseIds);
+
     print("removed list $removedCourseIds");
     print("added list $addedCourseIds");
-    //write a function to send the added or removed course to the server
+
+    provider.resetAddedandRemovedCourseList();
   }
 
   @override
@@ -169,7 +177,7 @@ class _EditPageState extends State<EditPage> {
                         List.from(provider.selectedCoursesData);
                     // await saveTimetableToLocalStorage(
                     //     copiedCoursesData, widget.semester);
-
+                    sendAddedOrRemovedCourse();
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => HomePage()

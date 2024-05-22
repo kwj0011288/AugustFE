@@ -41,28 +41,33 @@ class CoursesProvider with ChangeNotifier {
 
   void addCourseToCurrentTimetableforEditPage(ScheduleList course) {
     _courses.add(course);
-    notifyListeners(); // Notifies listeners about the change.
+    notifyListeners();
   }
 
   void setCoursesforEditingPage(List<ScheduleList> newCourses) {
     _courses = newCourses;
-    notifyListeners(); // Notifies listeners about the update.
+    notifyListeners();
   }
 
   void removeCourseFromTimetableforEditingPage(int courseId) {
     _courses.removeWhere((course) => course.id == courseId);
     notifyListeners();
-    // Optionally save the updated list to local storage or server
   }
 
   void additionalCourseforEditPage(ScheduleList course) {
     _addedCourseList.add(course);
-    notifyListeners(); // Notifies listeners about the change.
+    notifyListeners();
   }
 
   void RemovedCourseforEditPage(int courseId) {
     _removedCourseList.add(courseId);
-    notifyListeners(); // Notifies listeners about the change.
+    notifyListeners();
+  }
+
+  void resetAddedandRemovedCourseList() {
+    _removedCourseList.clear();
+    _addedCourseList.clear();
+    notifyListeners();
   }
 
 /* ---------------------below is for any other thing------------------------ */

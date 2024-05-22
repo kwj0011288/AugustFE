@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:august/components/button.dart';
 import 'package:august/components/loading.dart';
 import 'package:august/get_api/delete_timetable.dart';
+import 'package:august/get_api/edit_timetable.dart';
 import 'package:august/get_api/get_semester.dart';
 import 'package:august/get_api/get_timetables.dart';
 import 'package:august/get_api/schedule.dart';
@@ -75,7 +76,8 @@ class _SchedulePageState extends State<SchedulePage>
   bool loadDone = false;
   bool isLoading = true;
   Timer? _timer;
-
+  List<int> timetableOrder = [];
+  int serverIndex = 0;
   void createScheduler(BuildContext context) {
     setState(() {
       // Ensure there's at least one element in selectedCoursesData before accessing
@@ -208,6 +210,13 @@ class _SchedulePageState extends State<SchedulePage>
     });
   }
 
+  void reorderTimetableIndex(int moveIndex, List<int> currentList) {
+    currentList.remove(moveIndex);
+    currentList.insert(0, moveIndex);
+    timetableOrder = currentList;
+    reorderTimetable(_semester!, timetableOrder);
+  }
+
   Future<void> initializePage() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? storedSemesterString = prefs.getString('semester') ??
@@ -247,44 +256,6 @@ class _SchedulePageState extends State<SchedulePage>
       // Handle the case where semester information is not available or is invalid
       print("Semester information is missing or invalid.");
     }
-  }
-
-  /* 원래 버전 위는 바뀐 버전
-    Future<void> initializePage() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? storedSemesterString = prefs.getString('semester');
-    // loadDone 값을 불러옵니다. 값이 없다면 기본적으로 false를 반환합니다.
-    loadDone = prefs.getBool('loadDone') ?? false;
-
-    if (storedSemesterString != null) {
-      try {
-        if (loadDone == false) {
-          if (widget.firstTime == true) {
-            // Not the user's first time, load the timetable from local storage
-            await loadTimetableFromLocalStorage();
-          } else {
-            // It's the user's first time, attempt to load the timetable from the server
-
-            storedSemesterString = getOriginalSemester(storedSemesterString!);
-            int semesterInt = int.parse(storedSemesterString);
-            await loadTimetableFromServer(semesterInt);
-          }
-        } else {
-          await loadTimetableFromLocalStorage();
-        }
-      } catch (e) {
-        // Handle errors, such as parsing errors or issues with loading data from the server/local storage
-        print("Error during initialization: $e");
-      }
-    } else {
-      // Handle the case where semester information is not available or is invalid
-      print("Semester information is missing or invalid.");
-    }
-  }
-   */
-  Future<void> removeCourses() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('savedCourses');
   }
 
   Future<void> saveTimetableToLocalStorage() async {
@@ -369,13 +340,17 @@ class _SchedulePageState extends State<SchedulePage>
       // Decoding the JSON string to a dynamic structure
       List<dynamic> timetablesJson = jsonDecode(timetableData!);
 
+      // Initialize the list to store orders of timetables
+      timetableOrder = []; // Ensuring it is not null and empty before starting
+
       // Parsing each timetable in the list
       _timetableCollection = timetablesJson.map((timetable) {
         List<ScheduleList> sections = (timetable['sections'] as List)
             .map((section) => ScheduleList.fromJson(section))
             .toList();
 
-        return TimeTables(
+        // Create a TimeTables object
+        TimeTables newTimetable = TimeTables(
           name: timetable['name'],
           credits: timetable['credits'],
           order: timetable['order'],
@@ -385,24 +360,24 @@ class _SchedulePageState extends State<SchedulePage>
           pageController:
               PageController(), // Assuming each timetable gets its own page controller
         );
+
+        // Store the order of the timetable
+        timetableOrder.add(newTimetable.order!);
+
+        return newTimetable;
       }).toList();
 
       if (_timetableCollection.isNotEmpty) {
         _firstTimeTable.add(_timetableCollection.first);
       }
-      // Now that the timetable collection is updated, save it to local storage
+
+      // Now that the timetable collection and orders are updated, save it to local storage
       await saveTimetableToLocalStorage();
 
       setState(() {});
     } catch (e) {
       print("Error fetching timetable: $e");
     }
-  }
-
-  Future<void> clearSelectedGrades() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    // 'selectedGrades' 키에 저장된 데이터 삭제
-    await prefs.remove('selectedGrades');
   }
 
   void _navigateToPageSemester() async {
@@ -639,14 +614,12 @@ class _SchedulePageState extends State<SchedulePage>
 
   @override
   Widget build(BuildContext context) {
+    print(timetableOrder);
+    print(_semester);
     final currentIndexProv = Provider.of<CurrentIndexProvider>(context);
     _timetableCollection
         .removeWhere((timeTable) => timeTable.coursesData.isEmpty);
 
-    // if (_semester == null) {
-    //   // Show loading indicator until the data is fetched
-    //   return Center(child: Text('Loadgin'));
-    // }
     return WillPopScope(
       onWillPop: () async {
         return Future.value(false);
@@ -915,6 +888,11 @@ class _SchedulePageState extends State<SchedulePage>
                       PageView.builder(
                         controller: _pageController,
                         onPageChanged: (int value) {
+                          if (value < timetableOrder.length) {
+                            serverIndex = timetableOrder[value];
+                            print("this is the order from server $serverIndex");
+                          }
+
                           Provider.of<CurrentIndexProvider>(context,
                                   listen: false)
                               .setCurrentIndex(value);
@@ -1341,16 +1319,15 @@ class _SchedulePageState extends State<SchedulePage>
                                                             .easeInOut, // 애니메이션의 속도 곡선을 설정합니다.
                                                       );
 
+                                                      reorderTimetableIndex(
+                                                          serverIndex,
+                                                          timetableOrder);
+                                                      print(
+                                                          "Index to change $serverIndex");
+
                                                       currentIndexProv
                                                           .setCurrentIndex(
                                                               currentIndex);
-
-                                                      // Provider.of<SetMainState>(
-                                                      //         context,
-                                                      //         listen: false)
-                                                      //     .setSetMain(true);
-                                                      removeCourses();
-                                                      clearSelectedGrades();
                                                       saveTimetableToLocalStorage();
                                                     }
                                                   },
@@ -1371,19 +1348,12 @@ class _SchedulePageState extends State<SchedulePage>
                                                         CupertinoPageRoute(
                                                           builder: (context) =>
                                                               EditPage(
-                                                            index: currentIndex,
+                                                            index: serverIndex,
                                                             semester:
                                                                 widget.semester,
                                                           ),
                                                         ),
                                                       );
-                                                      currentIndexProv
-                                                          .setCurrentIndex(
-                                                              currentIndex);
-                                                      // Provider.of<EditState>(
-                                                      //         context,
-                                                      //         listen: false)
-                                                      //     .setEdit(true);
                                                       saveTimetableToLocalStorage();
                                                     }
                                                     ;
@@ -1393,7 +1363,8 @@ class _SchedulePageState extends State<SchedulePage>
                                                   title: 'Edit Name',
                                                   icon: FeatherIcons.type,
                                                   onTap: () {
-                                                    _editTimetableName(index);
+                                                    _editTimetableName(
+                                                        serverIndex);
                                                   },
                                                 ),
                                                 PullDownMenuDivider.large(),
@@ -1439,10 +1410,6 @@ class _SchedulePageState extends State<SchedulePage>
                                                                   .easeInOut,
                                                             );
                                                           }
-                                                          print(
-                                                              "그냥 index = ${index}");
-                                                          print(
-                                                              "그냥 currentIndex = ${currentIndex}");
 
                                                           // int? testindex =
                                                           //     _timetableCollection[
@@ -1463,7 +1430,7 @@ class _SchedulePageState extends State<SchedulePage>
 
                                                           deleteTimetable(
                                                               testSemester,
-                                                              index);
+                                                              serverIndex);
                                                           print(
                                                               getOriginalSemester(
                                                                   _semester!));
