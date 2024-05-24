@@ -1,3 +1,5 @@
+// ignore_for_file: depend_on_referenced_packages, camel_case_types, deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -9,7 +11,8 @@ class infoField extends StatelessWidget {
   final Color textColor;
   final int? index;
 
-  infoField({
+  const infoField({
+    super.key,
     this.svgAsset, // 필수가 아님
     required this.text,
     required this.onTap,
@@ -39,7 +42,7 @@ class infoField extends StatelessWidget {
                 height: 25,
               ),
             ),
-            SizedBox(width: 20),
+            const SizedBox(width: 20),
           ],
           // 텍스트
           Text(

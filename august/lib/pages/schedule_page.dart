@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print, unnecessary_string_interpolations
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
@@ -120,9 +122,9 @@ class _SchedulePageState extends State<SchedulePage>
   }
 
   Future<void> resetAnimations() async {
-    await Future.delayed(Duration(seconds: 1));
+    await Future.delayed(const Duration(seconds: 1));
     setState(() {});
-    await Future.delayed(Duration(seconds: 1));
+    await Future.delayed(const Duration(seconds: 1));
     return;
   }
 
@@ -216,7 +218,7 @@ class _SchedulePageState extends State<SchedulePage>
     if (!loadDone) {
       // If loadDone is not true, set it to false initially and then change to true after 1 minute
       await prefs.setBool('loadDone', false); // Set initially to false
-      Future.delayed(Duration(seconds: 3), () async {
+      Future.delayed(const Duration(seconds: 3), () async {
         await prefs.setBool('loadDone', true); // Change to true after 1 minute
         if (mounted) {
           setState(() {
@@ -412,14 +414,15 @@ class _SchedulePageState extends State<SchedulePage>
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) => HomePage(),
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              const HomePage(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(
               opacity: animation,
               child: child,
             );
           },
-          transitionDuration: Duration(
+          transitionDuration: const Duration(
               milliseconds: 200), // Adjust the speed of the fade transition
         ),
       );
@@ -452,10 +455,10 @@ class _SchedulePageState extends State<SchedulePage>
       context: context,
       builder: (BuildContext context) {
         return ClipRRect(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
           child: Container(
             color: Theme.of(context).colorScheme.background,
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             child: Column(
               children: <Widget>[
                 Text(
@@ -466,7 +469,7 @@ class _SchedulePageState extends State<SchedulePage>
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 CupertinoTextField(
                   autofocus: true,
                   controller: nameController,
@@ -482,7 +485,7 @@ class _SchedulePageState extends State<SchedulePage>
                     borderRadius: BorderRadius.circular(15),
                   ),
                   cursorColor: Theme.of(context).colorScheme.outline,
-                  padding: EdgeInsets.all(15),
+                  padding: const EdgeInsets.all(15),
                   onSubmitted: (value) {
                     // 'Done' 버튼을 눌렀을 때의 동작
                     checkAccessToken();
@@ -490,7 +493,7 @@ class _SchedulePageState extends State<SchedulePage>
                     Navigator.of(context).pop(value);
                   },
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
               ],
             ),
           ),
@@ -510,20 +513,11 @@ class _SchedulePageState extends State<SchedulePage>
     }
   }
 
-  void _launchURL() async {
-    const url = 'https://forms.gle/2ytdRmXgFps7pK567';
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
-
   void _navigateToPage() async {
     showCupertinoModalBottomSheet<Map<String, dynamic>>(
       context: context,
-      topRadius: Radius.circular(30),
-      duration: Duration(milliseconds: 350),
+      topRadius: const Radius.circular(30),
+      duration: const Duration(milliseconds: 350),
       backgroundColor: Colors.black.withOpacity(0.8),
       builder: (BuildContext context) {
         return GestureDetector(
@@ -570,7 +564,7 @@ class _SchedulePageState extends State<SchedulePage>
   }
 
   Widget GPAButton(String text, Color buttonColor, final VoidCallback onTap) {
-    TextStyle buttonTextStyle = TextStyle(
+    TextStyle buttonTextStyle = const TextStyle(
       // Define your text style here
       fontSize: 15,
       fontWeight: FontWeight.bold,
@@ -594,7 +588,7 @@ class _SchedulePageState extends State<SchedulePage>
             child: Center(
               child: Text(
                 text,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.black,
                   fontSize: 15,
                   fontWeight: FontWeight.w400,
@@ -625,7 +619,7 @@ class _SchedulePageState extends State<SchedulePage>
           padding: const EdgeInsets.symmetric(horizontal: 5),
           child: ColorfulSafeArea(
             bottomColor: Colors.white.withOpacity(0),
-            overflowRules: OverflowRules.only(bottom: true),
+            overflowRules: const OverflowRules.only(bottom: true),
             child: Column(
               children: [
                 Row(
@@ -698,12 +692,12 @@ class _SchedulePageState extends State<SchedulePage>
                                           ? formatSemester(
                                               widget.preloadedSemesters.last)
                                           : '${semesterProvider.selectedSemester}',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontSize: 15, color: Colors.grey),
                                     );
                                   },
                                 ),
-                                Icon(
+                                const Icon(
                                   Icons.keyboard_arrow_right,
                                   color: Colors.grey,
                                   size: 15,
@@ -714,7 +708,7 @@ class _SchedulePageState extends State<SchedulePage>
                         ],
                       ),
                     ),
-                    Spacer(),
+                    const Spacer(),
                     Padding(
                       padding: const EdgeInsets.only(
                         left: 15,
@@ -735,7 +729,7 @@ class _SchedulePageState extends State<SchedulePage>
                               ),
                               transitionsBuilder: (context, animation,
                                   secondaryAnimation, child) {
-                                var begin = Offset(0.0, 1.0);
+                                var begin = const Offset(0.0, 1.0);
                                 var end = Offset.zero;
                                 var curve = Curves.ease;
 
@@ -781,7 +775,7 @@ class _SchedulePageState extends State<SchedulePage>
                                       SearchPage(semester: _semester!),
                               transitionsBuilder: (context, animation,
                                   secondaryAnimation, child) {
-                                var begin = Offset(0.0, 1.0);
+                                var begin = const Offset(0.0, 1.0);
                                 var end = Offset.zero;
                                 var curve = Curves.ease;
 
@@ -867,7 +861,7 @@ class _SchedulePageState extends State<SchedulePage>
                                 20.0; // '20.0'은 도트와 여백의 크기에 따라 조정해야 할 수 있습니다.
                             _dotIndicatorScrollController.animateTo(
                               scrollToPosition,
-                              duration: Duration(milliseconds: 300),
+                              duration: const Duration(milliseconds: 300),
                               curve: Curves.easeInOut,
                             );
                           }
@@ -916,7 +910,8 @@ class _SchedulePageState extends State<SchedulePage>
                                                 child: Container(
                                                   height: 70,
                                                   width: 70,
-                                                  decoration: BoxDecoration(
+                                                  decoration:
+                                                      const BoxDecoration(
                                                     color: Colors
                                                         .blueAccent, // 원하는 배경 색상 설정
                                                     shape: BoxShape
@@ -957,10 +952,10 @@ class _SchedulePageState extends State<SchedulePage>
                                                                     .width,
                                                                 height:
                                                                     300, // 컨테이너의 높이 조정
-                                                                padding: EdgeInsets
+                                                                padding: const EdgeInsets
                                                                     .symmetric(
-                                                                        horizontal:
-                                                                            20),
+                                                                    horizontal:
+                                                                        20),
                                                                 child: Column(
                                                                   mainAxisAlignment:
                                                                       MainAxisAlignment
@@ -969,7 +964,7 @@ class _SchedulePageState extends State<SchedulePage>
                                                                       CrossAxisAlignment
                                                                           .center,
                                                                   children: <Widget>[
-                                                                    Text(
+                                                                    const Text(
                                                                       'Pick Your Favorite!',
                                                                       style:
                                                                           TextStyle(
@@ -982,7 +977,7 @@ class _SchedulePageState extends State<SchedulePage>
                                                                           TextAlign
                                                                               .center,
                                                                     ),
-                                                                    SizedBox(
+                                                                    const SizedBox(
                                                                         height:
                                                                             20),
                                                                     Row(
@@ -1008,12 +1003,12 @@ class _SchedulePageState extends State<SchedulePage>
                                                                                 BoxShadow(
                                                                                   color: Theme.of(context).colorScheme.shadow,
                                                                                   blurRadius: 10,
-                                                                                  offset: Offset(6, 4),
+                                                                                  offset: const Offset(6, 4),
                                                                                 ),
                                                                                 BoxShadow(
                                                                                   color: Theme.of(context).colorScheme.shadow,
                                                                                   blurRadius: 10,
-                                                                                  offset: Offset(-2, 0),
+                                                                                  offset: const Offset(-2, 0),
                                                                                 ),
                                                                               ],
                                                                             ),
@@ -1022,8 +1017,8 @@ class _SchedulePageState extends State<SchedulePage>
                                                                               mainAxisAlignment: MainAxisAlignment.center,
                                                                               crossAxisAlignment: CrossAxisAlignment.center,
                                                                               children: [
-                                                                                Icon(FeatherIcons.layout, size: 70, color: Colors.blueAccent),
-                                                                                SizedBox(height: 5),
+                                                                                const Icon(FeatherIcons.layout, size: 70, color: Colors.blueAccent),
+                                                                                const SizedBox(height: 5),
                                                                                 Text(
                                                                                   'Auto\nGenerate',
                                                                                   style: TextStyle(
@@ -1042,7 +1037,7 @@ class _SchedulePageState extends State<SchedulePage>
                                                                             ),
                                                                           ),
                                                                         ),
-                                                                        SizedBox(
+                                                                        const SizedBox(
                                                                             width:
                                                                                 20), // 버튼 사이의 간격
                                                                         Expanded(
@@ -1078,12 +1073,12 @@ class _SchedulePageState extends State<SchedulePage>
                                                                                   BoxShadow(
                                                                                     color: Theme.of(context).colorScheme.shadow,
                                                                                     blurRadius: 10,
-                                                                                    offset: Offset(6, 4),
+                                                                                    offset: const Offset(6, 4),
                                                                                   ),
                                                                                   BoxShadow(
                                                                                     color: Theme.of(context).colorScheme.shadow,
                                                                                     blurRadius: 10,
-                                                                                    offset: Offset(-2, 0),
+                                                                                    offset: const Offset(-2, 0),
                                                                                   ),
                                                                                 ],
                                                                               ),
@@ -1091,12 +1086,12 @@ class _SchedulePageState extends State<SchedulePage>
                                                                                 mainAxisAlignment: MainAxisAlignment.center,
                                                                                 crossAxisAlignment: CrossAxisAlignment.center,
                                                                                 children: [
-                                                                                  Icon(
+                                                                                  const Icon(
                                                                                     FeatherIcons.search,
                                                                                     size: 70,
                                                                                     color: Colors.amberAccent,
                                                                                   ),
-                                                                                  SizedBox(height: 5),
+                                                                                  const SizedBox(height: 5),
                                                                                   Text(
                                                                                     'Maunally\nCreate',
                                                                                     style: TextStyle(
@@ -1126,7 +1121,7 @@ class _SchedulePageState extends State<SchedulePage>
                                                         },
                                                       );
                                                     },
-                                                    icon: Icon(
+                                                    icon: const Icon(
                                                       FeatherIcons.plus,
                                                       size: 40,
                                                     ),
@@ -1135,7 +1130,7 @@ class _SchedulePageState extends State<SchedulePage>
                                                   ),
                                                 ),
                                               ),
-                                              SizedBox(height: 15),
+                                              const SizedBox(height: 15),
                                               Text(
                                                 _timetableCollection.length > 1
                                                     ? 'Create More'
@@ -1150,7 +1145,7 @@ class _SchedulePageState extends State<SchedulePage>
                                                       .outline,
                                                 ),
                                               ),
-                                              Text(
+                                              const Text(
                                                 'Create your schedules.\nTap the plus button to get started.',
                                                 textAlign: TextAlign
                                                     .center, // 텍스트를 가운데 정렬
@@ -1179,8 +1174,8 @@ class _SchedulePageState extends State<SchedulePage>
                                     padding: const EdgeInsets.only(top: 7),
                                     child: Row(
                                       children: [
-                                        Spacer(),
-                                        SizedBox(width: 10),
+                                        const Spacer(),
+                                        const SizedBox(width: 10),
                                         Padding(
                                           padding:
                                               const EdgeInsets.only(right: 20),
@@ -1273,7 +1268,8 @@ class _SchedulePageState extends State<SchedulePage>
                                                         serverIndex);
                                                   },
                                                 ),
-                                                PullDownMenuDivider.large(),
+                                                const PullDownMenuDivider
+                                                    .large(),
                                                 PullDownMenuItem(
                                                   title: 'Remove',
                                                   icon: FeatherIcons.trash,
@@ -1309,9 +1305,10 @@ class _SchedulePageState extends State<SchedulePage>
                                                             _pageController
                                                                 .animateToPage(
                                                               currentIndex,
-                                                              duration: Duration(
-                                                                  milliseconds:
-                                                                      500),
+                                                              duration:
+                                                                  const Duration(
+                                                                      milliseconds:
+                                                                          500),
                                                               curve: Curves
                                                                   .easeInOut,
                                                             );
@@ -1343,7 +1340,7 @@ class _SchedulePageState extends State<SchedulePage>
                                                         },
                                                       );
                                                       await Future.delayed(
-                                                          Duration(
+                                                          const Duration(
                                                               milliseconds:
                                                                   500));
                                                       await resetAnimations();
@@ -1458,7 +1455,7 @@ class _SchedulePageState extends State<SchedulePage>
                                                   HapticFeedback.mediumImpact();
                                                   showMenu();
                                                 },
-                                                child: Icon(
+                                                child: const Icon(
                                                   FeatherIcons.moreHorizontal,
                                                   size: 20,
                                                 ),
@@ -1545,12 +1542,12 @@ class _SchedulePageState extends State<SchedulePage>
                                                       1, // +1 for the extra page
                                                   (index) {
                                                     if (index == 0) {
-                                                      return SizedBox
+                                                      return const SizedBox
                                                           .shrink(); // Home 버튼을 위한 공간
                                                     } else if (index ==
                                                         _timetableCollection
                                                             .length) {
-                                                      return SizedBox
+                                                      return const SizedBox
                                                           .shrink(); // Add 버튼을 위한 공간
                                                     } else {
                                                       return GestureDetector(

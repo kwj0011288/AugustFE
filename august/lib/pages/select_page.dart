@@ -14,6 +14,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../components/courseprovider.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
 
 class SelectPage extends StatefulWidget {
   final List<List<ScheduleList>> selectedCoursesData;
@@ -143,6 +144,7 @@ class _SelectPageState extends State<SelectPage> {
               if (Navigator.canPop(context)) {
                 final coursesProvider =
                     Provider.of<CoursesProvider>(context, listen: false);
+                coursesProvider.resetSelectedCoursesData();
                 coursesProvider.setzero(0);
                 Navigator.pop(context);
               }
@@ -272,8 +274,46 @@ class _SelectPageState extends State<SelectPage> {
                               "Schedule"; // 사용자가 설정할 수 있는 타임테이블 이름
 
                           try {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext context) {
+                                return Dialog(
+                                  elevation: 0,
+                                  backgroundColor: Colors.transparent,
+                                  child: Center(
+                                    child: SizedBox(
+                                      width: MediaQuery.of(context).size.width,
+                                      height: 180,
+                                      child: Center(
+                                        child: AnimatedTextKit(
+                                          repeatForever: true,
+                                          animatedTexts: [
+                                            TypewriterAnimatedText(
+                                              "Loading...",
+                                              textStyle: TextStyle(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .outline,
+                                                fontSize: 60,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                              speed:
+                                                  Duration(milliseconds: 100),
+                                            ),
+                                          ],
+                                          isRepeatingAnimation: true,
+                                          pause: Duration(milliseconds: 10),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
                             // 현재 타임테이블을 서버에 전송
-                            sendTimetableToServer(
+                            await sendTimetableToServer(
                                 semester, timetableName, sectionIds);
                             print(
                                 "Sending timetable with section IDs: $sectionIds");
@@ -283,12 +323,9 @@ class _SelectPageState extends State<SelectPage> {
                           }
                         }
                       }
-                      saveTimetableToLocalStorage(
-                        coursesProvider.selectedCoursesData,
-                      );
-
                       coursesProvider.setCurrentPageIndex(0);
                       coursesProvider.setzero(0);
+                      coursesProvider.resetSelectedCoursesData();
 
                       Navigator.pushAndRemoveUntil(
                           context,

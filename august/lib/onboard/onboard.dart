@@ -43,7 +43,7 @@ class _OnBoardPageState extends State<OnBoardPage> {
     if (_currentPage > 0) {
       // 현재 페이지가 첫 페이지가 아니라면, 이전 페이지로 이동
       _pageController.previousPage(
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
     }
@@ -53,7 +53,7 @@ class _OnBoardPageState extends State<OnBoardPage> {
     if (_currentPage < _pages.length - 1) {
       // Not the last page, navigate to the next page
       _pageController.nextPage(
-          duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+          duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
     } else {
       // Last page, set the flag and navigate to the homepage
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -74,7 +74,7 @@ class _OnBoardPageState extends State<OnBoardPage> {
                 child: child,
               );
             },
-            transitionDuration: Duration(milliseconds: 300),
+            transitionDuration: const Duration(milliseconds: 300),
           ));
     }
   }
@@ -121,7 +121,7 @@ class _OnBoardPageState extends State<OnBoardPage> {
             _currentPage = page;
           });
         },
-        physics: NeverScrollableScrollPhysics(), // 스와이프로 페이지 넘김 방지
+        physics: const NeverScrollableScrollPhysics(), // 스와이프로 페이지 넘김 방지
         children: _pages,
       ),
     );

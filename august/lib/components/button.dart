@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class Button extends StatelessWidget {
   const Button({
-    Key? key,
+    super.key,
     required this.onTap,
     required this.buttonColor,
     required this.textColor,
@@ -10,7 +10,7 @@ class Button extends StatelessWidget {
     required this.width,
     required this.height,
     required this.borderColor,
-  }) : super(key: key);
+  });
 
   final VoidCallback onTap;
   final Color buttonColor;

@@ -1,3 +1,5 @@
+// ignore_for_file: depend_on_referenced_packages, use_super_parameters, use_key_in_widget_constructors, non_constant_identifier_names
+
 import 'package:flutter/material.dart';
 import 'package:skeleton_text/skeleton_text.dart';
 
@@ -76,8 +78,8 @@ Widget GroupLoading1(BuildContext context) {
         padding: const EdgeInsets.symmetric(horizontal: 15),
         child: Skelton(height: 100, width: MediaQuery.of(context).size.width),
       ),
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 23, horizontal: 34),
+      const Padding(
+        padding: EdgeInsets.symmetric(vertical: 23, horizontal: 34),
         child: Row(
           children: [
             Column(
@@ -95,7 +97,7 @@ Widget GroupLoading1(BuildContext context) {
             ),
             Spacer(),
             Padding(
-              padding: const EdgeInsets.only(right: 12),
+              padding: EdgeInsets.only(right: 12),
               child: SkeletonContainer.circular(
                 height: 30,
                 width: 30,
@@ -126,19 +128,19 @@ Widget GroupLoading2(BuildContext context) {
                     color: Theme.of(context).colorScheme.tertiary,
                     height: 25,
                     width: 95),
-                SizedBox(
+                const SizedBox(
                   height: 5,
                 ),
                 SkeletonContainer.rounded(
                     color: Theme.of(context).colorScheme.tertiary,
                     height: 25,
                     width: 140),
-                SizedBox(
+                const SizedBox(
                   width: 28,
                 ),
               ],
             ),
-            Spacer(),
+            const Spacer(),
             Padding(
               padding: const EdgeInsets.only(right: 5),
               child: SkeletonContainer.circular(
@@ -164,8 +166,8 @@ Widget GroupLoading3(BuildContext context) {
             height: 450,
             width: MediaQuery.of(context).size.width),
       ),
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 25),
+      const Padding(
+        padding: EdgeInsets.symmetric(vertical: 30, horizontal: 25),
         child: Row(
           children: [
             Column(
@@ -189,8 +191,8 @@ Widget GroupLoading4(BuildContext context) {
             height: MediaQuery.of(context).size.height - 250,
             width: MediaQuery.of(context).size.width),
       ),
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 25),
+      const Padding(
+        padding: EdgeInsets.symmetric(vertical: 30, horizontal: 25),
         child: Row(
           children: [
             Column(

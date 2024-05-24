@@ -1,32 +1,24 @@
-import 'dart:convert';
+// ignore_for_file: avoid_print, unnecessary_string_interpolations, depend_on_referenced_packages
 
 import 'package:animated_hint_textfield/animated_hint_textfield.dart';
 import 'package:august/components/search_tile.dart';
-import 'package:august/components/simple_course_tile.dart';
-import 'package:august/const/dark_theme.dart';
-import 'package:august/const/light_theme.dart';
 import 'package:august/get_api/get_semester.dart';
 import 'package:august/get_api/simple_sections.dart';
-import 'package:august/onboard/profile.dart';
 import 'package:august/onboard/semester.dart';
-import 'package:august/pages/me_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import '../components/courseprovider.dart';
 import '../components/loading.dart';
 import '../get_api/class.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
-import '../get_api/get_api.dart';
-import '../get_api/schedule.dart';
 import 'package:intl/intl.dart';
 import "package:flutter_feather_icons/flutter_feather_icons.dart";
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SearchPage extends StatefulWidget {
   final String semester;
-  SearchPage({
+  const SearchPage({
     Key? key,
     required this.semester,
   }) : super(key: key);
@@ -46,18 +38,18 @@ class _SearchPageState extends State<SearchPage>
     with SingleTickerProviderStateMixin {
   List<CourseList> _foundCourses = [];
   late TextEditingController _keywordController;
-  late Future<List<CourseList>>? _coursesFuture = null;
+  late Future<List<CourseList>>? _coursesFuture;
   late AnimationController _controller;
   String? currentSemester;
   Uint8List? profilePhoto;
   List<String> _searchKeywords = [];
 
   Future<List<CourseList>> _runSearch(String enteredKeyword) async {
-    FetchCourse _courses = FetchCourse();
+    FetchCourse courses = FetchCourse();
 
     String querytype = 'code';
 
-    List<CourseList> apiData = await _courses.getCourseList(
+    List<CourseList> apiData = await courses.getCourseList(
         querytype: querytype,
         semester: getOriginalSemester(currentSemester!),
         query: enteredKeyword);
@@ -83,11 +75,11 @@ class _SearchPageState extends State<SearchPage>
     currentSemester = (widget.semester);
 
     // Initialize the keyword controller and add listener
-    this._keywordController = TextEditingController();
+    _keywordController = TextEditingController();
 
     // Initialize animation controller
-    this._controller =
-        AnimationController(duration: Duration(seconds: 2), vsync: this);
+    _controller =
+        AnimationController(duration: const Duration(seconds: 2), vsync: this);
 
     //검색어 저장
     _loadSearchKeywords();
@@ -128,9 +120,6 @@ class _SearchPageState extends State<SearchPage>
   @override
   Widget build(BuildContext context) {
     print("Current hello: $currentSemester"); // Add this line
-    final theme = Theme.of(context);
-    List<Color> tileColors =
-        theme.brightness == Brightness.dark ? tileColorsDark : tileColorsLight;
     return Scaffold(
       extendBody: true,
       backgroundColor: Theme.of(context).colorScheme.background,
@@ -138,7 +127,7 @@ class _SearchPageState extends State<SearchPage>
         padding: const EdgeInsets.symmetric(horizontal: 5),
         child: ColorfulSafeArea(
           bottomColor: Colors.white.withOpacity(0),
-          overflowRules: OverflowRules.only(bottom: true),
+          overflowRules: const OverflowRules.only(bottom: true),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -167,7 +156,7 @@ class _SearchPageState extends State<SearchPage>
                                 builder: (context, semesterProvider, child) {
                                   return Text(
                                     '${semesterProvider.selectedSemester}',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         fontSize: 15, color: Colors.grey),
                                   );
                                 },
@@ -178,7 +167,7 @@ class _SearchPageState extends State<SearchPage>
                       ],
                     ),
                   ),
-                  Spacer(),
+                  const Spacer(),
                   Padding(
                     padding:
                         const EdgeInsets.only(left: 15, right: 10, top: 15),
@@ -203,7 +192,7 @@ class _SearchPageState extends State<SearchPage>
                 ],
               ),
               Padding(
-                padding: EdgeInsets.only(
+                padding: const EdgeInsets.only(
                     top: 15.0, bottom: 15.0, left: 10.0, right: 10.0),
                 child: AnimatedTextField(
                     animationType: Animationtype.typer,
@@ -217,7 +206,7 @@ class _SearchPageState extends State<SearchPage>
                       'MATH240 ',
                       'KORA201 ',
                     ],
-                    animationDuration: Duration(milliseconds: 100000),
+                    animationDuration: const Duration(milliseconds: 100000),
                     hintTextStyle: const TextStyle(
                       color: Colors.grey,
                       overflow: TextOverflow.ellipsis,
@@ -225,7 +214,8 @@ class _SearchPageState extends State<SearchPage>
                     decoration: InputDecoration(
                       fillColor: Theme.of(context).colorScheme.primary,
                       filled: true, // 배경색 채우기 활성화
-                      contentPadding: EdgeInsets.symmetric(vertical: 15.0),
+                      contentPadding:
+                          const EdgeInsets.symmetric(vertical: 15.0),
                       border: OutlineInputBorder(
                         // 기본 테두리 설정
                         borderRadius: BorderRadius.circular(30),
@@ -294,7 +284,7 @@ class _SearchPageState extends State<SearchPage>
                                   },
                                 ),
                               ),
-                              Spacer(),
+                              const Spacer(),
                             ],
                           ),
                           if (_searchKeywords.isEmpty)
@@ -311,7 +301,7 @@ class _SearchPageState extends State<SearchPage>
                             )
                           else
                             Container(
-                                margin: EdgeInsets.only(left: 10, top: 5),
+                                margin: const EdgeInsets.only(left: 10, top: 5),
                                 child: Wrap(
                                   spacing: 8.0, // 가로 간격
                                   runSpacing: 4.0, // 세로 간격
@@ -331,12 +321,12 @@ class _SearchPageState extends State<SearchPage>
                                         backgroundColor: Theme.of(context)
                                             .colorScheme
                                             .primary,
-                                        shape: RoundedRectangleBorder(
+                                        shape: const RoundedRectangleBorder(
                                           side: BorderSide(
                                               color: Colors.transparent),
                                           borderRadius: BorderRadius.horizontal(
-                                            left: const Radius.circular(30),
-                                            right: const Radius.circular(30),
+                                            left: Radius.circular(30),
+                                            right: Radius.circular(30),
                                           ),
                                         ),
                                         label: Text(
@@ -397,10 +387,8 @@ class _SearchPageState extends State<SearchPage>
                         if (course.sections != null) {
                           for (var section in course.sections!) {
                             if (section.instructors != null) {
-                              for (var instructor in section.instructors!) {
-                                instructorCourses
-                                    .add(InstructorCourse(course, section));
-                              }
+                              instructorCourses
+                                  .add(InstructorCourse(course, section));
                             }
                           }
                         }
@@ -468,18 +456,19 @@ class _SearchPageState extends State<SearchPage>
                                               .colorScheme
                                               .shadow,
                                           blurRadius: 10,
-                                          offset: Offset(6, 4),
+                                          offset: const Offset(6, 4),
                                         ),
                                         BoxShadow(
                                           color: Theme.of(context)
                                               .colorScheme
                                               .shadow,
                                           blurRadius: 10,
-                                          offset: Offset(-2, 0),
+                                          offset: const Offset(-2, 0),
                                         ),
                                       ],
                                     ),
-                                    child: Center(child: Text('Ad space')),
+                                    child:
+                                        const Center(child: Text('Ad space')),
                                   ),
                                 ),
                               );
@@ -507,18 +496,18 @@ class _SearchPageState extends State<SearchPage>
                                             .colorScheme
                                             .shadow,
                                         blurRadius: 10,
-                                        offset: Offset(6, 4),
+                                        offset: const Offset(6, 4),
                                       ),
                                       BoxShadow(
                                         color: Theme.of(context)
                                             .colorScheme
                                             .shadow,
                                         blurRadius: 10,
-                                        offset: Offset(-2, 0),
+                                        offset: const Offset(-2, 0),
                                       ),
                                     ],
                                   ),
-                                  child: Center(child: Text('Ad space')),
+                                  child: const Center(child: Text('Ad space')),
                                 ),
                               ),
                             );
@@ -531,7 +520,7 @@ class _SearchPageState extends State<SearchPage>
                   },
                 ),
               ),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
             ],
           ),
         ),

@@ -94,7 +94,7 @@ class _GeneratePageState extends State<GeneratePage> {
   String? selectedRawSemester;
 
   //첫번째 슬라이더
-  double _currentSliderValue1 = (10 * 60).toDouble();
+  double _currentSliderValue1 = (9 * 60).toDouble();
   double _slider1Min = (6 * 60).toDouble();
   double _slider1Max = (17 * 60).toDouble();
 

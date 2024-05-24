@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_literals_to_create_immutables
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -15,11 +17,11 @@ class _BooleanPickerState extends State<BooleanPicker> {
   Widget build(BuildContext context) {
     return CupertinoButton(
       borderRadius: BorderRadius.circular(15),
-      padding: EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16.0),
       color: CupertinoColors.white,
       child: Text(
         _selectedValueText,
-        style: TextStyle(fontSize: 18, color: Colors.black),
+        style: const TextStyle(fontSize: 18, color: Colors.black),
       ),
       onPressed: () {
         showCupertinoModalPopup(
@@ -29,7 +31,7 @@ class _BooleanPickerState extends State<BooleanPicker> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
                 Container(
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Colors.white,
                     border: Border(
                       bottom: BorderSide(
@@ -42,21 +44,21 @@ class _BooleanPickerState extends State<BooleanPicker> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       CupertinoButton(
-                        child: Text('Cancel'),
+                        child: const Text('Cancel'),
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                           horizontal: 16.0,
                           vertical: 5.0,
                         ),
                       ),
                       CupertinoButton(
-                        child: Text('Confirm'),
+                        child: const Text('Confirm'),
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                           horizontal: 16.0,
                           vertical: 5.0,
                         ),
@@ -66,9 +68,9 @@ class _BooleanPickerState extends State<BooleanPicker> {
                 ),
                 Container(
                   height: 250.0,
-                  color: Color(0xfff7f7f7),
+                  color: const Color(0xfff7f7f7),
                   child: CupertinoPicker(
-                    backgroundColor: Color(0xfff7f7f7),
+                    backgroundColor: const Color(0xfff7f7f7),
                     itemExtent: 28,
                     scrollController:
                         FixedExtentScrollController(initialItem: 0),
@@ -78,8 +80,8 @@ class _BooleanPickerState extends State<BooleanPicker> {
                       });
                     },
                     children: [
-                      Text('True'),
-                      Text('False'),
+                      const Text('True'),
+                      const Text('False'),
                     ],
                   ),
                 ),

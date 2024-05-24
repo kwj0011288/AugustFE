@@ -41,13 +41,13 @@ class ScheduleList {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['name'] = this.name;
-    data['instructors'] = this.instructors;
-    data['meetings'] = this.meetings?.map((m) => m.toJson()).toList();
-    data['course_code'] = this.courseCode;
-    data['section_code'] = this.sectionCode;
-    data['credits'] = this.credits;
+    data['id'] = id;
+    data['name'] = name;
+    data['instructors'] = instructors;
+    data['meetings'] = meetings?.map((m) => m.toJson()).toList();
+    data['course_code'] = courseCode;
+    data['section_code'] = sectionCode;
+    data['credits'] = credits;
     return data;
   }
 }
@@ -72,11 +72,11 @@ class ScheduleMeeting {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['building'] = this.building;
-    data['room'] = this.room;
-    data['days'] = this.days;
-    data['start_time'] = this.startTime;
-    data['end_time'] = this.endTime;
+    data['building'] = building;
+    data['room'] = room;
+    data['days'] = days;
+    data['start_time'] = startTime;
+    data['end_time'] = endTime;
     return data;
   }
 }

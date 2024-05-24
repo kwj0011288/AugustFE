@@ -1,3 +1,5 @@
+// ignore_for_file: depend_on_referenced_packages, avoid_print
+
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -11,7 +13,7 @@ Future<void> updateTimetableName(
     return; // Stops execution if no access token
   }
 
-  final String baseUrl = 'http://augustapp.one/timetables';
+  const String baseUrl = 'http://augustapp.one/timetables';
   String url = '$baseUrl/$semester/$order/';
 
   try {
