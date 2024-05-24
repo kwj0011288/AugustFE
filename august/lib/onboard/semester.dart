@@ -61,6 +61,11 @@ class _SemesterPageState extends State<SemesterPage> {
     return "$season $year";
   }
 
+  Future<void> removeGPACourses() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove("savedCourses");
+  }
+
   Future<void> _loadInfo() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? storedSemester = prefs.getString('semester');
@@ -377,6 +382,7 @@ class _SemesterPageState extends State<SemesterPage> {
                               : GestureDetector(
                                   onTap: () {
                                     _saveAndClose();
+                                    removeGPACourses();
                                     HapticFeedback.mediumImpact();
                                     Navigator.pushReplacement(
                                       context,

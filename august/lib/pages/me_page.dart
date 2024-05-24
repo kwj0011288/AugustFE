@@ -480,7 +480,7 @@ class _MypageState extends State<Mypage> {
     );
 
     double textWidth = calculateTextWidth(text, buttonTextStyle, context);
-    double buttonWidth = textWidth + 10; // Add some padding to the text width
+    double buttonWidth = textWidth + 20; // Add some padding to the text width
 
     return Container(
       width: buttonWidth,
@@ -494,15 +494,23 @@ class _MypageState extends State<Mypage> {
         child: InkWell(
           onTap: onTap,
           child: Container(
-            child: Center(
-              child: Text(
-                text,
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w400,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(width: 5),
+                Center(
+                  child: Text(
+                    text,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
                 ),
-              ),
+                Icon(Icons.keyboard_arrow_right, color: Colors.black, size: 18)
+              ],
             ),
           ),
         ),

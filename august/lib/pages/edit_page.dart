@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:intl/intl.dart';
 import 'dart:ui';
 import 'package:august/get_api/edit_timetable.dart';
 import 'package:august/get_api/get_semester.dart';
@@ -126,6 +127,7 @@ class _EditPageState extends State<EditPage> {
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<CoursesProvider>(context);
+
     return Scaffold(
       extendBody: true,
       backgroundColor: Theme.of(context).colorScheme.background,
@@ -136,6 +138,7 @@ class _EditPageState extends State<EditPage> {
           padding: const EdgeInsets.only(left: 10, top: 8, bottom: 8),
           child: GestureDetector(
             onTap: () {
+              provider.resetAddedandRemovedCourseList();
               if (Navigator.canPop(context)) {
                 Navigator.pop(context);
               }

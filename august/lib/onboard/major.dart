@@ -11,7 +11,7 @@ class MajorPage extends StatefulWidget {
   final bool onboard;
   final VoidCallback goBack;
   final VoidCallback gonext;
-  final List<String> preloadedDepartments;
+  List<String> preloadedDepartments;
   MajorPage({
     Key? key,
     required this.onboard,
@@ -35,6 +35,15 @@ class _MajorPageState extends State<MajorPage> {
     super.initState();
     // Print the preloaded departments to the console
     print("Preloaded Departments: ${widget.preloadedDepartments}");
+
+    if (widget.preloadedDepartments.isEmpty) {
+      // If the preloaded departments list is empty, fetch the departments
+      fetchDepartments().then((departments) {
+        setState(() {
+          widget.preloadedDepartments = departments;
+        });
+      });
+    }
   }
 
   Future<void> _selectMajor(String selectedDept) async {

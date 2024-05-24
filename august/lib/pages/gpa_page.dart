@@ -179,7 +179,6 @@ class _GPAPageState extends State<GPAPage> {
               ],
             ),
             SizedBox(height: 15),
-            SizedBox(height: 25),
             GestureDetector(
               onTap: () {
                 // Collecting input data and popping the modal with result

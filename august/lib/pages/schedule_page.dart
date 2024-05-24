@@ -203,7 +203,8 @@ class _SchedulePageState extends State<SchedulePage>
     currentList.remove(moveIndex);
     currentList.insert(0, moveIndex);
     timetableOrder = currentList;
-    reorderTimetable(_semester!, timetableOrder);
+    String ogsem = getOriginalSemester(_semester!);
+    reorderTimetable(ogsem, timetableOrder);
   }
 
   Future<void> initializePage() async {
@@ -561,6 +562,11 @@ class _SchedulePageState extends State<SchedulePage>
         );
       },
     );
+  }
+
+  Future<void> removeGPACourses() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove("savedCourses");
   }
 
   Widget GPAButton(String text, Color buttonColor, final VoidCallback onTap) {
@@ -1217,6 +1223,7 @@ class _SchedulePageState extends State<SchedulePage>
                                                         curve: Curves
                                                             .easeInOut, // 애니메이션의 속도 곡선을 설정합니다.
                                                       );
+                                                      removeGPACourses();
 
                                                       reorderTimetableIndex(
                                                           serverIndex,

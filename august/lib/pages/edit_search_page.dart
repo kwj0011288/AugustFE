@@ -53,26 +53,137 @@ class _EditSearchPageState extends State<EditSearchPage>
   late Future<List<CourseList>>? _coursesFuture = null;
   late AnimationController _controller;
   String? currentSemester;
+  List<ScheduleList> _courseList = [];
 
+/* --------------------------------------------------------*/
+  void _initializeCourseList() {
+    final coursesProvider =
+        Provider.of<CoursesProvider>(context, listen: false);
+    setState(() {
+      _courseList =
+          coursesProvider.courses; // Copying the courses from the provider
+    });
+    for (var course in _courseList) {
+      print('Course ID: ${course.id}, Course Name: ${course.name}');
+    }
+  }
+
+/* --------------------------------------------------------*/
   void removeFromGroup(CourseList course) {
     widget.addedCoursesNotifier.value.remove(course);
   }
 
-  // EditSearchPage 클래스 내부
+  /* --------------------------*/
+  bool _hasTimeConflict(ScheduleList newCourse, ScheduleList existingCourse) {
+    for (var newMeeting in newCourse.meetings!) {
+      for (var existingMeeting in existingCourse.meetings!) {
+        // Ensure that both meetings have defined days
+        if (newMeeting.days != null && existingMeeting.days != null) {
+          var newDays = Set.from(newMeeting.days!.split(''));
+          var existingDays = Set.from(existingMeeting.days!.split(''));
 
-  void _handleCourseSelection(CourseList course) {
+          // Check if the days intersect
+          if (newDays.intersection(existingDays).isNotEmpty) {
+            var newStart = DateFormat.Hm().parse(newMeeting.startTime!);
+            var newEnd = DateFormat.Hm().parse(newMeeting.endTime!);
+            var existingStart =
+                DateFormat.Hm().parse(existingMeeting.startTime!);
+            var existingEnd = DateFormat.Hm().parse(existingMeeting.endTime!);
+
+            // Check for any time overlap
+            if ((newStart.isBefore(existingEnd) &&
+                    newEnd.isAfter(existingStart)) ||
+                (existingStart.isBefore(newEnd) &&
+                    existingEnd.isAfter(newStart))) {
+              print(
+                  'Time Conflict Detected between ${newMeeting.startTime} - ${newMeeting.endTime} and ${existingMeeting.startTime} - ${existingMeeting.endTime}');
+              return true; // There is a conflict, return immediately
+            }
+          }
+        }
+      }
+    }
+    print('No Time Conflict Detected');
+    return false; // No conflict found after all checks
+  }
+
+/* --------------------------*/
+  void _handleCourseSelection(CourseList course, Section section) {
     // Convert the selected course to a ScheduleList object
-    ScheduleList newSchedule = convertCourseListToScheduleList(course);
+    ScheduleList newSchedule = convertCourseListToScheduleList(course, section);
+    bool conflictDetected = false;
 
-    Provider.of<CoursesProvider>(context, listen: false)
-        .addCourseToCurrentTimetableforEditPage(newSchedule);
+    // Check for conflicts with all existing courses
+    for (var existingCourse in _courseList) {
+      if (_hasTimeConflict(newSchedule, existingCourse)) {
+        Navigator.of(context).pop();
+        // If a conflict is detected, show dialog and set flag
+        conflictDetected = true;
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(
+                textAlign: TextAlign.center,
+                "Time Conflict",
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.outline,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold),
+              ),
+              content: Text(
+                textAlign: TextAlign.center,
+                "This course conflicts with\none of your selected courses.",
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.outline,
+                    fontSize: 15,
+                    fontWeight: FontWeight.normal),
+              ),
+              actions: <Widget>[
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pop(); // 팝업 닫기
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 30),
+                    height: 55,
+                    width: MediaQuery.of(context).size.width - 80,
+                    decoration: BoxDecoration(
+                        color: Colors.redAccent,
+                        borderRadius: BorderRadius.circular(60)),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'OK',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
 
-    Provider.of<CoursesProvider>(context, listen: false)
-        .additionalCourseforEditPage(newSchedule);
+        break;
+      }
+    }
 
-    widget.onCourseSelected(newSchedule);
-    // Go back to the previous screen after selection
-    Navigator.pop(context);
+    // If no conflicts were detected, add the course
+    if (!conflictDetected) {
+      Provider.of<CoursesProvider>(context, listen: false)
+          .addCourseToCurrentTimetableforEditPage(newSchedule);
+      Provider.of<CoursesProvider>(context, listen: false)
+          .additionalCourseforEditPage(newSchedule);
+      widget.onCourseSelected(newSchedule);
+      Navigator.pop(context); // Go back to the previous screen after selection
+    }
   }
 
   Future<List<CourseList>> _runSearch(String enteredKeyword) async {
@@ -94,15 +205,12 @@ class _EditSearchPageState extends State<EditSearchPage>
     return apiData;
   }
 
-  void updateUI() {
-    setState(() {
-      // UI 업데이트 로직
-    });
-  }
-
   @override
   void initState() {
     super.initState();
+
+    _initializeCourseList();
+
     _loadSearchKeywords();
     _fetchLatestSemester();
     // Initialize the keyword controller and add listener
@@ -475,7 +583,7 @@ class _EditSearchPageState extends State<EditSearchPage>
                                   backgroundColor: Colors.white,
                                   index: courseIndex,
                                   onPressed: (context) {
-                                    _handleCourseSelection(course);
+                                    _handleCourseSelection(course, section);
                                     //    addToGroup(context, section, course);
                                     // Navigator.pop(context);
                                   },
@@ -500,47 +608,15 @@ class _EditSearchPageState extends State<EditSearchPage>
   }
 }
 
-bool checkTimeConflict(
-    ScheduleList newCourse, List<ScheduleList> existingCourses) {
-  // Create a list of all day-time combinations for the new course.
-  List<String> newCombinations = [];
-  for (var meeting in newCourse.meetings!) {
-    var days = meeting.days!.split('');
-    var time = '${meeting.startTime}-${meeting.endTime}';
-    for (var day in days) {
-      newCombinations.add('$day-$time');
-    }
-  }
-
-  // Check each existing course for conflicts.
-  for (var existingCourse in existingCourses) {
-    // Create a list of all day-time combinations for the existing course.
-    List<String> existingCombinations = [];
-    for (var meeting in existingCourse.meetings!) {
-      var days = meeting.days!.split('');
-      var time = '${meeting.startTime}-${meeting.endTime}';
-      for (var day in days) {
-        existingCombinations.add('$day-$time');
-      }
-    }
-
-    // Check if any of the combinations overlap.
-    if (newCombinations
-        .any((element) => existingCombinations.contains(element))) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-ScheduleList convertCourseListToScheduleList(CourseList course) {
+ScheduleList convertCourseListToScheduleList(
+    CourseList course, Section section) {
   // 예시로, 첫 번째 섹션의 정보를 사용하여 ScheduleList 객체를 생성합니다.
   // 실제 구현에서는 CourseList 구조와 필요에 따라 조정이 필요합니다.
-  Section section = course.sections!.first;
   return ScheduleList(
       id: section.id,
       name: course.name,
+      courseCode: course.courseCode,
+      sectionCode: section.code,
       instructors: section.instructors,
       meetings: section.meetings
           ?.map((meeting) => ScheduleMeeting(
@@ -550,8 +626,6 @@ ScheduleList convertCourseListToScheduleList(CourseList course) {
               startTime: meeting.startTime,
               endTime: meeting.endTime))
           .toList(),
-      courseCode: course.courseCode,
-      sectionCode: section.code,
       credits: course.credits,
       seats: section.seats,
       openSeats: section.openSeats,
