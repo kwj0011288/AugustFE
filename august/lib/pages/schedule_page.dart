@@ -1252,6 +1252,9 @@ class _SchedulePageState extends State<SchedulePage>
                                                             index: serverIndex,
                                                             semester:
                                                                 widget.semester,
+                                                            name: _timetableCollection[
+                                                                    currentIndex]
+                                                                .name,
                                                           ),
                                                         ),
                                                       );
@@ -1264,6 +1267,7 @@ class _SchedulePageState extends State<SchedulePage>
                                                   title: 'Edit Name',
                                                   icon: FeatherIcons.type,
                                                   onTap: () {
+                                                    checkAccessToken();
                                                     _editTimetableName(
                                                         serverIndex);
                                                   },

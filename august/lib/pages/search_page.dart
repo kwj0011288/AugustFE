@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print, unnecessary_string_interpolations, depend_on_referenced_packages
-
 import 'package:animated_hint_textfield/animated_hint_textfield.dart';
 import 'package:august/components/search_tile.dart';
 import 'package:august/get_api/get_semester.dart';
@@ -18,7 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SearchPage extends StatefulWidget {
   final String semester;
-  const SearchPage({
+  SearchPage({
     Key? key,
     required this.semester,
   }) : super(key: key);
@@ -38,18 +36,18 @@ class _SearchPageState extends State<SearchPage>
     with SingleTickerProviderStateMixin {
   List<CourseList> _foundCourses = [];
   late TextEditingController _keywordController;
-  late Future<List<CourseList>>? _coursesFuture;
+  late Future<List<CourseList>>? _coursesFuture = null;
   late AnimationController _controller;
   String? currentSemester;
   Uint8List? profilePhoto;
   List<String> _searchKeywords = [];
 
   Future<List<CourseList>> _runSearch(String enteredKeyword) async {
-    FetchCourse courses = FetchCourse();
+    FetchCourse _courses = FetchCourse();
 
     String querytype = 'code';
 
-    List<CourseList> apiData = await courses.getCourseList(
+    List<CourseList> apiData = await _courses.getCourseList(
         querytype: querytype,
         semester: getOriginalSemester(currentSemester!),
         query: enteredKeyword);
@@ -75,11 +73,11 @@ class _SearchPageState extends State<SearchPage>
     currentSemester = (widget.semester);
 
     // Initialize the keyword controller and add listener
-    _keywordController = TextEditingController();
+    this._keywordController = TextEditingController();
 
     // Initialize animation controller
-    _controller =
-        AnimationController(duration: const Duration(seconds: 2), vsync: this);
+    this._controller =
+        AnimationController(duration: Duration(seconds: 2), vsync: this);
 
     //검색어 저장
     _loadSearchKeywords();
@@ -127,7 +125,7 @@ class _SearchPageState extends State<SearchPage>
         padding: const EdgeInsets.symmetric(horizontal: 5),
         child: ColorfulSafeArea(
           bottomColor: Colors.white.withOpacity(0),
-          overflowRules: const OverflowRules.only(bottom: true),
+          overflowRules: OverflowRules.only(bottom: true),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -156,7 +154,7 @@ class _SearchPageState extends State<SearchPage>
                                 builder: (context, semesterProvider, child) {
                                   return Text(
                                     '${semesterProvider.selectedSemester}',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                         fontSize: 15, color: Colors.grey),
                                   );
                                 },
@@ -167,7 +165,7 @@ class _SearchPageState extends State<SearchPage>
                       ],
                     ),
                   ),
-                  const Spacer(),
+                  Spacer(),
                   Padding(
                     padding:
                         const EdgeInsets.only(left: 15, right: 10, top: 15),
@@ -192,7 +190,7 @@ class _SearchPageState extends State<SearchPage>
                 ],
               ),
               Padding(
-                padding: const EdgeInsets.only(
+                padding: EdgeInsets.only(
                     top: 15.0, bottom: 15.0, left: 10.0, right: 10.0),
                 child: AnimatedTextField(
                     animationType: Animationtype.typer,
@@ -206,7 +204,7 @@ class _SearchPageState extends State<SearchPage>
                       'MATH240 ',
                       'KORA201 ',
                     ],
-                    animationDuration: const Duration(milliseconds: 100000),
+                    animationDuration: Duration(milliseconds: 100000),
                     hintTextStyle: const TextStyle(
                       color: Colors.grey,
                       overflow: TextOverflow.ellipsis,
@@ -214,8 +212,7 @@ class _SearchPageState extends State<SearchPage>
                     decoration: InputDecoration(
                       fillColor: Theme.of(context).colorScheme.primary,
                       filled: true, // 배경색 채우기 활성화
-                      contentPadding:
-                          const EdgeInsets.symmetric(vertical: 15.0),
+                      contentPadding: EdgeInsets.symmetric(vertical: 15.0),
                       border: OutlineInputBorder(
                         // 기본 테두리 설정
                         borderRadius: BorderRadius.circular(30),
@@ -284,7 +281,7 @@ class _SearchPageState extends State<SearchPage>
                                   },
                                 ),
                               ),
-                              const Spacer(),
+                              Spacer(),
                             ],
                           ),
                           if (_searchKeywords.isEmpty)
@@ -301,7 +298,7 @@ class _SearchPageState extends State<SearchPage>
                             )
                           else
                             Container(
-                                margin: const EdgeInsets.only(left: 10, top: 5),
+                                margin: EdgeInsets.only(left: 10, top: 5),
                                 child: Wrap(
                                   spacing: 8.0, // 가로 간격
                                   runSpacing: 4.0, // 세로 간격
@@ -321,12 +318,12 @@ class _SearchPageState extends State<SearchPage>
                                         backgroundColor: Theme.of(context)
                                             .colorScheme
                                             .primary,
-                                        shape: const RoundedRectangleBorder(
+                                        shape: RoundedRectangleBorder(
                                           side: BorderSide(
                                               color: Colors.transparent),
                                           borderRadius: BorderRadius.horizontal(
-                                            left: Radius.circular(30),
-                                            right: Radius.circular(30),
+                                            left: const Radius.circular(30),
+                                            right: const Radius.circular(30),
                                           ),
                                         ),
                                         label: Text(
@@ -456,19 +453,18 @@ class _SearchPageState extends State<SearchPage>
                                               .colorScheme
                                               .shadow,
                                           blurRadius: 10,
-                                          offset: const Offset(6, 4),
+                                          offset: Offset(6, 4),
                                         ),
                                         BoxShadow(
                                           color: Theme.of(context)
                                               .colorScheme
                                               .shadow,
                                           blurRadius: 10,
-                                          offset: const Offset(-2, 0),
+                                          offset: Offset(-2, 0),
                                         ),
                                       ],
                                     ),
-                                    child:
-                                        const Center(child: Text('Ad space')),
+                                    child: Center(child: Text('Ad space')),
                                   ),
                                 ),
                               );
@@ -496,18 +492,18 @@ class _SearchPageState extends State<SearchPage>
                                             .colorScheme
                                             .shadow,
                                         blurRadius: 10,
-                                        offset: const Offset(6, 4),
+                                        offset: Offset(6, 4),
                                       ),
                                       BoxShadow(
                                         color: Theme.of(context)
                                             .colorScheme
                                             .shadow,
                                         blurRadius: 10,
-                                        offset: const Offset(-2, 0),
+                                        offset: Offset(-2, 0),
                                       ),
                                     ],
                                   ),
-                                  child: const Center(child: Text('Ad space')),
+                                  child: Center(child: Text('Ad space')),
                                 ),
                               ),
                             );
@@ -520,7 +516,7 @@ class _SearchPageState extends State<SearchPage>
                   },
                 ),
               ),
-              const SizedBox(height: 15),
+              SizedBox(height: 15),
             ],
           ),
         ),

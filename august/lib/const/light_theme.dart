@@ -22,6 +22,8 @@ ThemeData lightTheme = ThemeData(
 
     tertiaryContainer: Colors.grey.shade100, // 로딩 배경
     tertiary: Colors.black.withOpacity(0.04), //로딩 안쪽
+
+    onSecondary: Color.fromARGB(255, 216, 215, 215),
   ),
 );
 

@@ -50,3 +50,12 @@ Color makeDarker(Color color, double amount) {
     max(0, color.blue - (255 * amount).toInt()),
   );
 }
+
+Color makeBrighter(Color color, double amount) {
+  return Color.fromARGB(
+    color.alpha,
+    min(255, color.red + (255 * amount).toInt()),
+    min(255, color.green + (255 * amount).toInt()),
+    min(255, color.blue + (255 * amount).toInt()),
+  );
+}

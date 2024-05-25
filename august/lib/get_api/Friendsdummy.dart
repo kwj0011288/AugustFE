@@ -13,16 +13,16 @@ class DataModel {
 }
 
 List<DataModel> dataList = [
-  DataModel("Beta", "assets/icons/memoji.png", "Freshman"),
-  DataModel("Alpha", "assets/icons/memoji.png", "Freshman"),
-  DataModel("Gamma", "assets/icons/memoji.png", "Freshman"),
-  DataModel("Beta", "assets/icons/memoji.png", "Freshman"),
-  DataModel("Alpha", "assets/icons/memoji.png", "Freshman"),
-  DataModel("Gamma", "assets/icons/memoji.png", "Freshman"),
-  DataModel("Beta", "assets/icons/memoji.png", "Freshman"),
-  DataModel("Alpha", "assets/icons/memoji.png", "Freshman"),
-  DataModel("Gamma", "assets/icons/memoji.png", "Freshman"),
-  DataModel("Beta", "assets/icons/memoji.png", "Freshman"),
-  DataModel("Alpha", "assets/icons/memoji.png", "Freshman"),
-  DataModel("Gamma", "assets/icons/memoji.png", "Freshman"),
+  // DataModel("Beta", "assets/icons/memoji.png", "Freshman"),
+  // DataModel("Alpha", "assets/icons/memoji.png", "Freshman"),
+  // DataModel("Gamma", "assets/icons/memoji.png", "Freshman"),
+  // DataModel("Beta", "assets/icons/memoji.png", "Freshman"),
+  // DataModel("Alpha", "assets/icons/memoji.png", "Freshman"),
+  // DataModel("Gamma", "assets/icons/memoji.png", "Freshman"),
+  // DataModel("Beta", "assets/icons/memoji.png", "Freshman"),
+  // DataModel("Alpha", "assets/icons/memoji.png", "Freshman"),
+  // DataModel("Gamma", "assets/icons/memoji.png", "Freshman"),
+  // DataModel("Beta", "assets/icons/memoji.png", "Freshman"),
+  // DataModel("Alpha", "assets/icons/memoji.png", "Freshman"),
+  // DataModel("Gamma", "assets/icons/memoji.png", "Freshman"),
 ];

@@ -4,7 +4,6 @@ import 'package:august/components/timetable.dart';
 import 'package:august/const/dark_theme.dart';
 import 'package:august/const/light_theme.dart';
 import 'package:august/const/tile_color.dart';
-import 'package:august/get_api/schedule.dart';
 import 'package:august/onboard/semester.dart';
 import 'package:august/pages/grade_cal.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
@@ -15,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import "package:flutter_feather_icons/flutter_feather_icons.dart";
 import 'package:flutter/material.dart' hide ModalBottomSheetRoute;
+import 'dart:math' as math;
 
 class GPAPage extends StatefulWidget {
   final String semester;
@@ -55,11 +55,14 @@ class Course {
       );
 }
 
-class _GPAPageState extends State<GPAPage> {
+class _GPAPageState extends State<GPAPage> with TickerProviderStateMixin {
   List<Course> courses = [];
   int _totalCredits = 0; // 총 학점을 저장할 변수
   double _newGPA = 0.0; // 새로운 GPA를 저장할 변수
   int totalLength = 0;
+  bool isEdit = false;
+  AnimationController? _controller;
+  AnimationController? _jiggleController;
 
   @override
   void initState() {
@@ -78,12 +81,56 @@ class _GPAPageState extends State<GPAPage> {
         }
       }
     }
+
     loadCourses();
+
+    /* Animation setting below */
+
+    _controller = AnimationController(
+      duration: const Duration(
+          milliseconds:
+              300), // Adjust duration to control speed of the animation
+      vsync: this,
+    );
+
+    _jiggleController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    )..repeat(reverse: true);
   }
 
   @override
   void dispose() {
+    _controller!.dispose();
+    _jiggleController!.dispose();
     super.dispose();
+  }
+
+  void toggleisEdit() {
+    setState(() {
+      isEdit = !isEdit; // Toggle the edit mode state
+    });
+    if (isEdit) {
+      _controller!.forward(); // Animate to expanded aspect ratio
+    } else {
+      _controller!.reverse(); // Animate to normal aspect ratio
+    }
+  }
+
+  Widget JiggleTrashIcon() {
+    return AnimatedBuilder(
+      animation: _jiggleController!,
+      child: Icon(FeatherIcons.trash2, color: Colors.black, size: 40),
+      builder: (context, child) {
+        // Use sin function to create the jiggle effect
+        final angle = math.sin(_jiggleController!.value * 5 * math.pi) *
+            0.1; // Adjust amplitude for more/less jiggle
+        return Transform.rotate(
+          angle: angle,
+          child: child,
+        );
+      },
+    );
   }
 
   Future<void> addCourse() async {
@@ -113,6 +160,16 @@ class _GPAPageState extends State<GPAPage> {
     }
   }
 
+  Future<void> removeCourse(int index) async {
+    final prefs = await SharedPreferences.getInstance();
+    String key = 'course_assignments_${index}';
+    setState(() {
+      courses.removeAt(index);
+      saveCourses();
+    });
+    await prefs.remove(key);
+  }
+
   Widget courseFormModal(
       BuildContext context,
       TextEditingController nameController,
@@ -136,6 +193,9 @@ class _GPAPageState extends State<GPAPage> {
             ),
             SizedBox(height: 10),
             CupertinoTextField(
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(8),
+              ],
               autofocus: true,
               controller: nameController,
               placeholder: "Name",
@@ -266,32 +326,8 @@ class _GPAPageState extends State<GPAPage> {
     }
   }
 
-// Calculate GPA
-  void calculateGPA() {
-    double totalPoints = 0;
-    int totalCredits = 0;
-
-    for (Course course in courses) {
-      if (course.letterGrade != '??') {
-        double courseGrade = gradeToNumber(course.letterGrade);
-        totalPoints += courseGrade * course.credits;
-        totalCredits += course.credits;
-      }
-    }
-
-    if (totalCredits != 0) {
-      setState(() {
-        _newGPA = totalPoints / totalCredits;
-        _totalCredits = totalCredits;
-        // Format GPA to two decimal places
-        _newGPA = double.parse(_newGPA.toStringAsFixed(2));
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    calculateGPA();
     _totalCredits = courses.fold(0, (sum, course) => sum + course.credits);
     final theme = Theme.of(context);
     List<Color> tileColors =
@@ -379,11 +415,42 @@ class _GPAPageState extends State<GPAPage> {
                           },
                         ),
                         Spacer(),
+                        GestureDetector(
+                          onTap: () {
+                            toggleisEdit();
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 5),
+                            child: AnimatedContainer(
+                              duration: Duration(milliseconds: 300),
+                              width: 60,
+                              height: 35,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30),
+                                color: isEdit
+                                    ? Colors.blueAccent
+                                    : Theme.of(context).colorScheme.primary,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  isEdit ? 'Done' : 'Edit',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ],
                 ),
               ),
+              SizedBox(height: 10),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(10),
@@ -420,101 +487,141 @@ class _GPAPageState extends State<GPAPage> {
                       Course course = courses[idx];
                       return GestureDetector(
                         onTap: () async {
-                          var letterGrade = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => GradeCalcPage(index: idx),
-                            ),
-                          );
+                          if (isEdit) {
+                            HapticFeedback.mediumImpact();
+                            removeCourse(idx);
+                          } else {
+                            var letterGrade = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => GradeCalcPage(index: idx),
+                              ),
+                            );
 
-                          if (letterGrade != null) {
-                            setState(() {
-                              courses[idx].letterGrade = letterGrade;
-                              saveCourses();
-                            });
+                            if (letterGrade != null) {
+                              setState(() {
+                                courses[idx].letterGrade = letterGrade;
+                                saveCourses();
+                              });
+                            }
                           }
                         },
-                        child: Container(
+                        child: AnimatedContainer(
+                          duration: Duration(milliseconds: 300),
                           decoration: BoxDecoration(
-                            color: tileColors[idx % tileColors.length],
+                            color: !isEdit
+                                ? tileColors[idx % tileColors.length]
+                                : Colors.redAccent,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Column(
-                            children: [
-                              Expanded(
-                                flex: 3,
-                                child: Container(
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(10),
-                                      topRight: Radius.circular(10),
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Center(
-                                        child: Text(
-                                          course.name,
-                                          style: TextStyle(
-                                            fontSize: 25,
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.bold,
+                          child: !isEdit
+                              ? Column(
+                                  children: [
+                                    Expanded(
+                                      flex: 3,
+                                      child: Align(
+                                        alignment: Alignment.center,
+                                        child: Container(
+                                          width: double.infinity,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(10),
+                                              topRight: Radius.circular(10),
+                                            ),
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                course.name,
+                                                style: TextStyle(
+                                                  fontSize: 25,
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              SizedBox(width: 5),
+                                              Icon(
+                                                Icons.arrow_forward_ios,
+                                                size: 15,
+                                                color: Colors.black,
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ),
-                                      SizedBox(width: 5),
-                                      Icon(
-                                        Icons.arrow_forward_ios,
-                                        size: 15,
-                                        color: Colors.black,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                flex: 1,
-                                child: Container(
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    color: makeDarker(
-                                        tileColors[idx % tileColors.length],
-                                        0.2),
-                                    borderRadius: BorderRadius.only(
-                                      bottomLeft: Radius.circular(10),
-                                      bottomRight: Radius.circular(10),
                                     ),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
+                                    Expanded(
+                                      flex: 1,
+                                      child: AnimatedContainer(
+                                        duration: Duration(milliseconds: 300),
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(
+                                          color: !isEdit
+                                              ? makeDarker(
+                                                  tileColors[
+                                                      idx % tileColors.length],
+                                                  0.2)
+                                              : Colors.redAccent,
+                                          borderRadius: BorderRadius.only(
+                                            bottomLeft: Radius.circular(10),
+                                            bottomRight: Radius.circular(10),
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            Text(
+                                              'Credits: ${course.credits}',
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold,
+                                                fontFamily: "Apple",
+                                              ),
+                                            ),
+                                            Text(
+                                              'GPA: ${courses[idx].letterGrade}',
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold,
+                                                fontFamily: "Apple",
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
-                                      Text(
-                                        'Credits: ${course.credits}',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: "Apple",
-                                        ),
+                                      Align(
+                                        alignment: Alignment.center,
+                                        child: CircleAvatar(
+                                            backgroundColor: Colors.transparent,
+                                            maxRadius: 50,
+                                            foregroundColor: Theme.of(context)
+                                                .colorScheme
+                                                .background,
+                                            child: JiggleTrashIcon()),
                                       ),
-                                      Text(
-                                        'GPA: ${courses[idx].letterGrade}',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: "Apple",
-                                        ),
-                                      ),
+                                      Text(course.name,
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.bold)),
                                     ],
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
                         ),
                       );
                     },

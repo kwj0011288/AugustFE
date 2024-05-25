@@ -138,6 +138,7 @@ class __GradeCalcPageState extends State<GradeCalcPage>
     setState(() {
       assignment.removeAt(index);
       saveAssignments();
+      recalculateTotalGPA();
     });
   }
 
@@ -213,6 +214,7 @@ class __GradeCalcPageState extends State<GradeCalcPage>
               children: [
                 Expanded(
                   child: CupertinoTextField(
+                    autofocus: true,
                     controller: nameController,
                     placeholder: "Assignment Name",
                     placeholderStyle: TextStyle(
@@ -314,6 +316,10 @@ class __GradeCalcPageState extends State<GradeCalcPage>
               children: [
                 Expanded(
                   child: CupertinoTextField(
+                    autofocus: true,
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(5),
+                    ],
                     controller: gradeController,
                     placeholder:
                         'Grade of ${formatAssignmentName(assignment[index].name)}',
@@ -417,6 +423,10 @@ class __GradeCalcPageState extends State<GradeCalcPage>
               children: [
                 Expanded(
                   child: CupertinoTextField(
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(3),
+                    ],
+                    autofocus: true,
                     controller: weightController,
                     placeholder: 'Weight of ${assignment[index].name}',
                     placeholderStyle: TextStyle(
@@ -482,13 +492,10 @@ class __GradeCalcPageState extends State<GradeCalcPage>
     for (var a in assignment) {
       double weight = double.tryParse(a.weight) ?? 0.0;
       double grade = double.tryParse(a.grade) ?? 0.0;
-      print(
-          "Assignment: ${a.name}, Weight: $weight, Grade: $grade"); // Log each assignment
+
       newTotalGpa += (weight * grade);
       newTotalWeight += weight;
     }
-    print(
-        "Total Weighted GPA: $newTotalGpa, Total Weight: $newTotalWeight"); // Log totals before division
     if (newTotalWeight > 0) {
       totalGpa = newTotalGpa / newTotalWeight;
     } else {
@@ -755,10 +762,9 @@ class __GradeCalcPageState extends State<GradeCalcPage>
                               borderRadius: BorderRadius.circular(
                                   10), // Smaller border radius for a more subtle effect
                               onPressed: (context) {
-                                removeAssignment(index);
-                                setState(() {
-                                  assignment.removeAt(index);
-                                });
+                                if (index >= 0 && index < assignment.length) {
+                                  removeAssignment(index);
+                                }
                               },
                               backgroundColor: Color(0xFFFE4A49),
                               foregroundColor: Colors.white,
@@ -782,7 +788,7 @@ class __GradeCalcPageState extends State<GradeCalcPage>
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 15),
+                                      horizontal: 10),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment:
@@ -817,7 +823,7 @@ class __GradeCalcPageState extends State<GradeCalcPage>
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 3),
                                     child: Container(
-                                      width: 100, // 너비 조절
+                                      width: 85, // 너비 조절
                                       height: 60, // 높이 조절
                                       decoration: BoxDecoration(
                                         color: assignment[index].weightButton
@@ -873,7 +879,7 @@ class __GradeCalcPageState extends State<GradeCalcPage>
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 5),
                                     child: Container(
-                                      width: 120, // 너비 조절
+                                      width: 140, // 너비 조절
                                       height: 60, // 높이 조절
                                       decoration: BoxDecoration(
                                         color: assignment[index].gradeButton

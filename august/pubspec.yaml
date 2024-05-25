@@ -76,6 +76,11 @@ flutter:
   - assets/icons/major.svg
   - assets/icons/univ.svg
   - assets/icons/profile.svg
+  - assets/memoji/Memoji1.png
+  - assets/memoji/Memoji2.png
+  - assets/memoji/Memoji3.png
+  - assets/memoji/Memoji4.png
+
 
 
   uses-material-design: true

@@ -259,6 +259,36 @@ class _SelectPageState extends State<SelectPage> {
 
                     print(semester);
 
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (BuildContext context) {
+                        return Dialog(
+                          elevation: 0,
+                          backgroundColor: Colors.transparent,
+                          child: Center(
+                            child: Container(
+                              width: 100, // Adjust as needed
+                              height: 100, // Adjust as needed
+                              decoration: BoxDecoration(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .primaryContainer,
+                                borderRadius: BorderRadius.circular(
+                                    100), // Adjust as needed
+                              ),
+                              child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: CircularProgressIndicator(
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
+                                  )),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+
                     if (coursesProvider.addedCoursesCount != 0) {
                       // 모든 선택된 타임테이블에 대해 반복
                       for (var selectedCourses
@@ -274,44 +304,6 @@ class _SelectPageState extends State<SelectPage> {
                               "Schedule"; // 사용자가 설정할 수 있는 타임테이블 이름
 
                           try {
-                            showDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              builder: (BuildContext context) {
-                                return Dialog(
-                                  elevation: 0,
-                                  backgroundColor: Colors.transparent,
-                                  child: Center(
-                                    child: SizedBox(
-                                      width: MediaQuery.of(context).size.width,
-                                      height: 180,
-                                      child: Center(
-                                        child: AnimatedTextKit(
-                                          repeatForever: true,
-                                          animatedTexts: [
-                                            TypewriterAnimatedText(
-                                              "Loading...",
-                                              textStyle: TextStyle(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .outline,
-                                                fontSize: 60,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                              textAlign: TextAlign.center,
-                                              speed:
-                                                  Duration(milliseconds: 100),
-                                            ),
-                                          ],
-                                          isRepeatingAnimation: true,
-                                          pause: Duration(milliseconds: 10),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
                             // 현재 타임테이블을 서버에 전송
                             await sendTimetableToServer(
                                 semester, timetableName, sectionIds);

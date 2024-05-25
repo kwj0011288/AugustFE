@@ -1,11 +1,8 @@
 import 'dart:convert';
-import 'package:intl/intl.dart';
 import 'dart:ui';
 import 'package:august/get_api/edit_timetable.dart';
-import 'package:august/get_api/get_semester.dart';
 import 'package:august/pages/edit_search_page.dart';
 import 'package:august/pages/homepage.dart';
-import 'package:august/pages/manual_search_page.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -18,22 +15,23 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import '../components/button.dart';
 import '../components/courseprovider.dart';
 import '../components/timetable.dart';
-import '../get_api/class.dart';
 import '../get_api/schedule.dart';
 
 class EditPage extends StatefulWidget {
   final int? index;
+  final String? name;
   final ScheduleList? newCourse;
   ValueNotifier<List<ScheduleList>>? addedCoursesNotifier;
   final String semester;
 
-  EditPage(
-      {Key? key,
-      this.index,
-      this.newCourse,
-      this.addedCoursesNotifier,
-      required this.semester})
-      : super(key: key);
+  EditPage({
+    super.key,
+    this.index,
+    this.newCourse,
+    this.addedCoursesNotifier,
+    required this.semester,
+    this.name,
+  });
 
   @override
   State<EditPage> createState() => _EditPageState();
@@ -227,7 +225,7 @@ class _EditPageState extends State<EditPage> {
                 Padding(
                   padding: const EdgeInsets.only(left: 20),
                   child: Text(
-                    'Edit',
+                    "Edit ${widget.name}",
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,

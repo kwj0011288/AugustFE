@@ -23,6 +23,8 @@ ThemeData dartTheme = ThemeData(
 
     tertiaryContainer: Colors.grey.shade900, // 로딩 배경
     tertiary: Colors.black.withOpacity(0.3), //로딩 안쪽
+
+    onSecondary: Color(0xFF4d4d4d),
   ),
 );
 
