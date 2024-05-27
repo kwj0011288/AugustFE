@@ -6,6 +6,10 @@ version: 0.1.4
 environment:
   sdk: '>=3.3.1 <4.0.0'
 
+
+dependency_overrides:
+  fading_edge_scrollview: ^4.1.1
+
 dependencies:
   avatar_glow: ^3.0.1
   flutter:
@@ -59,6 +63,7 @@ dev_dependencies:
   page_view_dot_indicator: ^2.3.0
   sliding_number: ^0.0.4
   url_launcher: ^6.2.5
+  toasty_box: 
 
 flutter:
   fonts:

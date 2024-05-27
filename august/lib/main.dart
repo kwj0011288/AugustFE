@@ -48,7 +48,6 @@ void main() async {
     email = "Error";
   }
 
-  // 앱 실행
   runApp(MyApp(
     preloadedSemesters: preloadedSemesters,
     initialSemester:

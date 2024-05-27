@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:august/components/add_friend.dart';
+import 'package:august/components/invitation_code.dart';
 import 'package:august/get_api/Friendsdummy.dart';
 import 'package:august/get_api/get_semester.dart';
 import 'package:august/onboard/profile.dart';
@@ -203,24 +204,42 @@ class _FriendsPageState extends State<FriendsPage> {
                         const EdgeInsets.only(left: 15, right: 15, top: 15),
                     child: GestureDetector(
                       onTap: () {
+                        HapticFeedback.mediumImpact();
                         Navigator.push(
                           context,
-                          CupertinoPageRoute(
-                              builder: (context) => FriendsAddPage()),
+                          PageRouteBuilder(
+                            opaque: false,
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    InvitationCodePage(),
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              return FadeTransition(
+                                opacity: animation,
+                                child: child,
+                              );
+                            },
+                            transitionDuration: Duration(
+                                milliseconds:
+                                    200), // Customize the duration as needed
+                          ),
                         );
                       },
                       child: Container(
-                        width: 50,
-                        height: 40,
+                        width: 100,
+                        height: 50,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(30),
                           color: Theme.of(context).colorScheme.primary,
                         ),
                         child: Center(
-                          child: Icon(
-                            FeatherIcons.userPlus,
-                            size: 25,
-                            color: Theme.of(context).colorScheme.outline,
+                          child: Text(
+                            'My Code',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.outline,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
