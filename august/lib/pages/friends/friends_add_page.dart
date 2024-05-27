@@ -3,7 +3,7 @@ import 'package:august/components/my_bottombar.dart';
 import 'package:august/pages/friend_request_page.dart';
 import 'package:august/pages/friend_sent_page.dart';
 import 'package:august/pages/friends_page.dart';
-import 'package:august/pages/homepage.dart';
+import 'package:august/pages/main/homepage.dart';
 import 'package:august/pages/schedule_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

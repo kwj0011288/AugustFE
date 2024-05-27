@@ -1,4 +1,4 @@
-import 'package:august/pages/homepage.dart';
+import 'package:august/pages/main/homepage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
