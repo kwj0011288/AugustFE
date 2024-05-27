@@ -10,11 +10,11 @@ import 'package:august/onboard/semester.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../components/courseprovider.dart';
-import '../components/loading.dart';
-import '../get_api/class.dart';
+import '../../components/courseprovider.dart';
+import '../../components/loading.dart';
+import '../../get_api/class.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../get_api/schedule.dart';
+import '../../get_api/schedule.dart';
 import 'package:intl/intl.dart';
 import "package:flutter_feather_icons/flutter_feather_icons.dart";
 

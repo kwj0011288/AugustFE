@@ -9,7 +9,7 @@ import 'package:august/onboard/profile.dart';
 import 'package:august/onboard/semester.dart';
 import 'package:august/onboard/grade.dart';
 import 'package:august/onboard/univ.dart';
-import 'package:august/pages/gpa_page.dart';
+import 'package:august/pages/gpa/gpa_page.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

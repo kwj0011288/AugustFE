@@ -1,6 +1,6 @@
-import 'package:august/pages/friends_page.dart';
-import 'package:august/pages/me_page.dart';
-import 'package:august/pages/schedule_page.dart';
+import 'package:august/pages/friends/friends_page.dart';
+import 'package:august/pages/profile/me_page.dart';
+import 'package:august/pages/main/schedule_page.dart';
 import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';

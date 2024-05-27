@@ -5,7 +5,7 @@ import 'package:august/onboard/major.dart';
 import 'package:august/onboard/profile.dart';
 import 'package:august/onboard/semester.dart';
 import 'package:august/onboard/univ.dart';
-import 'package:august/pages/homepage.dart';
+import 'package:august/pages/main/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

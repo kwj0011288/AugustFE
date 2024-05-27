@@ -5,7 +5,7 @@ import 'package:august/components/timetable.dart';
 import 'package:august/get_api/get_semester.dart';
 import 'package:august/get_api/send_timetable.dart';
 import 'package:august/get_api/schedule.dart';
-import 'package:august/pages/homepage.dart';
+import 'package:august/pages/main/homepage.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
 import 'package:flutter/cupertino.dart';
@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../components/courseprovider.dart';
+import '../../components/courseprovider.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 
 class SelectPage extends StatefulWidget {

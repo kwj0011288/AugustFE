@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:august/get_api/get_user_info.dart';
-import 'package:august/pages/homepage.dart';
+import 'package:august/pages/main/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;

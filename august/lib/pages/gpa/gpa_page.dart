@@ -5,7 +5,7 @@ import 'package:august/const/dark_theme.dart';
 import 'package:august/const/light_theme.dart';
 import 'package:august/const/tile_color.dart';
 import 'package:august/onboard/semester.dart';
-import 'package:august/pages/grade_cal.dart';
+import 'package:august/pages/gpa/grade_cal.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
