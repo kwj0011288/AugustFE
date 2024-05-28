@@ -25,18 +25,21 @@ class ScheduleList {
   int? seats;
   int? openSeats;
   int? waitlist;
+  int? holdfile;
 
-  ScheduleList(
-      {this.id,
-      this.name,
-      this.instructors,
-      this.meetings,
-      this.courseCode,
-      this.sectionCode,
-      this.credits,
-      this.seats,
-      this.openSeats,
-      this.waitlist});
+  ScheduleList({
+    this.id,
+    this.name,
+    this.instructors,
+    this.meetings,
+    this.courseCode,
+    this.sectionCode,
+    this.credits,
+    this.seats,
+    this.openSeats,
+    this.waitlist,
+    this.holdfile,
+  });
 
   ScheduleList.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -51,6 +54,7 @@ class ScheduleList {
     seats = json['seats'];
     openSeats = json['open_seats'];
     waitlist = json['waitlist'];
+    holdfile = json['holdfile'];
   }
 
   Map<String, dynamic> toJson() {
@@ -65,6 +69,7 @@ class ScheduleList {
     data['seats'] = seats;
     data['open_seats'] = openSeats;
     data['waitlist'] = waitlist;
+    data['holdfile'] = holdfile;
     return data;
   }
 }

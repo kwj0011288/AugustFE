@@ -5,7 +5,6 @@ import 'package:august/get_api/Friendsdummy.dart';
 import 'package:august/get_api/get_semester.dart';
 import 'package:august/onboard/profile.dart';
 import 'package:august/pages/friends/friend_schedule_page.dart';
-import 'package:august/pages/friends/friends_add_page.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -263,22 +262,27 @@ class _FriendsPageState extends State<FriendsPage> {
                         itemBuilder: (context, index) {
                           if (index == dataList.length) {
                             // If it is, return the red box
-                            return Container(
-                              decoration: BoxDecoration(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .primaryContainer,
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    FeatherIcons.plus,
-                                    size: 40,
-                                  ),
-                                  Text('Add Friends')
-                                ],
+                            return GestureDetector(
+                              onTap: () {
+                                InvitationInput();
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primaryContainer,
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      FeatherIcons.plus,
+                                      size: 40,
+                                    ),
+                                    Text('Add Friends')
+                                  ],
+                                ),
                               ),
                             );
                           }
@@ -373,7 +377,7 @@ class _FriendsPageState extends State<FriendsPage> {
                             ),
                           ),
                           SizedBox(height: 20),
-                          AnimationFriends(context),
+                          AnimationFriends(),
                           SizedBox(height: 20),
                           Padding(
                             padding: const EdgeInsets.all(10.0),
@@ -402,31 +406,6 @@ class _FriendsPageState extends State<FriendsPage> {
                                 ),
                               ),
                             ),
-                            // child: CupertinoTextField(
-                            //   inputFormatters: [
-                            //     LengthLimitingTextInputFormatter(8),
-                            //   ],
-                            //   controller: inviteController,
-                            //   placeholder: "Type Invitation Code",
-                            //   placeholderStyle: TextStyle(
-                            //     color: Theme.of(context).colorScheme.outline,
-                            //   ),
-                            //   style: TextStyle(
-                            //     fontSize: 18,
-                            //     fontWeight: FontWeight.bold,
-                            //     color: Theme.of(context).colorScheme.outline,
-                            //   ),
-                            //   decoration: BoxDecoration(
-                            //     color: Theme.of(context)
-                            //         .colorScheme
-                            //         .inversePrimary,
-                            //     borderRadius: BorderRadius.circular(15),
-                            //   ),
-                            //   cursorColor:
-                            //       Theme.of(context).colorScheme.outline,
-                            //   padding: EdgeInsets.symmetric(
-                            //       vertical: 20, horizontal: 15),
-                            // ),
                           ),
                         ],
                       ),

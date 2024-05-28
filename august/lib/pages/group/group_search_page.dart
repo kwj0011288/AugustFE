@@ -8,7 +8,6 @@ import '../../get_api/get_api.dart';
 import '../../components/class_tile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import "package:flutter_feather_icons/flutter_feather_icons.dart";
-import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 

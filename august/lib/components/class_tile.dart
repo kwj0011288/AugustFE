@@ -218,6 +218,7 @@ class _ClassTileState extends State<ClassTile> {
                         fontWeight: FontWeight.bold,
                         color: Colors.black),
                   ),
+
                   Text(
                     "${list.instructors?.map((instructor) => instructor.name).join(', ')}", // Display instructor names
                     style: TextStyle(
@@ -251,6 +252,13 @@ class _ClassTileState extends State<ClassTile> {
                     ),
                     Text(
                       "Waitlist: ${section.waitlist}",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black),
+                    ),
+                    Text(
+                      "Holdfile: ${section.holdfile}",
                       style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.normal,

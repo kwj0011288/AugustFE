@@ -530,7 +530,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                 children: [
                                   Padding(
                                     padding: EdgeInsets.only(
-                                        left: 20, top: 20, right: 20),
+                                        left: 20, top: 20, right: 10),
                                     child: Align(
                                       alignment: Alignment.centerLeft, // 왼쪽 정렬
                                       child: Text(
@@ -544,7 +544,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                   ),
                                   Padding(
                                     padding: EdgeInsets.only(
-                                        left: 20, top: 5, right: 20),
+                                        left: 20, top: 5, right: 10),
                                     child: Align(
                                       alignment: Alignment.centerLeft, // 왼쪽 정렬
                                       child: Text(
@@ -563,7 +563,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                 children: [
                                   Padding(
                                     padding: EdgeInsets.only(
-                                        left: 20, top: 20, right: 20),
+                                        left: 10, top: 20, right: 10),
                                     child: Align(
                                       alignment: Alignment.centerLeft, // 왼쪽 정렬
                                       child: Text(
@@ -577,7 +577,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                   ),
                                   Padding(
                                     padding: EdgeInsets.only(
-                                        left: 20, top: 5, right: 20),
+                                        left: 10, top: 5, right: 10),
                                     child: Align(
                                       alignment: Alignment.centerLeft, // 왼쪽 정렬
                                       child: Text(
@@ -598,7 +598,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                 children: [
                                   Padding(
                                     padding: EdgeInsets.only(
-                                        left: 20, top: 20, right: 20),
+                                        left: 10, top: 20, right: 10),
                                     child: Align(
                                       alignment: Alignment.centerLeft, // 왼쪽 정렬
                                       child: Text(
@@ -612,11 +612,46 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                   ),
                                   Padding(
                                     padding: EdgeInsets.only(
-                                        left: 20, top: 5, right: 20),
+                                        left: 10, top: 5, right: 10),
                                     child: Align(
                                       alignment: Alignment.centerLeft, // 왼쪽 정렬
                                       child: Text(
                                         '${schedule.waitlist}',
+                                        style: TextStyle(
+                                            fontSize: 25,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Spacer(),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                        left: 10, top: 20, right: 20),
+                                    child: Align(
+                                      alignment: Alignment.centerLeft, // 왼쪽 정렬
+                                      child: Text(
+                                        'Holdfile',
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                        left: 10, top: 5, right: 20),
+                                    child: Align(
+                                      alignment: Alignment.centerLeft, // 왼쪽 정렬
+                                      child: Text(
+                                        '${schedule.holdfile}',
                                         style: TextStyle(
                                             fontSize: 25,
                                             fontWeight: FontWeight.bold,

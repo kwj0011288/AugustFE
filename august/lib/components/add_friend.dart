@@ -37,69 +37,114 @@ Widget animationFriend(Color color, String imagePath) {
   );
 }
 
-Widget AnimationFriends(BuildContext context) {
-  // Define constants for easier adjustments
-  const double distance = 50.0; // Constant distance for all side widgets
-  const double farDistance = 90.0; // Distance for the farthest widgets
-  const double scaleCenter = 1.0; // Scale for the center widget
-  const double scaleSide = 0.9; // Scale for side widgets
-  const double scaleFarSide = 0.8; // Scale for the farthest side widgets
+class AnimationFriends extends StatefulWidget {
+  @override
+  _AnimationFriendsState createState() => _AnimationFriendsState();
+}
 
-  List<Widget> widgets = [];
+class _AnimationFriendsState extends State<AnimationFriends>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
 
-  // Generate far left widget (visually further back)
-  widgets.add(Transform.translate(
-    offset: Offset(-1 * farDistance, 0),
-    child: Transform.scale(
-      scale: scaleFarSide,
-      child: animationFriend(Theme.of(context).colorScheme.onSecondary,
-          "assets/memoji/Memoji1.png"),
-    ),
-  ));
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    );
 
-  // Generate left widget (visually further back)
-  widgets.add(Transform.translate(
-    offset: Offset(-1 * distance, 0),
-    child: Transform.scale(
-      scale: scaleSide,
-      child: animationFriend(
-          makeBrighter(Theme.of(context).colorScheme.onSecondary, 0.1),
-          "assets/memoji/Memoji2.png"),
-    ),
-  ));
-// Generate far right widget (visually further back)
-  widgets.add(Transform.translate(
-    offset: Offset(1 * farDistance, 0),
-    child: Transform.scale(
-      scale: scaleFarSide,
-      child: animationFriend(Theme.of(context).colorScheme.onSecondary,
-          "assets/memoji/Memoji3.png"),
-    ),
-  ));
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    );
 
-  // Generate right widget (visually further back)
-  widgets.add(Transform.translate(
-    offset: Offset(1 * distance, 0),
-    child: Transform.scale(
-      scale: scaleSide,
-      child: animationFriend(
-          makeBrighter(Theme.of(context).colorScheme.onSecondary, 0.1),
-          "assets/memoji/Memoji4.png"),
-    ),
-  ));
+    _controller.forward();
+  }
 
-  // Generate center widget (visually at the front)
-  widgets.add(Transform.translate(
-    offset: Offset(0, 0),
-    child: Transform.scale(
-      scale: scaleCenter,
-      child: animationFriend(Theme.of(context).colorScheme.onSecondary,
-          "assets/memoji/Memoji1.png"),
-    ),
-  ));
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
-  return Stack(
-    alignment: Alignment.center,
-    children: widgets,
-  );
+  Widget animatedFriendOffset(Widget child, double begin, double end) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        double dx = begin + (_animation.value * (end - begin));
+        return Transform.translate(
+          offset: Offset(dx, 0),
+          child: child,
+        );
+      },
+      child: child,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Constants
+    const double distance = 50.0;
+    const double farDistance = 90.0;
+    const double scaleSide = 0.9;
+    const double scaleFarSide = 0.8;
+    const double scaleCenter = 1.0;
+
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        // Far left widget
+        animatedFriendOffset(
+          Transform.scale(
+            scale: scaleFarSide,
+            child: animationFriend(Theme.of(context).colorScheme.onSecondary,
+                "assets/memoji/Memoji1.png"),
+          ),
+          0,
+          -farDistance,
+        ),
+        // Left widget
+        animatedFriendOffset(
+          Transform.scale(
+            scale: scaleSide,
+            child: animationFriend(
+                makeBrighter(Theme.of(context).colorScheme.onSecondary, 0.1),
+                "assets/memoji/Memoji2.png"),
+          ),
+          0,
+          -distance,
+        ),
+        // Far right widget
+        animatedFriendOffset(
+          Transform.scale(
+            scale: scaleFarSide,
+            child: animationFriend(Theme.of(context).colorScheme.onSecondary,
+                "assets/memoji/Memoji3.png"),
+          ),
+          0,
+          farDistance,
+        ),
+        // Right widget
+        animatedFriendOffset(
+          Transform.scale(
+            scale: scaleSide,
+            child: animationFriend(
+                makeBrighter(Theme.of(context).colorScheme.onSecondary, 0.1),
+                "assets/memoji/Memoji4.png"),
+          ),
+          0,
+          distance,
+        ),
+
+        // Center widget
+        Transform.scale(
+          scale: scaleCenter,
+          child: animationFriend(Theme.of(context).colorScheme.onSecondary,
+              "assets/memoji/Memoji1.png"),
+        ),
+      ],
+    );
+  }
 }
