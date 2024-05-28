@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:august/components/add_friend.dart';
-import 'package:august/components/invitation_code.dart';
+import 'package:august/pages/friends/invitation_code.dart';
 import 'package:august/get_api/Friendsdummy.dart';
 import 'package:august/get_api/get_semester.dart';
 import 'package:august/onboard/profile.dart';

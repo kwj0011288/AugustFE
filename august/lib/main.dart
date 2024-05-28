@@ -19,7 +19,6 @@ import 'get_api/class_grouping.dart';
 import 'get_api/get_semester.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:async';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

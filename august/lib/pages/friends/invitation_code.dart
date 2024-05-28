@@ -37,14 +37,14 @@ class _InvitationCodePageState extends State<InvitationCodePage> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.9),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 30),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
-              height: MediaQuery.of(context).size.height * 0.35,
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 30),
+              height: 300,
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.primaryContainer,

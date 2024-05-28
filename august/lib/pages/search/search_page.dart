@@ -430,6 +430,7 @@ class _SearchPageState extends State<SearchPage>
                               fullSeat: section.seats ?? 0,
                               openSeat: section.openSeats ?? 0,
                               waitlist: section.waitlist ?? 0,
+                              holdfile: section.holdfile ?? 0,
                             ));
 
                             // 3개보다 많은 섹션이 있을 경우, 5번째 섹션마다 광고 삽입

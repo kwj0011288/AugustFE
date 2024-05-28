@@ -29,7 +29,7 @@ class GroupPage extends StatefulWidget {
 }
 
 class _GroupPageState extends State<GroupPage> {
-  List<List<GroupList?>> containers = List.generate(7, (index) => []);
+  List<List<GroupList?>> containers = List.generate(8, (index) => []);
   ValueNotifier<List<GroupList>> addedCoursesNotifier = ValueNotifier([]);
   String? _semester;
 

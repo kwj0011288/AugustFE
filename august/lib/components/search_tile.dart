@@ -1,8 +1,5 @@
-import 'package:august/components/button.dart';
-import 'package:august/const/background_color.dart';
 import 'package:august/const/dark_theme.dart';
 import 'package:august/const/light_theme.dart';
-import 'package:august/const/tile_color.dart';
 import 'package:flutter/material.dart';
 import '../get_api/class.dart';
 
@@ -14,6 +11,7 @@ class SearchTile extends StatefulWidget {
   final int fullSeat;
   final int openSeat;
   final int waitlist;
+  final int holdfile;
 
   final void Function(BuildContext context)? onTap;
   final Function? onIconToggled;
@@ -34,6 +32,7 @@ class SearchTile extends StatefulWidget {
     required this.fullSeat,
     required this.openSeat,
     required this.waitlist,
+    required this.holdfile,
   }) : super(key: key);
 
   @override
@@ -118,10 +117,12 @@ class _SearchTileState extends State<SearchTile> {
                   padding: const EdgeInsets.all(5),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center, // 수직 방향 중앙 정렬
+                    crossAxisAlignment: CrossAxisAlignment.start, // 수평 방향 중앙 정렬
                     children: [
-                      Center(
+                      Padding(
+                        padding: const EdgeInsets.only(left: 5),
                         child: Text(
-                          'Seats: ${widget.fullSeat}\nOpen Seats: ${widget.openSeat}\nWaitlist: ${widget.waitlist}',
+                          'Seats: ${widget.fullSeat}\nOpen: ${widget.openSeat}\nWaitlist: ${widget.waitlist}\nHoldfile: ${widget.holdfile}',
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 12,

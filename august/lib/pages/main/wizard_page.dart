@@ -364,6 +364,10 @@ class _GeneratePageState extends State<GeneratePage> {
 
   @override
   Widget build(BuildContext context) {
+    Size screenSize = MediaQuery.of(context).size;
+    double minHeightForLargeDevice = 812.0;
+    bool isLargeDevice = screenSize.height > minHeightForLargeDevice;
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
@@ -979,128 +983,138 @@ class _GeneratePageState extends State<GeneratePage> {
                             ),
                           ),
                         ),
-                        Divider(
-                          color: Theme.of(context).colorScheme.background,
-                          thickness: 3,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10, left: 25),
-                          child: RichText(
-                            text: TextSpan(
-                              children: <TextSpan>[
-                                TextSpan(
-                                  text: 'Min. Break  :  ',
-                                  style: TextStyle(
-                                    fontFamily: 'Apple',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                    color: Colors.grey,
+                        if (isLargeDevice)
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 10, left: 25),
+                                child: RichText(
+                                  text: TextSpan(
+                                    children: <TextSpan>[
+                                      TextSpan(
+                                        text: 'Min. Break  :  ',
+                                        style: TextStyle(
+                                          fontFamily: 'Apple',
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: formatDuration(Duration(
+                                            minutes:
+                                                _currentSliderValue2.round())),
+                                        style: TextStyle(
+                                          fontFamily: 'Apple',
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: 20,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outline,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                TextSpan(
-                                  text: formatDuration(Duration(
-                                      minutes: _currentSliderValue2.round())),
-                                  style: TextStyle(
-                                    fontFamily: 'Apple',
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 20,
-                                    color:
+                              ),
+                              Container(
+                                width: double.infinity,
+                                child: SliderTheme(
+                                  data: SliderTheme.of(context).copyWith(
+                                    thumbShape: RoundSliderThumbShape(
+                                        enabledThumbRadius: 15),
+                                    inactiveTrackColor: Colors.grey,
+                                    activeTrackColor: Colors.blueAccent,
+                                    thumbColor: Colors.white,
+                                    inactiveTickMarkColor:
                                         Theme.of(context).colorScheme.outline,
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Container(
-                          width: double.infinity,
-                          child: SliderTheme(
-                            data: SliderTheme.of(context).copyWith(
-                              thumbShape:
-                                  RoundSliderThumbShape(enabledThumbRadius: 15),
-                              inactiveTrackColor: Colors.grey,
-                              activeTrackColor: Colors.blueAccent,
-                              thumbColor: Colors.white,
-                              inactiveTickMarkColor:
-                                  Theme.of(context).colorScheme.outline,
-                            ),
-                            child: Slider(
-                              value: _currentSliderValue2,
-                              min: _slider2Min,
-                              max: _slider2Max,
-                              divisions:
-                                  (_slider2Max - _slider2Min) ~/ 10, // 여기서 수정
-                              onChanged: (double newValue) {
-                                HapticFeedback.mediumImpact();
-                                onSliderChanged(newValue, "min_interval");
-                              },
-                              onChangeEnd: (double endVal) {
-                                onSliderEnd(endVal, "min_interval");
-                              },
-                            ),
-                          ),
-                        ),
-                        // Divider(
-                        //   color: Theme.of(context).colorScheme.background,
-                        // ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 5, left: 25),
-                          child: RichText(
-                            text: TextSpan(
-                              children: <TextSpan>[
-                                TextSpan(
-                                  text: 'Max. Break  :  ',
-                                  style: TextStyle(
-                                    fontFamily: 'Apple',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                    color: Colors.grey,
+                                  child: Slider(
+                                    value: _currentSliderValue2,
+                                    min: _slider2Min,
+                                    max: _slider2Max,
+                                    divisions: (_slider2Max - _slider2Min) ~/
+                                        10, // 여기서 수정
+                                    onChanged: (double newValue) {
+                                      HapticFeedback.mediumImpact();
+                                      onSliderChanged(newValue, "min_interval");
+                                    },
+                                    onChangeEnd: (double endVal) {
+                                      onSliderEnd(endVal, "min_interval");
+                                    },
                                   ),
                                 ),
-                                TextSpan(
-                                  text: formatDurationInHours(Duration(
-                                      minutes: _currentSliderValue3.round())),
-                                  style: TextStyle(
-                                    fontFamily: 'Apple',
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 20,
-                                    color:
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 5, left: 25),
+                                child: RichText(
+                                  text: TextSpan(
+                                    children: <TextSpan>[
+                                      TextSpan(
+                                        text: 'Max. Break  :  ',
+                                        style: TextStyle(
+                                          fontFamily: 'Apple',
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: formatDurationInHours(Duration(
+                                            minutes:
+                                                _currentSliderValue3.round())),
+                                        style: TextStyle(
+                                          fontFamily: 'Apple',
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: 20,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outline,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                width: double.infinity,
+                                child: SliderTheme(
+                                  data: SliderTheme.of(context).copyWith(
+                                    thumbShape: RoundSliderThumbShape(
+                                        enabledThumbRadius: 15),
+                                    inactiveTrackColor:
+                                        Colors.grey, // 선택되지 않은 트랙의 색상
+                                    activeTrackColor:
+                                        Colors.blueAccent, // 진행바(활성 트랙)의 색상
+                                    thumbColor:
+                                        Colors.white, // 이곳에 원하는 색상을 설정합니다.
+                                    inactiveTickMarkColor:
                                         Theme.of(context).colorScheme.outline,
                                   ),
+                                  child: Slider(
+                                    value: _currentSliderValue3,
+                                    min: _slider3Min,
+                                    max: _slider3Max,
+                                    divisions:
+                                        ((_slider3Max - _slider3Min) / 60)
+                                            .round(), // 여기서 수정
+                                    onChanged: (double newValue) {
+                                      HapticFeedback.mediumImpact();
+                                      onSliderChanged(newValue, "max_interval");
+                                    },
+                                    onChangeEnd: (double endVal) {
+                                      onSliderEnd(endVal, "max_interval");
+                                    },
+                                  ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        ),
-                        Container(
-                          width: double.infinity,
-                          child: SliderTheme(
-                            data: SliderTheme.of(context).copyWith(
-                              thumbShape:
-                                  RoundSliderThumbShape(enabledThumbRadius: 15),
-                              inactiveTrackColor: Colors.grey, // 선택되지 않은 트랙의 색상
-                              activeTrackColor:
-                                  Colors.blueAccent, // 진행바(활성 트랙)의 색상
-                              thumbColor: Colors.white, // 이곳에 원하는 색상을 설정합니다.
-                              inactiveTickMarkColor:
-                                  Theme.of(context).colorScheme.outline,
-                            ),
-                            child: Slider(
-                              value: _currentSliderValue3,
-                              min: _slider3Min,
-                              max: _slider3Max,
-                              divisions: ((_slider3Max - _slider3Min) / 60)
-                                  .round(), // 여기서 수정
-                              onChanged: (double newValue) {
-                                HapticFeedback.mediumImpact();
-                                onSliderChanged(newValue, "max_interval");
-                              },
-                              onChangeEnd: (double endVal) {
-                                onSliderEnd(endVal, "max_interval");
-                              },
-                            ),
-                          ),
-                        ),
+
                         Padding(
                           padding: const EdgeInsets.only(
                               left: 10, right: 10, top: 10, bottom: 20),
@@ -1127,15 +1141,6 @@ class _GeneratePageState extends State<GeneratePage> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: [
-                                      // Padding(
-                                      //   padding: const EdgeInsets.all(8.0),
-                                      //   child: Icon(
-                                      //       isButton2Pressed
-                                      //           ? FeatherIcons.checkCircle
-                                      //           : FeatherIcons.xCircle,
-                                      //       size: 25),
-                                      // ),
-                                      // SizedBox(width: 2),
                                       Column(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
@@ -1197,15 +1202,6 @@ class _GeneratePageState extends State<GeneratePage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
                                       children: [
-                                        // Padding(
-                                        //   padding: const EdgeInsets.all(8.0),
-                                        //   child: Icon(
-                                        //       isButton3Pressed
-                                        //           ? FeatherIcons.smile
-                                        //           : FeatherIcons.meh,
-                                        //       size: 25),
-                                        // ),
-                                        //   SizedBox(width: 2),
                                         Column(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
@@ -1254,34 +1250,6 @@ class _GeneratePageState extends State<GeneratePage> {
                     ),
                   ),
                 ),
-
-                // Container(
-                //   margin: EdgeInsets.symmetric(horizontal: 10),
-                //   decoration: BoxDecoration(
-                //     color: Theme.of(context).colorScheme.primaryContainer,
-                //     borderRadius: BorderRadius.all(
-                //       Radius.circular(20),
-                //     ),
-                //     boxShadow: [
-                //       BoxShadow(
-                //         color: Theme.of(context).colorScheme.shadow,
-                //         blurRadius: (10),
-                //         offset: (Offset(0, 1)),
-                //       )
-                //     ],
-                //   ),
-                //   child: Column(
-                //     mainAxisAlignment: MainAxisAlignment.start,
-                //     crossAxisAlignment: CrossAxisAlignment.start,
-                //     children: [
-                //       Divider(
-                //         color: Theme.of(context).colorScheme.background,
-                //       ),
-                //     ],
-                //   ),
-                // ),
-                // SizedBox(height: 15),
-
                 SizedBox(height: 40),
               ],
             ),
