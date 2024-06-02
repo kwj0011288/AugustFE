@@ -64,7 +64,8 @@ dev_dependencies:
   sliding_number: ^0.0.4
   url_launcher: ^6.2.5
   toasty_box: 
-
+  pull_to_refresh:
+  
 flutter:
   fonts:
     - family: Apple

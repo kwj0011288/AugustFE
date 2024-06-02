@@ -1,6 +1,6 @@
 import 'package:august/components/button.dart';
 import 'package:august/components/courseprovider.dart';
-import 'package:august/get_api/get_semester.dart';
+import 'package:august/get_api/onboard/get_semester.dart';
 import 'package:august/login/login.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

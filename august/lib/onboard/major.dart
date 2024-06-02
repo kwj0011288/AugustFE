@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:august/get_api/get_department.dart'; // Make sure this import is correct
+import 'package:august/get_api/onboard/get_department.dart'; // Make sure this import is correct
 import "package:flutter_feather_icons/flutter_feather_icons.dart";
 import 'package:flutter_svg/svg.dart';
 

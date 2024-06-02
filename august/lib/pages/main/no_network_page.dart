@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:august/const/dark_theme.dart';
 import 'package:august/const/light_theme.dart';
-import 'package:august/get_api/schedule.dart';
+import 'package:august/get_api/timetable/schedule.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -34,8 +34,6 @@ class _NoNetworkPageState extends State<NoNetworkPage> {
   Future<void> loadFirstTimetable() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? jsonString = prefs.getString('timetable');
-    String? gradesJson =
-        prefs.getString('selectedGrades'); // Fetch the saved grades JSON string
 
     if (jsonString != null) {
       try {

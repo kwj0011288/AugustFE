@@ -5,15 +5,15 @@ import 'package:august/components/courseprovider.dart';
 import 'package:august/components/simple_course_tile.dart';
 import 'package:august/const/dark_theme.dart';
 import 'package:august/const/light_theme.dart';
-import 'package:august/get_api/get_semester.dart';
+import 'package:august/get_api/onboard/get_semester.dart';
 import 'package:august/onboard/semester.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../components/loading.dart';
-import '../../get_api/class.dart';
+import '../../get_api/timetable/class.dart';
 import 'package:provider/provider.dart';
-import '../../get_api/get_api.dart';
-import '../../get_api/schedule.dart';
+import '../../get_api/search/get_api.dart';
+import '../../get_api/timetable/schedule.dart';
 import 'package:intl/intl.dart';
 import "package:flutter_feather_icons/flutter_feather_icons.dart";
 import 'package:shared_preferences/shared_preferences.dart';
@@ -591,6 +591,7 @@ class _EditSearchPageState extends State<EditSearchPage>
                                   fullSeat: section.seats ?? 0,
                                   openSeat: section.openSeats ?? 0,
                                   waitlist: section.waitlist ?? 0,
+                                  holdfile: section.holdfile ?? 0,
                                 );
                               }).toList() ??
                               [],

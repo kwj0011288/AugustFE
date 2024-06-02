@@ -1,10 +1,8 @@
 import 'package:august/components/button.dart';
-import 'package:august/const/background_color.dart';
 import 'package:august/const/dark_theme.dart';
 import 'package:august/const/light_theme.dart';
-import 'package:august/const/tile_color.dart';
 import 'package:flutter/material.dart';
-import '../get_api/class.dart';
+import '../get_api/timetable/class.dart';
 
 class SimepleCourseTile extends StatefulWidget {
   final CourseList classes;
@@ -14,6 +12,7 @@ class SimepleCourseTile extends StatefulWidget {
   final int fullSeat;
   final int openSeat;
   final int waitlist;
+  final int holdfile;
   final void Function(BuildContext context)? onPressed;
   final void Function(BuildContext context)? onTap;
   final IconData icon;
@@ -39,6 +38,7 @@ class SimepleCourseTile extends StatefulWidget {
     required this.fullSeat,
     required this.openSeat,
     required this.waitlist,
+    required this.holdfile,
   }) : super(key: key);
 
   @override
@@ -177,7 +177,9 @@ class _ClassTileState extends State<SimepleCourseTile> {
                                 ",  "
                                     'Open Seats: ${widget.openSeat.toString()}' +
                                 ",  "
-                                    'Waitlist: ${widget.waitlist.toString()}',
+                                    'Waitlist: ${widget.waitlist.toString()}' +
+                                ",  "
+                                    'Holdfile: ${widget.holdfile.toString()}',
                             Colors.white.withOpacity(0.7),
                             () {}),
                       ),

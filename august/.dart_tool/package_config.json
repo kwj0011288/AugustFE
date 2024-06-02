@@ -644,6 +644,12 @@
       "languageVersion": "2.17"
     },
     {
+      "name": "pull_to_refresh",
+      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/pull_to_refresh-2.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "qr",
       "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/qr-3.0.1",
       "packageUri": "lib/",
@@ -896,7 +902,7 @@
       "languageVersion": "3.3"
     }
   ],
-  "generated": "2024-05-27T11:42:06.060329Z",
+  "generated": "2024-05-30T11:30:21.394553Z",
   "generator": "pub",
   "generatorVersion": "3.4.1",
   "flutterRoot": "file:///opt/homebrew/Caskroom/flutter/3.10.6/flutter",

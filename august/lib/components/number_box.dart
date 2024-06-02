@@ -20,8 +20,8 @@ class DigitBoxes extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(5.0),
       child: Container(
-        width: 45, // Adjust the width as needed
-        height: 50, // Adjust the height as needed
+        width: 35,
+        height: 50,
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.primary,

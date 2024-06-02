@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:august/components/button.dart';
 import 'package:august/components/timetable.dart';
-import 'package:august/get_api/get_semester.dart';
-import 'package:august/get_api/send_timetable.dart';
-import 'package:august/get_api/schedule.dart';
+import 'package:august/get_api/onboard/get_semester.dart';
+import 'package:august/get_api/timetable/send_timetable.dart';
+import 'package:august/get_api/timetable/schedule.dart';
 import 'package:august/pages/main/homepage.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';

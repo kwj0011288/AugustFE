@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:august/get_api/get_semester.dart';
-import 'package:august/get_api/schedule_get.dart';
+import 'package:august/get_api/onboard/get_semester.dart';
+import 'package:august/get_api/wizard/schedule_get.dart';
 import 'package:august/login/initialpage.dart';
 import 'package:august/login/login.dart';
 import 'package:august/onboard/major.dart';

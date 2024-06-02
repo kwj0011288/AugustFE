@@ -1,14 +1,14 @@
 import 'package:animated_hint_textfield/animated_hint_textfield.dart';
 import 'package:august/components/search_tile.dart';
-import 'package:august/get_api/get_semester.dart';
-import 'package:august/get_api/simple_sections.dart';
+import 'package:august/get_api/onboard/get_semester.dart';
+import 'package:august/get_api/search/simple_sections.dart';
 import 'package:august/onboard/semester.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../components/loading.dart';
-import '../../get_api/class.dart';
+import '../../get_api/timetable/class.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
 import 'package:intl/intl.dart';
 import "package:flutter_feather_icons/flutter_feather_icons.dart";

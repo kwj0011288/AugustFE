@@ -5,7 +5,7 @@ import 'dart:typed_data';
 import 'package:august/const/course_color.dart';
 import 'package:flutter/cupertino.dart';
 
-import '../get_api/schedule.dart';
+import '../get_api/timetable/schedule.dart';
 
 class TimetableInfo {
   List<ScheduleList> courses;

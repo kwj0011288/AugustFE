@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../get_api/schedule.dart';
+import '../get_api/timetable/schedule.dart';
 
 class SectionTile extends StatefulWidget {
   final ScheduleList classes;

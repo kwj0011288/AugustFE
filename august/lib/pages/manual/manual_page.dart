@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:ui';
-import 'package:august/get_api/get_semester.dart';
+import 'package:august/get_api/onboard/get_semester.dart';
 import 'package:august/pages/main/homepage.dart';
 import 'package:august/pages/manual/manual_search_page.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
@@ -15,8 +15,8 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import '../../components/button.dart';
 import '../../components/courseprovider.dart';
 import '../../components/timetable.dart';
-import '../../get_api/class.dart';
-import '../../get_api/schedule.dart';
+import '../../get_api/timetable/class.dart';
+import '../../get_api/timetable/schedule.dart';
 
 class ManualPage extends StatefulWidget {
   final List<ScheduleList> coursesData; // Course is a hypothetical class here.

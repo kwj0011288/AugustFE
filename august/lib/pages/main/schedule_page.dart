@@ -5,12 +5,12 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:august/components/button.dart';
 import 'package:august/components/loading.dart';
-import 'package:august/get_api/delete_timetable.dart';
-import 'package:august/get_api/edit_timetable.dart';
-import 'package:august/get_api/get_semester.dart';
-import 'package:august/get_api/get_timetables.dart';
-import 'package:august/get_api/schedule.dart';
-import 'package:august/get_api/set_timetable_name.dart';
+import 'package:august/get_api/timetable/delete_timetable.dart';
+import 'package:august/get_api/timetable/edit_timetable.dart';
+import 'package:august/get_api/onboard/get_semester.dart';
+import 'package:august/get_api/onboard/get_timetables.dart';
+import 'package:august/get_api/timetable/schedule.dart';
+import 'package:august/get_api/timetable/set_timetable_name.dart';
 import 'package:august/login/login.dart';
 import 'package:august/onboard/profile.dart';
 import 'package:august/onboard/semester.dart';
@@ -74,7 +74,6 @@ class _SchedulePageState extends State<SchedulePage>
       PageController(viewportFraction: 0.8, keepPage: true);
   bool loadDone = false;
   bool isLoading = true;
-  Timer? _timer;
   List<int> timetableOrder = [];
   int serverIndex = 0;
 
@@ -123,7 +122,6 @@ class _SchedulePageState extends State<SchedulePage>
 
   Future<void> resetAnimations() async {
     await Future.delayed(const Duration(seconds: 1));
-    setState(() {});
     await Future.delayed(const Duration(seconds: 1));
     return;
   }
@@ -182,7 +180,6 @@ class _SchedulePageState extends State<SchedulePage>
 
   @override
   void dispose() {
-    _timer?.cancel(); // Cancel the timer if it is active
     _dotIndicatorScrollController.dispose();
     _pageController.dispose();
     _animationController.dispose();
@@ -320,7 +317,6 @@ class _SchedulePageState extends State<SchedulePage>
       }
       _timetableCollection
           .removeWhere((timeTable) => timeTable.coursesData[0].isEmpty);
-      setState(() {});
     }
   }
 
@@ -365,8 +361,6 @@ class _SchedulePageState extends State<SchedulePage>
 
       // Now that the timetable collection and orders are updated, save it to local storage
       await saveTimetableToLocalStorage();
-
-      setState(() {});
     } catch (e) {
       print("Error fetching timetable: $e");
     }
@@ -444,8 +438,6 @@ class _SchedulePageState extends State<SchedulePage>
     } else {
       _semester = ' '; // Use a default value if there's no stored value
     }
-
-    setState(() {}); // Update the UI with the new values
   }
 
   Future<void> _editTimetableName(int index) async {
@@ -1093,7 +1085,7 @@ class _SchedulePageState extends State<SchedulePage>
                                                                                   ),
                                                                                   const SizedBox(height: 5),
                                                                                   Text(
-                                                                                    'Maunally\nCreate',
+                                                                                    'Manually\nCreate',
                                                                                     style: TextStyle(
                                                                                       fontSize: 20,
                                                                                       fontWeight: FontWeight.bold,

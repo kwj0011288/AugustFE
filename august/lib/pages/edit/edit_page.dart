@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:ui';
-import 'package:august/get_api/edit_timetable.dart';
+import 'package:august/get_api/timetable/edit_timetable.dart';
 import 'package:august/pages/edit/edit_search_page.dart';
 import 'package:august/pages/main/homepage.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
@@ -15,7 +15,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import '../../components/button.dart';
 import '../../components/courseprovider.dart';
 import '../../components/timetable.dart';
-import '../../get_api/schedule.dart';
+import '../../get_api/timetable/schedule.dart';
 
 class EditPage extends StatefulWidget {
   final int? index;

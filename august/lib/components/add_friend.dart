@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:august/const/tile_color.dart';
 import 'package:flutter/material.dart';
 
@@ -46,6 +48,7 @@ class _AnimationFriendsState extends State<AnimationFriends>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
+  late Timer _timer = Timer(Duration.zero, () {});
 
   @override
   void initState() {
@@ -59,12 +62,24 @@ class _AnimationFriendsState extends State<AnimationFriends>
       parent: _controller,
       curve: Curves.easeInOut,
     );
+    _startAnimationCycle();
+  }
 
-    _controller.forward();
+  void _startAnimationCycle() {
+    _controller.forward().then((_) {
+      _timer = Timer(Duration(seconds: 3), () {
+        _controller.reverse().then((_) {
+          _timer = Timer(Duration(seconds: 3), () {
+            _startAnimationCycle(); // 다시 애니메이션 사이클 시작
+          });
+        });
+      });
+    });
   }
 
   @override
   void dispose() {
+    _timer.cancel();
     _controller.dispose();
     super.dispose();
   }

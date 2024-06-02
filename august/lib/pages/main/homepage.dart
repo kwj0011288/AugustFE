@@ -1,6 +1,7 @@
 import 'package:august/components/my_bottombar.dart';
 import 'package:august/const/save_image.dart';
-import 'package:august/get_api/get_semester.dart';
+import 'package:august/get_api/friends/get_friends.dart';
+import 'package:august/get_api/onboard/get_semester.dart';
 import 'package:august/login/login.dart';
 import 'package:august/onboard/onboard.dart';
 import 'package:august/onboard/semester.dart';
@@ -288,9 +289,12 @@ class _HomePageState extends State<HomePage> {
           child: BottomBar(
             onIndexChanged: (index) {
               checkAccessToken();
-              setState(() {
-                _currentIndex = index;
-              });
+              if (_currentIndex != index) {
+                // Only update if different to prevent unnecessary rebuilds
+                setState(() {
+                  _currentIndex = index;
+                });
+              }
             },
           ),
         ),

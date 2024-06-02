@@ -1,21 +1,35 @@
+import 'dart:convert';
 import 'dart:math';
 
-import 'package:august/components/button.dart';
+import 'package:august/components/friend_button.dart';
 import 'package:august/components/timetable.dart';
-import 'package:august/get_api/schedule.dart';
+import 'package:august/const/tile_color.dart';
+import 'package:august/get_api/friends/friend_table.dart';
+import 'package:august/get_api/onboard/get_semester.dart';
+import 'package:august/get_api/timetable/schedule.dart';
+import 'package:august/login/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import "package:flutter_feather_icons/flutter_feather_icons.dart";
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FriendSchedulePage extends StatefulWidget {
   final String? photoUrl; // 사진 URL
   final String name; // 친구 이름
+  final String yearInSchool;
+  final String department;
+  final List<int>? semesterList;
+  final int? friendId;
 
   const FriendSchedulePage({
     Key? key,
     this.photoUrl,
     required this.name,
+    required this.yearInSchool,
+    required this.department,
+    this.semesterList,
+    this.friendId,
   }) : super(key: key);
 
   @override
@@ -27,136 +41,25 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
   AnimationController? _animationController;
   bool schedule1 = true;
   bool schedule2 = false;
-  bool schedule3 = false;
+  int? selectedSemester;
+  int? numberOfClasses = 0;
+  bool isLoading = false;
 
   List<ScheduleList> scheduleLists = [];
   List<ScheduleList> chillLists = [];
+  List<ScheduleList> _firstTimetableCourses = [];
 
-  final List<Map<String, dynamic>> jsonData = [
-    // 시간표 1
-    {
-      // 시간표 1에 포함된 수업 1
-      "id": 123,
-      "name": "Anatomy of Domestic Animals",
-      "course_code": "ANSC204",
-      "section_code": "ANSC204-0101",
-      "instructors": ["Angela Black"],
-      "meetings": [
-        {
-          "building": "ANS",
-          "room": "0408",
-          "days": "M",
-          "start_time": "14:00",
-          "end_time": "14:50"
-        },
-        {
-          "building": "ANS",
-          "room": "0408",
-          "days": "W",
-          "start_time": "14:00",
-          "end_time": "14:50"
-        }
-      ],
-      "credits": 2,
-      "seats": 50,
-      "open_seats": 35,
-      "waitlist": 0,
-      "holdfile": null
-    },
-    {
-      // 시간표 1에 포함된 수업 2
-      "id": 456,
-      "name": "Introduction to Plant Biology",
-      "course_code": "BIOL101",
-      "section_code": "BIOL101-0202",
-      "instructors": ["Christopher Green"],
-      "meetings": [
-        {
-          "building": "BIO",
-          "room": "0203",
-          "days": "T",
-          "start_time": "10:00",
-          "end_time": "11:15"
-        },
-        {
-          "building": "BIO",
-          "room": "0203",
-          "days": "Th",
-          "start_time": "10:00",
-          "end_time": "11:15"
-        }
-      ],
-      "credits": 3,
-      "seats": 60,
-      "open_seats": 40,
-      "waitlist": 5,
-      "holdfile": null
-    }
-  ];
-  final List<Map<String, dynamic>> jsonData1 = [
-    // 시간표 1
-    {
-      // 시간표 1에 포함된 수업 1
-      "id": 123,
-      "name": "Anatomy of Domestic Animals",
-      "course_code": "Chill",
-      "section_code": "ANSC204-0101",
-      "instructors": ["Angela Black"],
-      "meetings": [
-        {
-          "building": "ANS",
-          "room": "0408",
-          "days": "M",
-          "start_time": "7:00",
-          "end_time": "14:50"
-        },
-        {
-          "building": "ANS",
-          "room": "0408",
-          "days": "W",
-          "start_time": "14:00",
-          "end_time": "14:50"
-        }
-      ],
-      "credits": 2,
-      "seats": 50,
-      "open_seats": 35,
-      "waitlist": 0,
-      "holdfile": null
-    },
-    {
-      // 시간표 1에 포함된 수업 2
-      "id": 456,
-      "name": "Introduction to Plant Biology",
-      "course_code": "BIOL101",
-      "section_code": "BIOL101-0202",
-      "instructors": ["Christopher Green"],
-      "meetings": [
-        {
-          "building": "BIO",
-          "room": "0203",
-          "days": "T",
-          "start_time": "8:00",
-          "end_time": "11:15"
-        },
-        {
-          "building": "BIO",
-          "room": "0203",
-          "days": "Th",
-          "start_time": "10:00",
-          "end_time": "11:15"
-        }
-      ],
-      "credits": 3,
-      "seats": 60,
-      "open_seats": 40,
-      "waitlist": 5,
-      "holdfile": null
-    }
-  ];
+  String formatSemester(String semester) {
+    String year = semester.substring(0, 4);
+    String season = getSeasonFromSemester(semester);
+    return "$season $year";
+  }
+
   @override
   void initState() {
     super.initState();
+
+    selectedSemester = widget.semesterList!.last;
     _animationController = AnimationController(
       duration: const Duration(seconds: 1),
       vsync: this,
@@ -164,10 +67,150 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
 
     _animationController!.forward();
     //demo 데이터
-    scheduleLists =
-        jsonData.map((data) => ScheduleList.fromJson(data)).toList();
+    if (selectedSemester != null) {
+      loadTimetable(widget.friendId!, selectedSemester!);
+    }
 
-    chillLists = jsonData1.map((data) => ScheduleList.fromJson(data)).toList();
+    loadFirstTimetable();
+
+    // chillLists = jsonData1.map((data) => ScheduleList.fromJson(data)).toList();
+  }
+
+  void loadTimetable(int friendId, int semester) async {
+    await checkAccessToken();
+    setState(() {
+      isLoading = true; // Start loading
+    });
+
+    FriendTimeTable friendTimeTable = FriendTimeTable();
+    try {
+      var schedules =
+          await friendTimeTable.fetchFriendTimetable(friendId, semester);
+      setState(() {
+        scheduleLists = schedules;
+        numberOfClasses = schedules.length;
+        isLoading = false; // Stop loading after data is fetched
+      });
+      if (scheduleLists.isNotEmpty) {
+        findNonOverlappingTimeslots(); // Ensure this is called after data is loaded
+      }
+    } catch (e) {
+      // Log error or show an error message on the UI
+      print('Error fetching schedule: $e');
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text("Error"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(ctx).pop();
+              },
+              child: Text("OK"),
+            ),
+          ],
+        ),
+      );
+      setState(() {
+        isLoading = false; // Stop loading if an error occurs
+      });
+    }
+  }
+
+  Future<void> loadFirstTimetable() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? jsonString = prefs.getString('timetable');
+
+    if (jsonString != null) {
+      try {
+        List<dynamic> decodedJson = jsonDecode(jsonString);
+        if (decodedJson.isNotEmpty) {
+          List<dynamic> firstTimetableDataList = decodedJson[0];
+          List<ScheduleList> firstTimetableCourses = firstTimetableDataList
+              .map((e) => ScheduleList.fromJson(e as Map<String, dynamic>))
+              .toList();
+
+          setState(() {
+            _firstTimetableCourses = firstTimetableCourses;
+          });
+        }
+      } catch (e) {
+        print("Error loading timetable: $e");
+      }
+    } else {
+      print("No timetable data found in SharedPreferences.");
+    }
+  }
+
+  void findNonOverlappingTimeslots() {
+    List<ScheduleList> nonOverlapping = [];
+
+    // Log the contents of the schedules to ensure they're being loaded correctly
+    print("Schedule Lists: ${scheduleLists.length}");
+    print("First Timetable Courses: ${_firstTimetableCourses.length}");
+
+    if (scheduleLists.isEmpty || _firstTimetableCourses.isEmpty) {
+      print("One of the timetables is empty, skipping comparison.");
+      return;
+    }
+
+    // Check each course in the main schedule list
+    for (var course in scheduleLists) {
+      bool isOverlapping = false;
+
+      // Check each meeting time of the current course
+      for (var meeting in course.meetings ?? []) {
+        if (_firstTimetableCourses.any((firstCourse) {
+          return firstCourse.meetings?.any((firstMeeting) {
+                // Check if days intersect
+                bool daysOverlap = (meeting.days ?? "")
+                    .split('')
+                    .any((day) => firstMeeting.days?.contains(day) ?? false);
+                if (daysOverlap) {
+                  // Check if times overlap
+                  DateTime startA =
+                      DateTime.parse('2000-01-01 ${meeting.startTime}');
+                  DateTime endA =
+                      DateTime.parse('2000-01-01 ${meeting.endTime}');
+                  DateTime startB =
+                      DateTime.parse('2000-01-01 ${firstMeeting.startTime}');
+                  DateTime endB =
+                      DateTime.parse('2000-01-01 ${firstMeeting.endTime}');
+                  bool timesOverlap =
+                      startA.isBefore(endB) && startB.isBefore(endA);
+                  return timesOverlap;
+                }
+                return false;
+              }) ??
+              false;
+        })) {
+          isOverlapping = true;
+          break; // Break if any overlap is found
+        }
+      }
+
+      // If no overlaps are found for all meetings, add to non-overlapping list
+      if (!isOverlapping) {
+        nonOverlapping.add(course);
+      }
+    }
+
+    print("Non-overlapping courses: ${nonOverlapping.length}");
+
+    setState(() {
+      chillLists = nonOverlapping;
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant FriendSchedulePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Check if selectedSemester has changed
+    if (selectedSemester != oldWidget.semesterList!.last) {
+      // If there is a change in the selected semester, reload the timetable
+      loadTimetable(widget.friendId!, selectedSemester!);
+    }
   }
 
   @override
@@ -176,58 +219,121 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
     super.dispose();
   }
 
-  Widget buildButton(String text, Color buttonColor, final VoidCallback onTap,
-      Color textColor, FontWeight textWeight) {
-    TextStyle buttonTextStyle = TextStyle(
-      fontSize: 16,
-      fontWeight: FontWeight.bold,
-    );
-
-    double textWidth = calculateTextWidth(text, buttonTextStyle, context);
-    double buttonWidth = textWidth + 10; // Add some padding to the text width
-
-    // AnimatedContainer for background color animation
-    return AnimatedContainer(
-      duration: Duration(milliseconds: 200), // Duration of the animation
-      width: buttonWidth,
-      height: 30,
-      decoration: BoxDecoration(
-        color: buttonColor,
-        borderRadius: BorderRadius.circular(40),
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).colorScheme.shadow,
-            blurRadius: 10,
-            offset: Offset(6, 4),
-          ),
-          BoxShadow(
-            color: Theme.of(context).colorScheme.shadow,
-            blurRadius: 10,
-            offset: Offset(-2, 0),
-          ),
-        ],
+  void _selectFriendsSem(BuildContext context) {
+    showModalBottomSheet(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(40.0),
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          child: Center(
-            // AnimatedSwitcher for text change animation
-            child: AnimatedSwitcher(
-              duration: Duration(milliseconds: 200),
-              transitionBuilder: (Widget child, Animation<double> animation) {
-                return FadeTransition(opacity: animation, child: child);
-              },
-              child: Text(
-                text,
-                key: ValueKey<String>(text), // Unique key for AnimatedSwitcher
-                style: TextStyle(
-                    color: textColor, fontSize: 15, fontWeight: textWeight),
+      context: context,
+      builder: (BuildContext context) {
+        return ClipRRect(
+          borderRadius: BorderRadius.all(Radius.circular(40)),
+          child: Container(
+            margin: EdgeInsets.only(bottom: 20),
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width - 20,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              borderRadius: BorderRadius.all(Radius.circular(40)),
+            ),
+            child: Padding(
+              padding: EdgeInsets.only(left: 30, right: 20, top: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 0),
+                        child: Text(
+                          "Select Semester",
+                          style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.outline,
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          HapticFeedback.mediumImpact();
+                          Navigator.pop(context);
+                        },
+                        child: CircleAvatar(
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
+                          foregroundColor:
+                              Theme.of(context).colorScheme.background,
+                          child: Center(
+                            child: Icon(
+                              FeatherIcons.x,
+                              color: Theme.of(context).colorScheme.outline,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      padding: EdgeInsets.only(top: 10),
+                      shrinkWrap: true,
+                      itemCount: widget.semesterList!.length,
+                      itemBuilder: (context, index) {
+                        int semester = widget.semesterList![index];
+                        String formattedSemester =
+                            formatSemester(semester.toString());
+                        bool isSelected = selectedSemester ==
+                            semester; // Check if it's the selected semester
+
+                        return ListTile(
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                formattedSemester,
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: isSelected
+                                        ? Theme.of(context).colorScheme.outline
+                                        : makeDarker(
+                                            Theme.of(context)
+                                                .colorScheme
+                                                .outline,
+                                            0.3)),
+                              ),
+                            ],
+                          ),
+                          trailing: isSelected
+                              ? const Icon(FeatherIcons.check,
+                                  color: Colors.green)
+                              : null,
+                          onTap: () {
+                            if (semester != selectedSemester) {
+                              // Check if the tapped semester is different
+                              setState(() {
+                                selectedSemester =
+                                    semester; // Update the selected semester
+                              });
+                              loadTimetable(widget.friendId!,
+                                  semester); // Reload timetable
+                            }
+                            Navigator.pop(context); // Close the modal sheet
+                          },
+                        );
+                      },
+                    ),
+                  )
+                ],
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -309,194 +415,151 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                             SizedBox(
                               height: 10,
                             ),
-                            buildButton('6 Courses', Color(0xFFffe6ea), () {},
-                                Colors.black, FontWeight.w400),
+                            buildButton(
+                                '$numberOfClasses Courses',
+                                Color(0xFFffe6ea),
+                                () {},
+                                Colors.black,
+                                FontWeight.w400,
+                                context),
                             SizedBox(
                               height: 10,
                             ),
-                            buildButton(('Sophomore'), Color(0xFFe5fff9), () {},
-                                Colors.black, FontWeight.w400),
+                            buildButton(
+                                (widget.yearInSchool),
+                                Color(0xFFe5fff9),
+                                () {},
+                                Colors.black,
+                                FontWeight.w400,
+                                context),
                             SizedBox(
                               height: 10,
                             ),
-                            buildButton('CMSC', Color(0xFFe3ecff), () {},
-                                Colors.black, FontWeight.w400),
+                            buildButton(widget.department, Color(0xFFe3ecff),
+                                () {}, Colors.black, FontWeight.w400, context),
                           ],
                         ),
                       ],
                     ),
                   ),
-                  // Padding(
-                  //   padding: const EdgeInsets.symmetric(horizontal: 15),
-                  //   child: Divider(
-                  //     color: Colors.grey.shade500,
-                  //   ),
-                  // ),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(right: 20, top: 5),
+                        padding: const EdgeInsets.only(
+                            right: 20, top: 10, bottom: 10, left: 20),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            buildButton(
-                              'Friends Schedule',
-                              schedule1
-                                  ? Colors.blueAccent.shade400
-                                  : Colors.grey.shade700,
-                              () {
-                                HapticFeedback.mediumImpact();
-                                setState(() {
-                                  schedule1 = true;
-                                  schedule2 = false;
-                                  schedule3 = false;
-                                });
-                              },
-                              Colors.white,
-                              FontWeight.bold,
-                            ),
-                            SizedBox(width: 10),
-                            buildButton(
-                              'Chill Together',
-                              schedule2
-                                  ? Color.fromARGB(255, 81, 108, 136)
-                                  : Colors.grey.shade700,
-                              () {
-                                HapticFeedback.mediumImpact();
-                                setState(() {
-                                  schedule1 = false;
-                                  schedule2 = true;
-                                  schedule3 = false;
-                                });
-                              },
-                              Colors.white,
-                              FontWeight.bold,
-                            ),
-                            SizedBox(width: 10),
                             GestureDetector(
-                              child: Container(
-                                width: 30.0, // 원하는 크기 설정
-                                height: 30.0, // 원하는 크기 설정
-                                decoration: BoxDecoration(
-                                    color: schedule3
-                                        ? Color.fromARGB(255, 81, 124, 136)
-                                        : Colors.grey.shade700,
-                                    borderRadius: BorderRadius.circular(30)),
-                                child: Center(
-                                  child: Icon(
-                                    FeatherIcons.type,
-                                    size: 20,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                              onTap: () {
-                                HapticFeedback.mediumImpact();
-                                setState(() {
-                                  schedule1 = false;
-                                  schedule2 = false;
-                                  schedule3 = true;
-                                });
+                              onTap: () async {
+                                await checkAccessToken();
+                                _selectFriendsSem(context);
                               },
+                              child: Row(
+                                children: [
+                                  Text(
+                                    selectedSemester != null
+                                        ? formatSemester(
+                                            selectedSemester.toString())
+                                        : 'Select Semester',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .outline,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Icon(Icons.keyboard_arrow_down,
+                                      color:
+                                          Theme.of(context).colorScheme.outline,
+                                      size: 20)
+                                ],
+                              ),
                             ),
+                            Spacer(),
+                            buildButton(
+                                'Schedule',
+                                schedule1
+                                    ? Colors.blueAccent.shade400
+                                    : Colors.grey.shade700, () {
+                              HapticFeedback.mediumImpact();
+                              setState(() {
+                                schedule1 = true;
+                                schedule2 = false;
+                              });
+                            }, Colors.white, FontWeight.bold, context),
+                            SizedBox(width: 10),
+                            buildButton(
+                                'Hang out',
+                                schedule2
+                                    ? Colors.blueAccent.shade400
+                                    : Colors.grey.shade700, () {
+                              HapticFeedback.mediumImpact();
+                              setState(() {
+                                schedule1 = false;
+                                schedule2 = true;
+                              });
+                            }, Colors.white, FontWeight.bold, context),
                           ],
                         ),
                       ),
 
                       // 기존의 Column 위젯을 AnimatedSwitcher로 감싸서 애니메이션 효과 추가
                       AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 0),
-                        child: schedule3
-                            ? Container(
-                                margin: EdgeInsets.only(
-                                    top: 10, left: 10, right: 10),
-                                padding: EdgeInsets.all(10), // 내부 여백 추가
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .primaryContainer,
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color:
-                                          Theme.of(context).colorScheme.shadow,
-                                      blurRadius: 10,
-                                      offset: Offset(6, 4),
-                                    ),
-                                    BoxShadow(
-                                      color:
-                                          Theme.of(context).colorScheme.shadow,
-                                      blurRadius: 10,
-                                      offset: Offset(-2, 0),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text(
-                                          "Same Courses",
-                                          style: TextStyle(
-                                            fontSize: 20,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .outline,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Text(
-                                      "1. CMSC335\n2. CMSC330\n3. CMSC351",
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        color: Colors.grey,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      "Time to chill together",
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .outline,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Text(
-                                      "10:00 ~ 10:50 AM\n3:00 ~ 5:00 PM",
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        color: Colors.grey,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                key: ValueKey<int>(3),
-                              ) // Unique key for AnimatedSwitcher
-                            : schedule1
+                        duration: const Duration(
+                            milliseconds:
+                                300), // Adjust duration for visual effect
+                        child: scheduleLists.isEmpty ||
+                                isLoading // Check if the scheduleLists is empty
+                            ? Center(
+                                child: null) // Show loading indicator if empty
+                            : (schedule1
                                 ? SingleTimetable(
                                     key: ValueKey<int>(
-                                        1), // Unique key for AnimatedSwitcher
+                                        1), // Unique key for AnimatedSwitcher when showing schedule
                                     courses: scheduleLists,
                                     index: 0,
+                                    forceFixedTimeRange: true,
                                   )
                                 : SingleTimetable(
                                     key: ValueKey<int>(
-                                        2), // Unique key for AnimatedSwitcher
+                                        2), // Unique key for AnimatedSwitcher when showing chill lists
                                     courses: chillLists,
                                     index: 0,
-                                  ),
+                                    forceFixedTimeRange: true,
+                                  )),
                       ),
+                      // Padding(
+                      //   padding: const EdgeInsets.only(
+                      //     top: 10,
+                      //     bottom: 15,
+                      //     left: 10,
+                      //     right: 10,
+                      //   ),
+                      //   child: Container(
+                      //     height: 100,
+                      //     decoration: BoxDecoration(
+                      //       color: Theme.of(context).colorScheme.primary,
+                      //       borderRadius: BorderRadius.circular(20),
+                      //       boxShadow: [
+                      //         BoxShadow(
+                      //           color: Theme.of(context).colorScheme.shadow,
+                      //           blurRadius: 10,
+                      //           offset: Offset(6, 4),
+                      //         ),
+                      //         BoxShadow(
+                      //           color: Theme.of(context).colorScheme.shadow,
+                      //           blurRadius: 10,
+                      //           offset: Offset(-2, 0),
+                      //         ),
+                      //       ],
+                      //     ),
+                      //     child: Center(child: Text('Ad space')),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ],

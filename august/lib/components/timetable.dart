@@ -2,7 +2,7 @@
 import 'dart:math';
 
 import 'package:animations/animations.dart';
-import 'package:august/get_api/schedule.dart';
+import 'package:august/get_api/timetable/schedule.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -765,7 +765,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
     }
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 100),
+        padding: const EdgeInsets.only(bottom: 0),
         child: Container(
           height: ColumnLength / 2 * BoxSize + ColumnLength + 0,
           decoration: BoxDecoration(

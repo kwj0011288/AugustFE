@@ -4,7 +4,7 @@ import 'package:august/const/dark_theme.dart';
 import 'package:august/const/light_theme.dart';
 import 'package:august/const/tile_color.dart';
 import 'package:flutter/material.dart';
-import '../get_api/class.dart';
+import '../get_api/timetable/class.dart';
 
 class ClassTile extends StatefulWidget {
   final GroupList classes;

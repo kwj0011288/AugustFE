@@ -1,6 +1,7 @@
 import 'package:august/const/dark_theme.dart';
 import 'package:august/const/light_theme.dart';
-import 'package:august/get_api/get_department.dart';
+import 'package:august/get_api/friends/get_friends.dart';
+import 'package:august/get_api/onboard/get_department.dart';
 import 'package:august/login/initialpage.dart';
 import 'package:august/login/login.dart';
 import 'package:august/onboard/profile.dart';
@@ -15,8 +16,8 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'components/courseprovider.dart';
 import 'components/timetable.dart';
-import 'get_api/class_grouping.dart';
-import 'get_api/get_semester.dart';
+import 'get_api/timetable/class_grouping.dart';
+import 'get_api/onboard/get_semester.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

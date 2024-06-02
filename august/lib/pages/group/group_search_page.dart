@@ -1,10 +1,10 @@
 import 'package:animated_hint_textfield/animated_hint_textfield.dart';
 import 'package:august/components/loading.dart';
-import 'package:august/get_api/get_semester.dart';
+import 'package:august/get_api/onboard/get_semester.dart';
 import 'package:august/onboard/semester.dart';
 import 'package:flutter/material.dart';
-import '../../get_api/class.dart';
-import '../../get_api/get_api.dart';
+import '../../get_api/timetable/class.dart';
+import '../../get_api/search/get_api.dart';
 import '../../components/class_tile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import "package:flutter_feather_icons/flutter_feather_icons.dart";

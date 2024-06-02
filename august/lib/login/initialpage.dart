@@ -1,10 +1,5 @@
-import 'dart:io';
-
-import 'package:august/components/button.dart';
 import 'package:august/login/login.dart';
-import 'package:august/login/loginpage.dart';
 import 'package:august/pages/main/homepage.dart';
-import 'package:august/pages/main/schedule_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
@@ -14,7 +9,6 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:gaimon/gaimon.dart';
 
 class InitialPage extends StatefulWidget {
   final List<String> departments;

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:august/components/number_box.dart';
+import 'package:august/get_api/friends/invitation_code.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
@@ -15,11 +16,65 @@ class InvitationCodePage extends StatefulWidget {
 }
 
 class _InvitationCodePageState extends State<InvitationCodePage> {
+  String? formattedTime;
   Uint8List? profilePhoto;
+  String? _code = "00000000";
+  String? _expires;
+  String? _url;
+
   @override
   void initState() {
+    formatExpires();
     super.initState();
+    generateCode();
     loadProfilePhoto();
+  }
+
+  String formatExpires() {
+    if (_expires != null) {
+      final now = DateTime.now();
+      final expires = DateTime.parse(_expires!);
+
+      // Calculate the difference between now and the expiration time
+      final duration = expires.difference(now);
+
+      // Check if the expiration date has already passed
+      if (duration.isNegative) {
+        return "Expired";
+      } else {
+        // Format the duration to display in days, hours, and minutes
+        final days = duration.inDays;
+        final hours = duration.inHours % 24;
+        final minutes = duration.inMinutes % 60;
+
+        // Build a string showing the remaining time until expiration
+        String formattedTime = "";
+        if (days > 0) {
+          formattedTime += "$days days ";
+        }
+        if (hours > 0) {
+          formattedTime += "$hours hours ";
+        }
+        if (minutes > 0) {
+          formattedTime += "$minutes minutes ";
+        }
+
+        return formattedTime.trim(); // Trim any trailing space
+      }
+    }
+
+    return "";
+  }
+
+  void generateCode() async {
+    FriendsRequestCode requestCode =
+        await FriendRequestService().createFriendRequestCode();
+    setState(() {
+      _code = requestCode.code;
+      _expires = requestCode.expires;
+      _url = requestCode.url;
+      formattedTime = formatExpires();
+    });
   }
 
   Future<void> loadProfilePhoto() async {
@@ -34,17 +89,18 @@ class _InvitationCodePageState extends State<InvitationCodePage> {
 
   @override
   Widget build(BuildContext context) {
+    print(_expires);
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.9),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 30),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 30),
-              height: 300,
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 25),
+              height: 310,
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.primaryContainer,
@@ -77,20 +133,37 @@ class _InvitationCodePageState extends State<InvitationCodePage> {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    "Invitation Code",
+                    "Shareable Code",
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   SizedBox(height: 10),
-                  DigitBoxes(
-                      code:
-                          "123123"), // Assuming this is a widget you've created
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      DigitBoxes(code: "$_code"),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 10, bottom: 5),
+                        child: Text(
+                          formattedTime?.isEmpty ?? true
+                              ? "Expires in 0 days 0 hours 0 minutes"
+                              : "Expires in $formattedTime",
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                   Spacer(),
                   GestureDetector(
                     onTap: () {
-                      Clipboard.setData(ClipboardData(text: "123123"));
+                      Clipboard.setData(ClipboardData(text: "$_code"));
                       ToastService.showToast(
                         context,
                         isClosable: true,
