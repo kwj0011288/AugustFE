@@ -112,60 +112,122 @@ class _GroupPageState extends State<GroupPage> {
                 padding: const EdgeInsets.only(right: 15, bottom: 10, top: 15),
                 child: Button(
                     onTap: () async {
-                      showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (BuildContext context) {
-                          return Dialog(
-                            elevation: 0,
-                            backgroundColor: Colors.transparent,
-                            child: Center(
-                              child: Container(
-                                width: 100, // Adjust as needed
-                                height: 100, // Adjust as needed
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(
-                                      20), // Adjust as needed
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 5,
-                                      blurRadius: 7,
-                                      offset: Offset(0, 3),
+                      if (containers.every((container) => container.isEmpty)) {
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text(
+                                textAlign: TextAlign.center,
+                                'No courses selected',
+                                style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              content: Text(
+                                textAlign: TextAlign.center,
+                                "Please add course(s) to class block.",
+                                style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal),
+                              ),
+                              actions: [
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Container(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 30),
+                                    height: 55,
+                                    width:
+                                        MediaQuery.of(context).size.width - 80,
+                                    decoration: BoxDecoration(
+                                        color: Colors.redAccent,
+                                        borderRadius:
+                                            BorderRadius.circular(60)),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'OK',
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 20),
+                                        ),
+                                      ],
                                     ),
-                                  ],
+                                  ),
                                 ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: CircularProgressIndicator(),
+                              ],
+                            );
+                          },
+                        );
+                      } else {
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (BuildContext context) {
+                            return Dialog(
+                              elevation: 0,
+                              backgroundColor: Colors.transparent,
+                              child: Center(
+                                child: Container(
+                                  width: 100, // Adjust as needed
+                                  height: 100, // Adjust as needed
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(
+                                        20), // Adjust as needed
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.5),
+                                        spreadRadius: 5,
+                                        blurRadius: 7,
+                                        offset: Offset(0, 3),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: CircularProgressIndicator(),
+                                  ),
                                 ),
                               ),
-                            ),
+                            );
+                          },
+                        );
+
+                        try {
+                          Navigator.pop(context); // Close the dialog
+
+                          //확인해봐야함
+                          HapticFeedback.mediumImpact();
+
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                                builder: (context) => GeneratePage(
+                                      containers: containers,
+                                      semester: widget.semester,
+                                    )),
                           );
-                        },
-                      );
+                        } catch (e) {
+                          Navigator.pop(context); // Close the dialog
 
-                      try {
-                        Navigator.pop(context); // Close the dialog
-
-                        //확인해봐야함
-                        HapticFeedback.mediumImpact();
-
-                        Navigator.push(
-                          context,
-                          CupertinoPageRoute(
-                              builder: (context) => GeneratePage(
-                                    containers: containers,
-                                    semester: widget.semester,
-                                  )),
-                        );
-                      } catch (e) {
-                        Navigator.pop(context); // Close the dialog
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Failed to get data: $e')),
-                        );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Failed to get data: $e')),
+                          );
+                        }
                       }
                     },
                     buttonColor: Colors.blueAccent,

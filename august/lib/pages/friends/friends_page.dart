@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:august/components/add_friend.dart';
+import 'package:august/components/number_box.dart';
+import 'package:august/get_api/friends/delete_friend.dart';
 import 'package:august/get_api/friends/friends_sem.dart';
 import 'package:august/get_api/friends/verify_friend.dart';
 import 'package:august/login/login.dart';
-import 'package:august/pages/friends/invitation_code.dart';
+import 'package:august/pages/friends/my_code.dart';
 import 'package:august/get_api/friends/get_friends.dart';
 import 'package:august/get_api/onboard/get_semester.dart';
 import 'package:august/onboard/profile.dart';
@@ -18,6 +20,8 @@ import "package:flutter_feather_icons/flutter_feather_icons.dart";
 import 'package:flutter/material.dart' hide ModalBottomSheetRoute;
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:toasty_box/toasty_box.dart';
+import 'dart:math' as math;
 
 class FriendsPage extends StatefulWidget {
   final String semester;
@@ -28,15 +32,20 @@ class FriendsPage extends StatefulWidget {
   State<FriendsPage> createState() => _FriendsPageState();
 }
 
-class _FriendsPageState extends State<FriendsPage> {
+class _FriendsPageState extends State<FriendsPage>
+    with TickerProviderStateMixin {
   int bottomIndex = 0;
   List<FriendInfo> friends = [];
   bool isLoading = true;
+  bool isEdit = false;
   String? selectedValue;
   Uint8List? profilePhoto;
   TextEditingController inviteController = TextEditingController();
+  AnimationController? _controller;
+  AnimationController? _jiggleController;
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
+  AnimationController? _refreshFriendsController;
 
   String formatSemester(String semester) {
     String year = semester.substring(0, 4);
@@ -54,12 +63,59 @@ class _FriendsPageState extends State<FriendsPage> {
 
     _loadProfilePhoto();
     _listenForPhotoChanges(); // Listen for photo changes if using a Provider
+
+    //refresh button
+    _refreshFriendsController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+
+    //for edit button
+    _controller = AnimationController(
+      duration: const Duration(
+          milliseconds:
+              300), // Adjust duration to control speed of the animation
+      vsync: this,
+    );
+
+    //for trashcan jiggle
+    _jiggleController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    )..repeat(reverse: true);
+  }
+
+  void toggleisEdit(int friendListLength) {
+    setState(() {
+      isEdit =
+          friendListLength > 0 ? !isEdit : false; // Toggle the edit mode state
+    });
+    if (isEdit) {
+      _controller!.forward(); // Animate to expanded aspect ratio
+    } else {
+      _controller!.reverse(); // Animate to normal aspect ratio
+    }
+  }
+
+  Widget JiggleTrashIcon() {
+    return AnimatedBuilder(
+      animation: _jiggleController!,
+      child: Icon(FeatherIcons.trash2, color: Colors.black, size: 40),
+      builder: (context, child) {
+        // Use sin function to create the jiggle effect
+        final angle = math.sin(_jiggleController!.value * 5 * math.pi) *
+            0.1; // Adjust amplitude for more/less jiggle
+        return Transform.rotate(
+          angle: angle,
+          child: child,
+        );
+      },
+    );
   }
 
   Future<void> loadFriends() async {
     try {
       friends = await FriendInfos().fetchFriends();
-      ;
       setState(() {
         isLoading = false;
       });
@@ -96,7 +152,10 @@ class _FriendsPageState extends State<FriendsPage> {
   @override
   void dispose() {
     super.dispose();
+    _controller!.dispose();
+    _jiggleController!.dispose();
     _refreshController.dispose();
+    _refreshFriendsController!.dispose();
   }
 
   String convertDepartment(String department) {
@@ -132,6 +191,34 @@ class _FriendsPageState extends State<FriendsPage> {
     }
   }
 
+  void addFriend(String input) async {
+    // Assuming VerifyFriendService is properly imported and initialized
+    var response = await VerifyFriendService().acceptFriendRequest(input);
+    if (!response.success) {
+      ToastService.showToast(
+        context,
+        backgroundColor: Theme.of(context).colorScheme.background,
+        shadowColor: Theme.of(context).colorScheme.shadow,
+        leading: Icon(
+          FeatherIcons.xCircle,
+          color: Colors.redAccent,
+        ),
+        message: "This code is invalid or expired. Please try again.",
+      );
+    } else {
+      ToastService.showToast(
+        context,
+        backgroundColor: Theme.of(context).colorScheme.background,
+        shadowColor: Theme.of(context).colorScheme.shadow,
+        leading: Icon(
+          FeatherIcons.checkCircle,
+          color: Colors.greenAccent,
+        ),
+        message: "You have successfully added a friend!",
+      );
+    }
+  }
+
   Widget weightModal(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
@@ -155,6 +242,7 @@ class _FriendsPageState extends State<FriendsPage> {
                 Expanded(
                   child: CupertinoTextField(
                     inputFormatters: [
+                      UpperCaseTextFormatter(),
                       LengthLimitingTextInputFormatter(8),
                     ],
                     autofocus: true,
@@ -176,16 +264,16 @@ class _FriendsPageState extends State<FriendsPage> {
                     padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
                   ),
                 ),
-                SizedBox(
-                    width:
-                        10), // Provide some spacing between the text field and the button
+                SizedBox(width: 10),
                 GestureDetector(
                   onTap: () {
                     Navigator.of(context).pop();
-                    loadFriends();
-                    VerifyFriendService()
-                        .acceptFriendRequest(inviteController.text);
+                    addFriend(inviteController.text);
                     inviteController.clear();
+
+                    Future.delayed(Duration(milliseconds: 100), () {
+                      loadFriends();
+                    });
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 18, horizontal: 15),
@@ -211,6 +299,106 @@ class _FriendsPageState extends State<FriendsPage> {
     );
   }
 
+  Future<void> deleteFriends(int friendId) async {
+    // Show a confirmation dialog to confirm deletion
+    final bool? deleted = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () async => false,
+          child: AlertDialog(
+            title: Text(
+              textAlign: TextAlign.center,
+              'Are you sure?',
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.outline,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold),
+            ),
+            content: Text(
+              textAlign: TextAlign.center,
+              "He/She will be removed from friends list.",
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.outline,
+                  fontSize: 15,
+                  fontWeight: FontWeight.normal),
+            ),
+            actions: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pop(true);
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 30),
+                      height: 55,
+                      width: MediaQuery.of(context).size.width / 3.3,
+                      decoration: BoxDecoration(
+                          color: Colors.redAccent,
+                          borderRadius: BorderRadius.circular(60)),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Delete',
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 5),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pop(false);
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 30),
+                      height: 55,
+                      width: MediaQuery.of(context).size.width / 3.3,
+                      decoration: BoxDecoration(
+                          color: Colors.blueAccent,
+                          borderRadius: BorderRadius.circular(60)),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Keep',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (deleted!) {
+      // Delete the friend from your database or API here
+      await deleteFriend(friendId);
+      // Fetch the updated list of friends
+      friends = await FriendInfos().fetchFriends();
+
+      // Rebuild the widget with the updated list of friends
+      setState(() {});
+    }
+  }
+
   void _onRefresh() async {
     try {
       await loadFriends();
@@ -232,7 +420,6 @@ class _FriendsPageState extends State<FriendsPage> {
           overflowRules: OverflowRules.only(bottom: true),
           child: SmartRefresher(
             enablePullDown: true,
-            enablePullUp: true,
             onRefresh: _onRefresh,
             controller: _refreshController,
             header: MaterialClassicHeader(
@@ -313,41 +500,86 @@ class _FriendsPageState extends State<FriendsPage> {
                     ),
                   ],
                 ),
-                // Align(
-                //   alignment: Alignment.centerRight,
-                //   child: GestureDetector(
-                //     onTap: () {
-                //       //toggleisEdit();
-                //     },
-                //     child: Padding(
-                //       padding:
-                //           const EdgeInsets.only(top: 10, bottom: 10, right: 20),
-                //       child: AnimatedContainer(
-                //         duration: Duration(milliseconds: 300),
-                //         width: 60,
-                //         height: 35,
-                //         decoration: BoxDecoration(
-                //           borderRadius: BorderRadius.circular(30),
-                //           // color: isEdit
-                //           //     ? Colors.blueAccent
-                //           //     : Theme.of(context).colorScheme.primary,
-                //           color: Colors.blueAccent,
-                //         ),
-                //         child: Center(
-                //           child: Text(
-                //             'Edit',
-                //             // isEdit ? 'Done' : 'Edit',
-                //             style: TextStyle(
-                //               fontSize: 15,
-                //               color: Theme.of(context).colorScheme.outline,
-                //               fontWeight: FontWeight.bold,
-                //             ),
-                //           ),
-                //         ),
-                //       ),
-                //     ),
-                //   ),
-                // ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10, right: 10),
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: GestureDetector(
+                            onTap: () {
+                              toggleisEdit(friends.length);
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 5),
+                              child: AnimatedContainer(
+                                duration: Duration(milliseconds: 300),
+                                width: 60,
+                                height: 35,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(30),
+                                  color: isEdit
+                                      ? Colors.blueAccent
+                                      : Theme.of(context).colorScheme.primary,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    isEdit ? 'Done' : 'Edit',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color:
+                                          Theme.of(context).colorScheme.outline,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 10, top: 10),
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: GestureDetector(
+                            onTap: () {
+                              loadFriends();
+                              _refreshFriendsController!.forward(from: 0.0);
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 5, right: 15),
+                              child: AnimatedContainer(
+                                duration: Duration(milliseconds: 300),
+                                width: 35,
+                                height: 35,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(30),
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                child: Center(
+                                  child: RotationTransition(
+                                    turns: Tween(begin: 0.0, end: 1.0)
+                                        .animate(_refreshFriendsController!),
+                                    child: Icon(
+                                      Icons.refresh,
+                                      color:
+                                          Theme.of(context).colorScheme.outline,
+                                      size: 20,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 isLoading
                     ? Container()
                     : friends.isNotEmpty
@@ -355,18 +587,17 @@ class _FriendsPageState extends State<FriendsPage> {
                             child: GridView.builder(
                               itemCount: friends.length +
                                   2, // itemCount를 dataList의 길이로 설정
-                              padding: EdgeInsets.only(
-                                  top: 20, left: 20, right: 20, bottom: 100),
+                              padding:
+                                  EdgeInsets.only(top: 10, left: 20, right: 20),
                               gridDelegate:
                                   SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 2, // 한 줄에 표시할 항목의 수
-                                crossAxisSpacing: 30.0, // 가로 간격
-                                mainAxisSpacing: 30.0, // 세로 간격
+                                crossAxisSpacing: 20.0, // 가로 간격
+                                mainAxisSpacing: 20.0, // 세로 간격
                                 childAspectRatio: (10 / 11), // 가로 세로 비율 조정
                               ),
                               itemBuilder: (context, index) {
                                 if (index == friends.length) {
-                                  // If it is, return the red box
                                   return Container(
                                     decoration: BoxDecoration(
                                       color: Theme.of(context)
@@ -394,9 +625,9 @@ class _FriendsPageState extends State<FriendsPage> {
                                   );
                                 } else if (index == friends.length + 1) {
                                   return GestureDetector(
-                                    onTap: () async {
+                                    onTap: () {
                                       InvitationInput();
-                                      await checkAccessToken();
+                                      checkAccessToken();
                                     },
                                     child: Container(
                                       decoration: BoxDecoration(
@@ -429,7 +660,17 @@ class _FriendsPageState extends State<FriendsPage> {
                                             FeatherIcons.plus,
                                             size: 40,
                                           ),
-                                          Text('Add Friends')
+                                          SizedBox(height: 10),
+                                          Text(
+                                            'Add Friends',
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .outline,
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -441,52 +682,59 @@ class _FriendsPageState extends State<FriendsPage> {
                                   onTap: () async {
                                     await checkAccessToken();
 
-                                    /* 여기 */
-                                    var semesters = await FriendSemester()
-                                        .fetchFriendSemester(friends[index].id);
-                                    HapticFeedback.mediumImpact();
-                                    showCupertinoModalBottomSheet(
-                                      context: context,
-                                      backgroundColor: Colors
-                                          .transparent, // BottomSheet 배경을 투명하게 설정
-                                      topRadius: Radius.circular(30),
-                                      builder: (BuildContext context) {
-                                        return Container(
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.93, // BottomSheet의 높이 조정
-                                          decoration: BoxDecoration(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .background, // BottomSheet의 배경색
-                                            borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(100),
-                                              topRight: Radius.circular(100),
+                                    if (!isEdit) {
+                                      /* 여기 */
+                                      var semesters = await FriendSemester()
+                                          .fetchFriendSemester(
+                                              friends[index].id);
+                                      HapticFeedback.mediumImpact();
+                                      showCupertinoModalBottomSheet(
+                                        context: context,
+                                        backgroundColor: Colors
+                                            .transparent, // BottomSheet 배경을 투명하게 설정
+                                        topRadius: Radius.circular(30),
+                                        builder: (BuildContext context) {
+                                          return Container(
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.93, // BottomSheet의 높이 조정
+                                            decoration: BoxDecoration(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .background, // BottomSheet의 배경색
+                                              borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(100),
+                                                topRight: Radius.circular(100),
+                                              ),
                                             ),
-                                          ),
-                                          child: FriendSchedulePage(
-                                            photoUrl:
-                                                friends[index].profileImage,
-                                            name: friends[index].name,
-                                            department:
-                                                friends[index].department,
-                                            yearInSchool: convertDepartment(
-                                                friends[index].yearInSchool),
-                                            semesterList: semesters,
-                                            friendId: friends[index].id,
-                                          ),
-                                        );
-                                      },
-                                    );
+                                            child: FriendSchedulePage(
+                                              photoUrl:
+                                                  friends[index].profileImage,
+                                              name: friends[index].name,
+                                              department:
+                                                  friends[index].department,
+                                              yearInSchool: convertDepartment(
+                                                  friends[index].yearInSchool),
+                                              semesterList: semesters,
+                                              friendId: friends[index].id,
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    } else {
+                                      await deleteFriends(friends[index].id);
+                                    }
                                   },
-
-                                  child: Container(
+                                  child: AnimatedContainer(
+                                    duration: Duration(milliseconds: 200),
                                     padding: EdgeInsets.all(0), // 내부 여백 추가
                                     decoration: BoxDecoration(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primaryContainer,
+                                      color: isEdit
+                                          ? Colors.redAccent
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .primaryContainer,
                                       borderRadius: BorderRadius.circular(30),
                                       boxShadow: [
                                         BoxShadow(
@@ -505,31 +753,62 @@ class _FriendsPageState extends State<FriendsPage> {
                                         ),
                                       ],
                                     ),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Container(
-                                          width: 80, // 이미지의 가로 크기를 80으로 설정
-                                          height: 80, // 이미지의 세로 크기를 80으로 설정
-                                          child: ClipOval(
-                                            child:
-                                                friends[index].profileImage !=
-                                                        null
-                                                    ? Image.network(
-                                                        friends[index]
-                                                            .profileImage!,
-                                                        fit: BoxFit.cover)
-                                                    : Icon(Icons.person,
-                                                        size: 70), // 기본 아이콘 표시
+                                    child: (!isEdit)
+                                        ? Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Container(
+                                                width:
+                                                    100, // 이미지의 가로 크기를 80으로 설정
+                                                height:
+                                                    100, // 이미지의 세로 크기를 80으로 설정
+                                                child: ClipOval(
+                                                  child: friends[index]
+                                                              .profileImage !=
+                                                          null
+                                                      ? Image.network(
+                                                          friends[index]
+                                                              .profileImage!,
+                                                          fit: BoxFit.cover)
+                                                      : Icon(Icons.person,
+                                                          size:
+                                                              70), // 기본 아이콘 표시
+                                                ),
+                                              ),
+                                              SizedBox(height: 10),
+                                              Text(friends[index].name,
+                                                  style: TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight: FontWeight
+                                                          .bold)), // 이름 표시
+                                            ],
+                                          )
+                                        : Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Align(
+                                                  alignment: Alignment.center,
+                                                  child: CircleAvatar(
+                                                      backgroundColor:
+                                                          Colors.transparent,
+                                                      maxRadius: 50,
+                                                      child: JiggleTrashIcon()),
+                                                ),
+                                                Text(friends[index].name,
+                                                    style: TextStyle(
+                                                        fontSize: 20,
+                                                        color: Colors.black,
+                                                        fontWeight:
+                                                            FontWeight.bold)),
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                        SizedBox(height: 10),
-                                        Text(friends[index].name,
-                                            style: TextStyle(
-                                                fontSize: 15)), // 이름 표시
-                                      ],
-                                    ),
                                   ),
                                 );
                               },
@@ -558,8 +837,8 @@ class _FriendsPageState extends State<FriendsPage> {
                                   padding: const EdgeInsets.all(10.0),
                                   child: GestureDetector(
                                     onTap: () async {
-                                      await checkAccessToken();
                                       InvitationInput();
+                                      await checkAccessToken();
                                     },
                                     child: Container(
                                       width: MediaQuery.of(context).size.width,
@@ -592,6 +871,18 @@ class _FriendsPageState extends State<FriendsPage> {
           ),
         ),
       ),
+    );
+  }
+}
+
+// UpperCaseTextFormatter definition
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    return TextEditingValue(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
     );
   }
 }

@@ -1,12 +1,9 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:august/get_api/onboard/get_user_info.dart';
-import 'package:august/pages/main/homepage.dart';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'package:august/get_api/onboard/get_user_info.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> saveTokensToSpecificPath(
     String accessToken, String idToken) async {
@@ -42,36 +39,6 @@ Future<bool> checkLoginStatus() async {
     return false;
   }
 }
-
-// Future<bool> refreshToken() async {
-//   final prefs = await SharedPreferences.getInstance();
-//   final refreshToken = prefs.getString('refreshToken');
-//   if (refreshToken == null) {
-//     print('No refresh token found');
-//     return false;
-//   }
-
-//   final response = await http.post(
-//     Uri.parse('http://augustapp.one/dj-rest-auth/token/refresh/'),
-//     headers: {'Content-Type': 'application/json'},
-//     body: jsonEncode({'refresh': refreshToken}),
-//   );
-
-//   if (response.statusCode == 200) {
-//     final responseData = jsonDecode(response.body);
-//     final newAccessToken = responseData['access'];
-//     // 서버에서 새로운 refreshToken을 반환하지 않는 경우 대비
-//     final newRefreshToken = responseData['refresh'] ?? refreshToken;
-
-//     await prefs.setString('accessToken', newAccessToken);
-//     await prefs.setString('refreshToken', newRefreshToken);
-//     print('Token refreshed successfully');
-//     return true;
-//   } else {
-//     print('Failed to refresh token');
-//     return false;
-//   }
-// }
 
 Future<bool> refreshToken() async {
   final prefs = await SharedPreferences.getInstance();
@@ -204,11 +171,11 @@ Future<bool> verifyUser() async {
 
   if (response.statusCode == 200) {
     final responseData = jsonDecode(response.body);
-    print('User verified: $responseData'); // Debug: Print the response data
-    return true; // User is verified
+    print('User verified: $responseData');
+    return true;
   } else {
     print('Failed to verify user');
-    return false; // User verification failed
+    return false;
   }
 }
 
@@ -216,7 +183,7 @@ Future<bool> verifyUser() async {
 Future<UserDetails?> fetchUserDetails() async {
   final prefs = await SharedPreferences.getInstance();
   final accessToken = prefs.getString('accessToken');
-  final userPk = prefs.getInt('userPk'); // 저장된 사용자 PK 가져오기
+  final userPk = prefs.getInt('userPk');
 
   if (accessToken == null || userPk == null) {
     print('Access token or user PK not found');
@@ -232,12 +199,13 @@ Future<UserDetails?> fetchUserDetails() async {
   );
 
   if (response.statusCode == 200) {
-    final responseData = jsonDecode(response.body);
+    final responseBody = utf8.decode(response.bodyBytes);
+    final responseData = jsonDecode(responseBody);
     print('User details fetched: $responseData');
     return UserDetails.fromJson(responseData);
   } else {
     print('Failed to fetch user details');
-    return null; // 실패 시 null 반환
+    return null;
   }
 }
 
@@ -456,39 +424,6 @@ Future<void> updateInstitution(int userPk, int institution) async {
   }
 }
 
-// Future<void> updateSemester(int userPk, String name, int institution,
-//     int department, String? profileImage, String yearInSchool) async {
-//   final String url = 'http://augustapp.one/users/$userPk';
-//   final prefs = await SharedPreferences.getInstance();
-//   final String? accessToken = prefs.getString('accessToken');
-
-//   if (accessToken == null) {
-//     print('Access token not found. User needs to login.');
-//     return;
-//   }
-
-//   final response = await http.patch(
-//     Uri.parse(url),
-//     headers: {
-//       'Content-Type': 'application/json',
-//       'Authorization': 'Bearer $accessToken',
-//     },
-//     body: jsonEncode({
-//       'name': name,
-//       'institution': institution,
-//       'department': department,
-//       'profile_image': profileImage, // null이 가능하므로, 그대로 전달
-//       'year_in_school': yearInSchool,
-//     }),
-//   );
-
-//   if (response.statusCode == 200) {
-//     print('User details updated successfully.');
-//   } else {
-//     print('Failed to update user details. Status code: ${response.statusCode}');
-//   }
-// }
-
 Future<void> updateGrade(int userPk, String yearInSchool) async {
   final String url = 'http://augustapp.one/users/$userPk/';
   final prefs = await SharedPreferences.getInstance();
@@ -592,15 +527,15 @@ void startTokenRefreshTimer() {
         print('Token refresh successful.');
       }
     }
-  }, interval: Duration(minutes: 5)); // Adjusted to 5 minutes
+  }, interval: Duration(minutes: 5));
 }
 
 Future<bool> checkIfRefreshTokenNeeded() async {
   final prefs = await SharedPreferences.getInstance();
   String? expirationString = prefs.getString('accessTokenExpiration');
-  if (expirationString == null) return true; // 만료 시간이 없으면 갱신 필요
+  if (expirationString == null) return true;
 
   DateTime expirationDate = DateTime.parse(expirationString);
-  // 만료 5분 전부터 리프레시 시작
+
   return DateTime.now().isAfter(expirationDate.subtract(Duration(minutes: 5)));
 }

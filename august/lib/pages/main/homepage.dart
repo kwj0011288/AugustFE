@@ -45,10 +45,10 @@ class _HomePageState extends State<HomePage> {
       try {
         formattedSemester = getOriginalSemester(storedSemester);
       } catch (e) {
-        formattedSemester = '202008'; // 오류 발생 시 기본값 사용
+        formattedSemester = '202008';
       }
     } else {
-      formattedSemester = widget.preloadedSemesters.last; // 저장된 값이 없을 때 기본값 사용
+      formattedSemester = widget.preloadedSemesters.last;
     }
 
     setState(() {
@@ -98,8 +98,7 @@ class _HomePageState extends State<HomePage> {
       String dateJoined = userInfo?['dateJoined'] ?? '2021-01-01T00:00:00.000Z';
       isFirst = isTodayOrWithin30Days(dateJoined);
       await prefs.setBool('hasCheckedFirst', true);
-      await prefs.setBool(
-          'isFirst', isFirst); // isFirst 값을 SharedPreferences에 저장합니다.
+      await prefs.setBool('isFirst', isFirst);
     } else {
       // 이미 저장된 isFirst 값을 사용
       isFirst = prefs.getBool('isFirst') ?? false;
@@ -114,14 +113,11 @@ class _HomePageState extends State<HomePage> {
           .setSelectedSemester(formatSemester(widget.preloadedSemesters.last));
       fetchAndSetUserInfo(isFirst);
     }
-    //await fetchAndSetUserInfo(isFirst);
 
     await Future.wait([
       // loadSemesterInfo와 fetchAndSetUserInfo 함수들이 백그라운드에서 동시에 실행될 수 있도록 변경
       loadSemesterInfo(),
-      if (isFirst)
-        fetchAndSetUserInfo(
-            isFirst), // isFirst가 true일 때만 fetchAndSetUserInfo 실행
+      if (isFirst) fetchAndSetUserInfo(isFirst),
     ]);
 
     if (isFirst == true) {
@@ -155,7 +151,7 @@ class _HomePageState extends State<HomePage> {
     bool isTodayAndWithin10Minutes = now.year == dateJoined.year &&
         now.month == dateJoined.month &&
         now.day == dateJoined.day &&
-        difference.inMinutes.abs() <= 10; // 차이가 10분 이내
+        difference.inMinutes.abs() <= 10;
 
     return isTodayAndWithin10Minutes;
   }
@@ -226,7 +222,7 @@ class _HomePageState extends State<HomePage> {
           'department_fullname': userDetails.department?.fullName ?? 'Unknown',
           'department_nickname': userDetails.department?.nickname ?? 'Unknown',
           'contactPhoto': userDetails.profileImage,
-          'yearInSchool': displayGrade, // 여기서 사용
+          'yearInSchool': displayGrade,
           'dateJoined': userDetails.dateJoined,
         };
       });
@@ -240,7 +236,6 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-// 서버로부터 받은 학년 코드를 사용자가 이해하기 쉬운 형태로 변환하는 함수
   String convertGrade(String code) {
     switch (code) {
       case 'FR':
@@ -284,13 +279,12 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.only(top: 10),
         child: AnimatedOpacity(
-          opacity: _showBottomBar ? 1.0 : 0.0, // 표시 여부에 따라 투명도 결정
-          duration: Duration(seconds: 1), // 페이드 인 지속 시간
+          opacity: _showBottomBar ? 1.0 : 0.0,
+          duration: Duration(seconds: 1),
           child: BottomBar(
             onIndexChanged: (index) {
               checkAccessToken();
               if (_currentIndex != index) {
-                // Only update if different to prevent unnecessary rebuilds
                 setState(() {
                   _currentIndex = index;
                 });

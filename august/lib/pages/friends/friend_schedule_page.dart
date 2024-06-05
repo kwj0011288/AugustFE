@@ -221,6 +221,7 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
 
   void _selectFriendsSem(BuildContext context) {
     showModalBottomSheet(
+      backgroundColor: Colors.transparent,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(40.0),
       ),
@@ -454,8 +455,8 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             GestureDetector(
-                              onTap: () async {
-                                await checkAccessToken();
+                              onTap: () {
+                                checkAccessToken();
                                 _selectFriendsSem(context);
                               },
                               child: Row(
@@ -517,19 +518,43 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                             ? Center(
                                 child: null) // Show loading indicator if empty
                             : (schedule1
-                                ? SingleTimetable(
-                                    key: ValueKey<int>(
-                                        1), // Unique key for AnimatedSwitcher when showing schedule
-                                    courses: scheduleLists,
-                                    index: 0,
-                                    forceFixedTimeRange: true,
+                                ? Column(
+                                    children: [
+                                      Text(
+                                        'This is ${widget.name}\'s schedule.',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                      SingleTimetable(
+                                        key: ValueKey<int>(
+                                            1), // Unique key for AnimatedSwitcher when showing schedule
+                                        courses: scheduleLists,
+                                        index: 0,
+                                        forceFixedTimeRange: true,
+                                      ),
+                                    ],
                                   )
-                                : SingleTimetable(
-                                    key: ValueKey<int>(
-                                        2), // Unique key for AnimatedSwitcher when showing chill lists
-                                    courses: chillLists,
-                                    index: 0,
-                                    forceFixedTimeRange: true,
+                                : Column(
+                                    children: [
+                                      Text(
+                                        '${widget.name} and you can hang out at these times!',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                      SingleTimetable(
+                                        key: ValueKey<int>(
+                                            2), // Unique key for AnimatedSwitcher when showing chill lists
+                                        courses: chillLists,
+                                        index: 0,
+                                        forceFixedTimeRange: true,
+                                      ),
+                                    ],
                                   )),
                       ),
                       // Padding(

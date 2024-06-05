@@ -450,11 +450,11 @@ class _GPAPageState extends State<GPAPage> with TickerProviderStateMixin {
                   ],
                 ),
               ),
-              SizedBox(height: 10),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(10),
                   child: GridView.builder(
+                    padding: EdgeInsets.only(top: 10),
                     itemCount: courses.isEmpty ? 1 : courses.length + 1,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: MediaQuery.of(context).size.width >
@@ -473,6 +473,18 @@ class _GPAPageState extends State<GPAPage> with TickerProviderStateMixin {
                           },
                           child: Container(
                             decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Theme.of(context).colorScheme.shadow,
+                                  blurRadius: 10,
+                                  offset: Offset(6, 4),
+                                ),
+                                BoxShadow(
+                                  color: Theme.of(context).colorScheme.shadow,
+                                  blurRadius: 10,
+                                  offset: Offset(-2, 0),
+                                ),
+                              ],
                               color: Theme.of(context).colorScheme.primary,
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -512,6 +524,18 @@ class _GPAPageState extends State<GPAPage> with TickerProviderStateMixin {
                             color: !isEdit
                                 ? tileColors[idx % tileColors.length]
                                 : Colors.redAccent,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Theme.of(context).colorScheme.shadow,
+                                blurRadius: 10,
+                                offset: Offset(6, 4),
+                              ),
+                              BoxShadow(
+                                color: Theme.of(context).colorScheme.shadow,
+                                blurRadius: 10,
+                                offset: Offset(-2, 0),
+                              ),
+                            ],
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: !isEdit

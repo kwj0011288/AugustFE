@@ -16,16 +16,24 @@ class VerifyFriend {
   }
 }
 
+class VerifyFriendResponse {
+  final bool success;
+  final VerifyFriend? friend;
+
+  VerifyFriendResponse({required this.success, this.friend});
+}
+
 class VerifyFriendService {
-  Future<VerifyFriend?> acceptFriendRequest(String code) async {
+  Future<VerifyFriendResponse> acceptFriendRequest(String code) async {
     final prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString('accessToken');
     if (accessToken == null) {
       print('Access token not found');
-      return null;
+      return VerifyFriendResponse(success: false);
     }
 
-    final url = Uri.parse('http://augustapp.one/friends/accept?code=$code/');
+    final url = Uri.parse('http://augustapp.one/friends/accept/?code=$code');
+
     final response = await http.post(
       url,
       headers: {
@@ -35,20 +43,19 @@ class VerifyFriendService {
     );
 
     if (response.statusCode == 201) {
-      final data = json.decode(response.body);
-      return VerifyFriend.fromJson(data['user']);
+      final jsonData = jsonDecode(response.body);
+      return VerifyFriendResponse(
+          success: true, friend: VerifyFriend.fromJson(jsonData['user']));
     } else {
-      String errorMessage;
       if (response.statusCode == 401) {
-        errorMessage = 'Authentication credentials were not provided.';
+        print('Authentication credentials were not provided.');
       } else if (response.statusCode == 404) {
-        errorMessage = 'Invalid or expired code provided.';
+        print('Invalid or expired code provided.');
       } else {
-        errorMessage =
-            'Failed to process the request. Status Code: ${response.statusCode}';
+        print(
+            'Failed to process the request. Status Code: ${response.statusCode}');
       }
-      print(errorMessage);
-      return null;
+      return VerifyFriendResponse(success: false);
     }
   }
 }
