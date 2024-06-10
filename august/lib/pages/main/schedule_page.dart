@@ -1175,57 +1175,58 @@ class _SchedulePageState extends State<SchedulePage>
                                             itemBuilder:
                                                 (BuildContext context) {
                                               return <PullDownMenuEntry>[
-                                                PullDownMenuItem(
-                                                  title: 'Move to First',
-                                                  icon: FeatherIcons.star,
-                                                  onTap: () {
-                                                    if (currentIndex <
-                                                        _timetableCollection
-                                                            .length) {
-                                                      checkAccessToken();
-                                                      HapticFeedback
-                                                          .mediumImpact();
-                                                      setState(() {
-                                                        if (currentIndex > 0 &&
-                                                            currentIndex <
-                                                                _timetableCollection
-                                                                    .length) {
-                                                          final currentTimetable =
-                                                              _timetableCollection
-                                                                  .removeAt(
-                                                                      currentIndex);
+                                                if (currentIndex != 0)
+                                                  PullDownMenuItem(
+                                                    title: 'Set to ☆',
+                                                    icon: FeatherIcons.star,
+                                                    onTap: () {
+                                                      if (currentIndex <
                                                           _timetableCollection
-                                                              .insert(0,
-                                                                  currentTimetable);
-                                                          currentIndex = 0;
-                                                        }
-                                                      });
+                                                              .length) {
+                                                        checkAccessToken();
+                                                        HapticFeedback
+                                                            .mediumImpact();
+                                                        setState(() {
+                                                          if (currentIndex >
+                                                                  0 &&
+                                                              currentIndex <
+                                                                  _timetableCollection
+                                                                      .length) {
+                                                            final currentTimetable =
+                                                                _timetableCollection
+                                                                    .removeAt(
+                                                                        currentIndex);
+                                                            _timetableCollection
+                                                                .insert(0,
+                                                                    currentTimetable);
+                                                            currentIndex = 0;
+                                                          }
+                                                        });
 
-                                                      _pageController
-                                                          .animateToPage(
-                                                        currentIndex,
-                                                        duration: const Duration(
-                                                            milliseconds:
-                                                                500), // 애니메이션의 지속 시간을 설정합니다.
-                                                        curve: Curves
-                                                            .easeInOut, // 애니메이션의 속도 곡선을 설정합니다.
-                                                      );
-                                                      removeGPACourses();
+                                                        _pageController
+                                                            .animateToPage(
+                                                          currentIndex,
+                                                          duration: const Duration(
+                                                              milliseconds:
+                                                                  500), // 애니메이션의 지속 시간을 설정합니다.
+                                                          curve: Curves
+                                                              .easeInOut, // 애니메이션의 속도 곡선을 설정합니다.
+                                                        );
+                                                        removeGPACourses();
 
-                                                      reorderTimetableIndex(
-                                                          serverIndex,
-                                                          timetableOrder);
-                                                      print(
-                                                          "Index to change $serverIndex");
+                                                        reorderTimetableIndex(
+                                                            serverIndex,
+                                                            timetableOrder);
+                                                        print(
+                                                            "Index to change $serverIndex");
 
-                                                      currentIndexProv
-                                                          .setCurrentIndex(
-                                                              currentIndex);
-                                                      saveTimetableToLocalStorage();
-                                                    }
-                                                  },
-                                                ),
-                                                //   if (currentIndex == 0)
+                                                        currentIndexProv
+                                                            .setCurrentIndex(
+                                                                currentIndex);
+                                                        saveTimetableToLocalStorage();
+                                                      }
+                                                    },
+                                                  ),
                                                 PullDownMenuItem(
                                                   title: 'Edit Schedule',
                                                   icon: FeatherIcons.edit2,
@@ -1279,7 +1280,7 @@ class _SchedulePageState extends State<SchedulePage>
                                                           .mediumImpact();
 
                                                       await _animationController
-                                                          .forward(); // Start the animation
+                                                          .forward();
                                                       setState(
                                                         () {
                                                           if (_timetableCollection
@@ -1295,7 +1296,6 @@ class _SchedulePageState extends State<SchedulePage>
                                                               currentIndex--;
                                                             }
                                                           }
-                                                          //   cmsc216
                                                           if (_pageController
                                                               .hasClients) {
                                                             _pageController
@@ -1310,29 +1310,13 @@ class _SchedulePageState extends State<SchedulePage>
                                                             );
                                                           }
 
-                                                          // int? testindex =
-                                                          //     _timetableCollection[
-                                                          //                 currentIndex]
-                                                          //             .order! -
-                                                          //         1; // 이거 고쳐야됌
-                                                          // print(
-                                                          //     "Test Index ${testindex}");
-
                                                           String? testSemester =
                                                               getOriginalSemester(
                                                                   _semester!);
 
-//3
-
-                                                          print(
-                                                              "Test Semester : ${testSemester}");
-
                                                           deleteTimetable(
                                                               testSemester,
                                                               serverIndex);
-                                                          print(
-                                                              getOriginalSemester(
-                                                                  _semester!));
                                                         },
                                                       );
                                                       await Future.delayed(
@@ -1345,101 +1329,6 @@ class _SchedulePageState extends State<SchedulePage>
                                                     saveTimetableToLocalStorage();
                                                   },
                                                 ),
-                                                // PullDownMenuItem(
-                                                //   title: 'Delete All',
-                                                //   icon: FeatherIcons.trash2,
-                                                //   isDestructive: true,
-                                                //   onTap: () async {
-                                                //     bool? confirmDelete =
-                                                //         await showCupertinoModalPopup<
-                                                //             bool>(
-                                                //       context: context,
-                                                //       builder: (BuildContext
-                                                //           context) {
-                                                //         return CupertinoActionSheet(
-                                                //           title: const Text(
-                                                //               'This will delete all schedules\nexcept the first schedule.'),
-                                                //           actions: <CupertinoActionSheetAction>[
-                                                //             CupertinoActionSheetAction(
-                                                //               child: const Text(
-                                                //                 'Remove',
-                                                //                 style: TextStyle(
-                                                //                     color: CupertinoColors
-                                                //                         .destructiveRed,
-                                                //                     fontWeight:
-                                                //                         FontWeight
-                                                //                             .normal),
-                                                //               ),
-                                                //               onPressed: () {
-                                                //                 Navigator.pop(
-                                                //                     context,
-                                                //                     true); // Returns true on tap
-                                                //               },
-                                                //               isDestructiveAction:
-                                                //                   true,
-                                                //             ),
-                                                //           ],
-                                                //           cancelButton:
-                                                //               CupertinoActionSheetAction(
-                                                //             child: const Text(
-                                                //               'Cancel',
-                                                //               style: TextStyle(
-                                                //                   color: CupertinoColors
-                                                //                       .activeBlue,
-                                                //                   fontWeight:
-                                                //                       FontWeight
-                                                //                           .normal),
-                                                //             ),
-                                                //             onPressed: () {
-                                                //               Navigator.pop(
-                                                //                   context,
-                                                //                   false); // Returns false on tap
-                                                //             },
-                                                //           ),
-                                                //         );
-                                                //       },
-                                                //     );
-
-                                                //     // Check if the user confirmed the deletion
-                                                //     if (confirmDelete == true) {
-                                                //       // Place your existing deletion logic here
-                                                //       if (_timetableCollection
-                                                //               .length >
-                                                //           1) {
-                                                //         HapticFeedback
-                                                //             .mediumImpact();
-                                                //         await _animationController
-                                                //             .forward(); // Start the animation
-
-                                                //         setState(() {
-                                                //           // Remove all timetables except the first one
-                                                //           _timetableCollection
-                                                //               .removeRange(
-                                                //                   1,
-                                                //                   _timetableCollection
-                                                //                       .length);
-                                                //         });
-
-                                                //         await Future.delayed(
-                                                //             Duration(
-                                                //                 milliseconds:
-                                                //                     500));
-                                                //         await resetAnimations();
-                                                //         saveTimetableToLocalStorage();
-                                                //         Provider.of<CurrentIndexProvider>(
-                                                //                 context,
-                                                //                 listen: false)
-                                                //             .setCurrentIndex(
-                                                //                 currentIndex);
-                                                //         Provider.of<RemoveState>(
-                                                //                 context,
-                                                //                 listen: false)
-                                                //             .setRemove(true);
-                                                //         saveTimetableToLocalStorage();
-                                                //       }
-                                                //     }
-                                                //   },
-                                                // ),
                                               ];
                                             },
                                             buttonBuilder:
@@ -1451,9 +1340,26 @@ class _SchedulePageState extends State<SchedulePage>
                                                   HapticFeedback.mediumImpact();
                                                   showMenu();
                                                 },
-                                                child: const Icon(
-                                                  FeatherIcons.moreHorizontal,
-                                                  size: 20,
+                                                child: Row(
+                                                  children: [
+                                                    Text(
+                                                      currentIndex == 0
+                                                          ? 'This schedule will be used for friends and GPA page'
+                                                          : 'Try to set this schedule as ☆',
+                                                      style: TextStyle(
+                                                        fontSize: 10,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.grey,
+                                                      ),
+                                                    ),
+                                                    SizedBox(width: 10),
+                                                    const Icon(
+                                                      FeatherIcons
+                                                          .moreHorizontal,
+                                                      size: 20,
+                                                    ),
+                                                  ],
                                                 ),
                                               );
                                             },
@@ -1465,7 +1371,7 @@ class _SchedulePageState extends State<SchedulePage>
                                   //이게 타임테이블
                                   Expanded(
                                     child: Stack(
-                                      alignment: Alignment.bottomCenter,
+                                      alignment: Alignment.topCenter,
                                       children: [
                                         Padding(
                                           padding:

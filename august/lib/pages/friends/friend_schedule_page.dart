@@ -2,9 +2,11 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:august/components/friend_button.dart';
+import 'package:august/components/loading.dart';
 import 'package:august/components/timetable.dart';
 import 'package:august/const/tile_color.dart';
 import 'package:august/get_api/friends/friend_table.dart';
+import 'package:august/get_api/friends/friends_sem.dart';
 import 'package:august/get_api/onboard/get_semester.dart';
 import 'package:august/get_api/timetable/schedule.dart';
 import 'package:august/login/login.dart';
@@ -19,7 +21,7 @@ class FriendSchedulePage extends StatefulWidget {
   final String name; // 친구 이름
   final String yearInSchool;
   final String department;
-  final List<int>? semesterList;
+  // final List<int>? semesterList;
   final int? friendId;
 
   const FriendSchedulePage({
@@ -28,7 +30,7 @@ class FriendSchedulePage extends StatefulWidget {
     required this.name,
     required this.yearInSchool,
     required this.department,
-    this.semesterList,
+    //   this.semesterList,
     this.friendId,
   }) : super(key: key);
 
@@ -45,6 +47,7 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
   int? numberOfClasses = 0;
   bool isLoading = false;
 
+  List<int>? friendSemList;
   List<ScheduleList> scheduleLists = [];
   List<ScheduleList> chillLists = [];
   List<ScheduleList> _firstTimetableCourses = [];
@@ -58,22 +61,53 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
   @override
   void initState() {
     super.initState();
-
-    selectedSemester = widget.semesterList!.last;
+    // selectedSemester = friendSemList!.last;
+    // selectedSemester = widget.semesterList!.last;
     _animationController = AnimationController(
       duration: const Duration(seconds: 1),
       vsync: this,
     );
 
     _animationController!.forward();
-    //demo 데이터
+
+    checkAndLoad();
+  }
+
+  void checkAndLoad() async {
+    // Perform an asynchronous check for an access token and then load data accordingly
+    await checkAccessToken();
+    print('token refreshed');
+
+    // Assuming `selectedSemester` and `loadTimetable` logic is correctly handled elsewhere and available here
     if (selectedSemester != null) {
       loadTimetable(widget.friendId!, selectedSemester!);
     }
 
+    // Load the first timetable regardless of the above condition
     loadFirstTimetable();
 
-    // chillLists = jsonData1.map((data) => ScheduleList.fromJson(data)).toList();
+    // Load semesters
+    _loadSemesters();
+  }
+
+  Future<void> _loadSemesters() async {
+    if (widget.friendId != null) {
+      try {
+        var semesters =
+            await FriendSemester().fetchFriendSemester(widget.friendId!);
+        setState(() {
+          friendSemList = semesters;
+          if (friendSemList != null && friendSemList!.isNotEmpty) {
+            selectedSemester =
+                friendSemList!.last; // Update selected semester after loading
+            loadTimetable(widget.friendId!,
+                selectedSemester!); // Load timetable after setting the semester
+          }
+        });
+      } catch (e) {
+        print("Failed to load semesters: $e");
+      }
+    }
   }
 
   void loadTimetable(int friendId, int semester) async {
@@ -203,15 +237,15 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
     });
   }
 
-  @override
-  void didUpdateWidget(covariant FriendSchedulePage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // Check if selectedSemester has changed
-    if (selectedSemester != oldWidget.semesterList!.last) {
-      // If there is a change in the selected semester, reload the timetable
-      loadTimetable(widget.friendId!, selectedSemester!);
-    }
-  }
+  // @override
+  // void didUpdateWidget(covariant FriendSchedulePage oldWidget) {
+  //   super.didUpdateWidget(oldWidget);
+  //   // Check if selectedSemester has changed
+  //   if (selectedSemester != oldWidget.semesterList!.last) {
+  //     // If there is a change in the selected semester, reload the timetable
+  //     loadTimetable(widget.friendId!, selectedSemester!);
+  //   }
+  // }
 
   @override
   void dispose() {
@@ -282,9 +316,9 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                     child: ListView.builder(
                       padding: EdgeInsets.only(top: 10),
                       shrinkWrap: true,
-                      itemCount: widget.semesterList!.length,
+                      itemCount: friendSemList!.length,
                       itemBuilder: (context, index) {
-                        int semester = widget.semesterList![index];
+                        int semester = friendSemList![index];
                         String formattedSemester =
                             formatSemester(semester.toString());
                         bool isSelected = selectedSemester ==
@@ -317,8 +351,8 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                             if (semester != selectedSemester) {
                               // Check if the tapped semester is different
                               setState(() {
-                                selectedSemester =
-                                    semester; // Update the selected semester
+                                selectedSemester = semester;
+                                isLoading = true;
                               });
                               loadTimetable(widget.friendId!,
                                   semester); // Reload timetable
@@ -455,31 +489,44 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             GestureDetector(
-                              onTap: () {
-                                checkAccessToken();
-                                _selectFriendsSem(context);
-                              },
-                              child: Row(
-                                children: [
-                                  Text(
-                                    selectedSemester != null
-                                        ? formatSemester(
-                                            selectedSemester.toString())
-                                        : 'Select Semester',
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .outline,
-                                        fontWeight: FontWeight.bold),
+                                onTap: () {
+                                  checkAccessToken();
+                                  _selectFriendsSem(context);
+                                },
+                                child: AnimatedContainer(
+                                  duration: Duration(milliseconds: 200),
+                                  child: AnimatedOpacity(
+                                    duration: Duration(milliseconds: 200),
+                                    opacity:
+                                        selectedSemester != null ? 1.0 : 0.0,
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          selectedSemester != null
+                                              ? formatSemester(
+                                                  selectedSemester.toString())
+                                              : '',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .outline,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Icon(
+                                          selectedSemester != null
+                                              ? Icons.keyboard_arrow_down
+                                              : null,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outline,
+                                          size: 20,
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  Icon(Icons.keyboard_arrow_down,
-                                      color:
-                                          Theme.of(context).colorScheme.outline,
-                                      size: 20)
-                                ],
-                              ),
-                            ),
+                                )),
                             Spacer(),
                             buildButton(
                                 'Schedule',
@@ -513,10 +560,10 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                         duration: const Duration(
                             milliseconds:
                                 300), // Adjust duration for visual effect
-                        child: scheduleLists.isEmpty ||
-                                isLoading // Check if the scheduleLists is empty
+                        child: scheduleLists.isEmpty || isLoading
                             ? Center(
-                                child: null) // Show loading indicator if empty
+                                child: GroupLoading4(
+                                    context)) // Show loading indicator if empty
                             : (schedule1
                                 ? Column(
                                     children: [
@@ -557,34 +604,6 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                                     ],
                                   )),
                       ),
-                      // Padding(
-                      //   padding: const EdgeInsets.only(
-                      //     top: 10,
-                      //     bottom: 15,
-                      //     left: 10,
-                      //     right: 10,
-                      //   ),
-                      //   child: Container(
-                      //     height: 100,
-                      //     decoration: BoxDecoration(
-                      //       color: Theme.of(context).colorScheme.primary,
-                      //       borderRadius: BorderRadius.circular(20),
-                      //       boxShadow: [
-                      //         BoxShadow(
-                      //           color: Theme.of(context).colorScheme.shadow,
-                      //           blurRadius: 10,
-                      //           offset: Offset(6, 4),
-                      //         ),
-                      //         BoxShadow(
-                      //           color: Theme.of(context).colorScheme.shadow,
-                      //           blurRadius: 10,
-                      //           offset: Offset(-2, 0),
-                      //         ),
-                      //       ],
-                      //     ),
-                      //     child: Center(child: Text('Ad space')),
-                      //   ),
-                      // ),
                     ],
                   ),
                 ],
@@ -601,18 +620,6 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                     decoration: BoxDecoration(
                       color: Theme.of(innerContext).colorScheme.primary,
                       shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Theme.of(context).colorScheme.shadow,
-                          blurRadius: 10,
-                          offset: Offset(6, 4),
-                        ),
-                        BoxShadow(
-                          color: Theme.of(context).colorScheme.shadow,
-                          blurRadius: 10,
-                          offset: Offset(-2, 0),
-                        ),
-                      ],
                     ),
                     child: IconButton(
                       icon: Icon(

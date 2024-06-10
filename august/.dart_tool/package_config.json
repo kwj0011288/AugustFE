@@ -26,8 +26,14 @@
       "languageVersion": "3.2"
     },
     {
+      "name": "ansicolor",
+      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/ansicolor-2.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "archive",
-      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/archive-3.6.0",
+      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/archive-3.6.1",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -106,6 +112,12 @@
     {
       "name": "crypto",
       "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/crypto-3.0.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
+    },
+    {
+      "name": "csslib",
+      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/csslib-1.0.0",
       "packageUri": "lib/",
       "languageVersion": "2.19"
     },
@@ -255,7 +267,7 @@
     },
     {
       "name": "flutter_lints",
-      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/flutter_lints-3.0.2",
+      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/flutter_lints-4.0.0",
       "packageUri": "lib/",
       "languageVersion": "3.1"
     },
@@ -266,10 +278,16 @@
       "languageVersion": "2.12"
     },
     {
-      "name": "flutter_plugin_android_lifecycle",
-      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.19",
+      "name": "flutter_native_splash",
+      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/flutter_native_splash-2.4.0",
       "packageUri": "lib/",
-      "languageVersion": "3.2"
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "flutter_plugin_android_lifecycle",
+      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.20",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
     },
     {
       "name": "flutter_slidable",
@@ -327,9 +345,9 @@
     },
     {
       "name": "google_sign_in_android",
-      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/google_sign_in_android-6.1.23",
+      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/google_sign_in_android-6.1.24",
       "packageUri": "lib/",
-      "languageVersion": "3.2"
+      "languageVersion": "3.4"
     },
     {
       "name": "google_sign_in_ios",
@@ -350,6 +368,12 @@
       "languageVersion": "3.3"
     },
     {
+      "name": "html",
+      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/html-0.15.4",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
+    },
+    {
       "name": "http",
       "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/http-1.2.1",
       "packageUri": "lib/",
@@ -360,6 +384,12 @@
       "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/http_parser-4.0.2",
       "packageUri": "lib/",
       "languageVersion": "2.12"
+    },
+    {
+      "name": "image",
+      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/image-4.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.15"
     },
     {
       "name": "image_cropper",
@@ -381,15 +411,15 @@
     },
     {
       "name": "image_picker",
-      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/image_picker-1.1.1",
+      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/image_picker-1.1.2",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
     {
       "name": "image_picker_android",
-      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/image_picker_android-0.8.12+1",
+      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/image_picker_android-0.8.12+3",
       "packageUri": "lib/",
-      "languageVersion": "3.3"
+      "languageVersion": "3.4"
     },
     {
       "name": "image_picker_for_web",
@@ -399,7 +429,7 @@
     },
     {
       "name": "image_picker_ios",
-      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/image_picker_ios-0.8.11+2",
+      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/image_picker_ios-0.8.12",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
@@ -471,9 +501,9 @@
     },
     {
       "name": "lints",
-      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/lints-3.0.0",
+      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/lints-4.0.0",
       "packageUri": "lib/",
-      "languageVersion": "3.0"
+      "languageVersion": "3.1"
     },
     {
       "name": "lottie",
@@ -543,9 +573,9 @@
     },
     {
       "name": "path_provider_android",
-      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/path_provider_android-2.2.4",
+      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/path_provider_android-2.2.5",
       "packageUri": "lib/",
-      "languageVersion": "3.2"
+      "languageVersion": "3.4"
     },
     {
       "name": "path_provider_foundation",
@@ -585,7 +615,7 @@
     },
     {
       "name": "permission_handler_apple",
-      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/permission_handler_apple-9.4.4",
+      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/permission_handler_apple-9.4.5",
       "packageUri": "lib/",
       "languageVersion": "2.15"
     },
@@ -633,7 +663,7 @@
     },
     {
       "name": "provider",
-      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/provider-5.0.0",
+      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/provider-6.1.2",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -675,9 +705,9 @@
     },
     {
       "name": "shared_preferences_android",
-      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/shared_preferences_android-2.2.2",
+      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/shared_preferences_android-2.2.3",
       "packageUri": "lib/",
-      "languageVersion": "3.2"
+      "languageVersion": "3.4"
     },
     {
       "name": "shared_preferences_foundation",
@@ -795,15 +825,15 @@
     },
     {
       "name": "url_launcher",
-      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/url_launcher-6.2.6",
+      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/url_launcher-6.3.0",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
     {
       "name": "url_launcher_android",
-      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/url_launcher_android-6.3.2",
+      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/url_launcher_android-6.3.3",
       "packageUri": "lib/",
-      "languageVersion": "3.2"
+      "languageVersion": "3.4"
     },
     {
       "name": "url_launcher_ios",
@@ -896,13 +926,19 @@
       "languageVersion": "3.2"
     },
     {
+      "name": "yaml",
+      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/yaml-3.1.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
+    },
+    {
       "name": "august",
       "rootUri": "../",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     }
   ],
-  "generated": "2024-05-30T11:30:21.394553Z",
+  "generated": "2024-06-05T13:01:39.771974Z",
   "generator": "pub",
   "generatorVersion": "3.4.1",
   "flutterRoot": "file:///opt/homebrew/Caskroom/flutter/3.10.6/flutter",

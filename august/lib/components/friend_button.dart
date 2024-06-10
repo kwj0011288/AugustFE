@@ -22,18 +22,6 @@ Widget buildButton(String text, Color buttonColor, final VoidCallback onTap,
     decoration: BoxDecoration(
       color: buttonColor,
       borderRadius: BorderRadius.circular(40),
-      boxShadow: [
-        BoxShadow(
-          color: Theme.of(context).colorScheme.shadow,
-          blurRadius: 10,
-          offset: Offset(6, 4),
-        ),
-        BoxShadow(
-          color: Theme.of(context).colorScheme.shadow,
-          blurRadius: 10,
-          offset: Offset(-2, 0),
-        ),
-      ],
     ),
     child: Material(
       color: Colors.transparent,

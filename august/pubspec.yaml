@@ -18,7 +18,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
+  flutter_lints: ^4.0.0
 
   http: ^1.1.0
   json_annotation: ^4.0.1
@@ -65,7 +65,13 @@ dev_dependencies:
   url_launcher: ^6.2.5
   toasty_box: 
   pull_to_refresh:
+  flutter_native_splash:
   
+
+flutter_native_splash:
+  color: "#FFFFFF"
+  color_dark: "#000000"
+  image: assets/icons/splash.png
 flutter:
   fonts:
     - family: Apple

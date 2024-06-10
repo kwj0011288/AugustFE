@@ -46,6 +46,7 @@ class _FriendsPageState extends State<FriendsPage>
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
   AnimationController? _refreshFriendsController;
+  String? _ownInvitationCode;
 
   String formatSemester(String semester) {
     String year = semester.substring(0, 4);
@@ -63,7 +64,6 @@ class _FriendsPageState extends State<FriendsPage>
 
     _loadProfilePhoto();
     _listenForPhotoChanges(); // Listen for photo changes if using a Provider
-
     //refresh button
     _refreshFriendsController = AnimationController(
       duration: const Duration(milliseconds: 500),
@@ -115,14 +115,19 @@ class _FriendsPageState extends State<FriendsPage>
 
   Future<void> loadFriends() async {
     try {
-      friends = await FriendInfos().fetchFriends();
-      setState(() {
-        isLoading = false;
-      });
+      var fetchedFriends = await FriendInfos().fetchFriends();
+      if (mounted) {
+        setState(() {
+          friends = fetchedFriends;
+          isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
       print('Failed to load friends: $e');
     }
   }
@@ -151,11 +156,11 @@ class _FriendsPageState extends State<FriendsPage>
 
   @override
   void dispose() {
-    super.dispose();
     _controller!.dispose();
     _jiggleController!.dispose();
     _refreshController.dispose();
     _refreshFriendsController!.dispose();
+    super.dispose();
   }
 
   String convertDepartment(String department) {
@@ -194,7 +199,19 @@ class _FriendsPageState extends State<FriendsPage>
   void addFriend(String input) async {
     // Assuming VerifyFriendService is properly imported and initialized
     var response = await VerifyFriendService().acceptFriendRequest(input);
-    if (!response.success) {
+
+    if (_ownInvitationCode == input) {
+      ToastService.showToast(
+        context,
+        backgroundColor: Theme.of(context).colorScheme.background,
+        shadowColor: Theme.of(context).colorScheme.shadow,
+        leading: Icon(
+          FeatherIcons.xCircle,
+          color: Colors.redAccent,
+        ),
+        message: "Yo! You can't add yourself as a friend.",
+      );
+    } else if (!response.success) {
       ToastService.showToast(
         context,
         backgroundColor: Theme.of(context).colorScheme.background,
@@ -262,6 +279,16 @@ class _FriendsPageState extends State<FriendsPage>
                     ),
                     cursorColor: Theme.of(context).colorScheme.outline,
                     padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                    onSubmitted: (value) {
+                      // 이벤트 처리기 추가
+                      Navigator.of(context).pop();
+                      addFriend(inviteController.text);
+                      inviteController.clear();
+
+                      Future.delayed(Duration(microseconds: 1500), () {
+                        loadFriends();
+                      });
+                    },
                   ),
                 ),
                 SizedBox(width: 10),
@@ -271,7 +298,7 @@ class _FriendsPageState extends State<FriendsPage>
                     addFriend(inviteController.text);
                     inviteController.clear();
 
-                    Future.delayed(Duration(milliseconds: 100), () {
+                    Future.delayed(Duration(microseconds: 1500), () {
                       loadFriends();
                     });
                   },
@@ -402,6 +429,7 @@ class _FriendsPageState extends State<FriendsPage>
   void _onRefresh() async {
     try {
       await loadFriends();
+
       _refreshController.refreshCompleted();
     } catch (error) {
       _refreshController.refreshFailed();
@@ -457,7 +485,7 @@ class _FriendsPageState extends State<FriendsPage>
                       child: GestureDetector(
                         onTap: () async {
                           HapticFeedback.mediumImpact();
-                          Navigator.push(
+                          var result = await Navigator.push(
                             context,
                             PageRouteBuilder(
                               opaque: false,
@@ -471,11 +499,16 @@ class _FriendsPageState extends State<FriendsPage>
                                   child: child,
                                 );
                               },
-                              transitionDuration: Duration(
-                                  milliseconds:
-                                      200), // Customize the duration as needed
+                              transitionDuration: Duration(milliseconds: 200),
                             ),
                           );
+
+                          if (result != null) {
+                            _ownInvitationCode = result;
+                            print("Received invitation code: $result");
+                            // You can use the `result` here to perform further operations
+                          }
+
                           await checkAccessToken();
                         },
                         child: Container(
@@ -546,8 +579,12 @@ class _FriendsPageState extends State<FriendsPage>
                         child: Align(
                           alignment: Alignment.centerRight,
                           child: GestureDetector(
-                            onTap: () {
+                            onTap: () async {
+                              final SharedPreferences prefs =
+                                  await SharedPreferences.getInstance();
                               loadFriends();
+                              await prefs.remove('codeExpires');
+                              await prefs.remove('invitationCode');
                               _refreshFriendsController!.forward(from: 0.0);
                             },
                             child: Padding(
@@ -568,7 +605,7 @@ class _FriendsPageState extends State<FriendsPage>
                                       Icons.refresh,
                                       color:
                                           Theme.of(context).colorScheme.outline,
-                                      size: 20,
+                                      size: 25,
                                     ),
                                   ),
                                 ),
@@ -594,7 +631,7 @@ class _FriendsPageState extends State<FriendsPage>
                                 crossAxisCount: 2, // 한 줄에 표시할 항목의 수
                                 crossAxisSpacing: 20.0, // 가로 간격
                                 mainAxisSpacing: 20.0, // 세로 간격
-                                childAspectRatio: (10 / 11), // 가로 세로 비율 조정
+                                childAspectRatio: (10 / 10.5), // 가로 세로 비율 조정
                               ),
                               itemBuilder: (context, index) {
                                 if (index == friends.length) {
@@ -679,15 +716,9 @@ class _FriendsPageState extends State<FriendsPage>
                                 // dataList에서 각 항목에 대한 정보를 사용하여 UI 구성
                                 return GestureDetector(
                                   // onTap에서 호출되는 부분
-                                  onTap: () async {
-                                    await checkAccessToken();
-
+                                  onTap: () {
+                                    HapticFeedback.mediumImpact();
                                     if (!isEdit) {
-                                      /* 여기 */
-                                      var semesters = await FriendSemester()
-                                          .fetchFriendSemester(
-                                              friends[index].id);
-                                      HapticFeedback.mediumImpact();
                                       showCupertinoModalBottomSheet(
                                         context: context,
                                         backgroundColor: Colors
@@ -716,14 +747,16 @@ class _FriendsPageState extends State<FriendsPage>
                                                   friends[index].department,
                                               yearInSchool: convertDepartment(
                                                   friends[index].yearInSchool),
-                                              semesterList: semesters,
                                               friendId: friends[index].id,
                                             ),
                                           );
                                         },
                                       );
+                                      refreshToken().then((_) {
+                                        checkAccessToken();
+                                      });
                                     } else {
-                                      await deleteFriends(friends[index].id);
+                                      deleteFriends(friends[index].id);
                                     }
                                   },
                                   child: AnimatedContainer(
@@ -760,9 +793,9 @@ class _FriendsPageState extends State<FriendsPage>
                                             children: [
                                               Container(
                                                 width:
-                                                    100, // 이미지의 가로 크기를 80으로 설정
+                                                    95, // 이미지의 가로 크기를 80으로 설정
                                                 height:
-                                                    100, // 이미지의 세로 크기를 80으로 설정
+                                                    95, // 이미지의 세로 크기를 80으로 설정
                                                 child: ClipOval(
                                                   child: friends[index]
                                                               .profileImage !=
@@ -777,11 +810,15 @@ class _FriendsPageState extends State<FriendsPage>
                                                 ),
                                               ),
                                               SizedBox(height: 10),
-                                              Text(friends[index].name,
-                                                  style: TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight: FontWeight
-                                                          .bold)), // 이름 표시
+                                              Text(
+                                                friends[index].name,
+                                                style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 1,
+                                              ), // 이름 표시
                                             ],
                                           )
                                         : Padding(
@@ -800,12 +837,17 @@ class _FriendsPageState extends State<FriendsPage>
                                                       maxRadius: 50,
                                                       child: JiggleTrashIcon()),
                                                 ),
-                                                Text(friends[index].name,
-                                                    style: TextStyle(
-                                                        fontSize: 20,
-                                                        color: Colors.black,
-                                                        fontWeight:
-                                                            FontWeight.bold)),
+                                                Text(
+                                                  friends[index].name,
+                                                  style: TextStyle(
+                                                      fontSize: 20,
+                                                      color: Colors.black,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  maxLines: 1,
+                                                ),
                                               ],
                                             ),
                                           ),

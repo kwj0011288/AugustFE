@@ -42,6 +42,8 @@ void main() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('loadDone', false);
     await prefs.setString('semester', preloadedSemesters.last);
+    await prefs.remove('codeExpires');
+    await prefs.remove('invitationCode');
   } else {
     preloadedSemesters = ["Error"];
     departments = ["Error"];

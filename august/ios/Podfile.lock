@@ -12,6 +12,8 @@ PODS:
     - Flutter
   - flutter_native_contact_picker (0.0.1):
     - Flutter
+  - flutter_native_splash (0.0.1):
+    - Flutter
   - gaimon (0.0.1):
     - Flutter
   - google_sign_in_ios (0.0.1):
@@ -54,6 +56,7 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_keyboard_visibility (from `.symlinks/plugins/flutter_keyboard_visibility/ios`)
   - flutter_native_contact_picker (from `.symlinks/plugins/flutter_native_contact_picker/ios`)
+  - flutter_native_splash (from `.symlinks/plugins/flutter_native_splash/ios`)
   - gaimon (from `.symlinks/plugins/gaimon/ios`)
   - google_sign_in_ios (from `.symlinks/plugins/google_sign_in_ios/darwin`)
   - image_cropper (from `.symlinks/plugins/image_cropper/ios`)
@@ -80,6 +83,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_keyboard_visibility/ios"
   flutter_native_contact_picker:
     :path: ".symlinks/plugins/flutter_native_contact_picker/ios"
+  flutter_native_splash:
+    :path: ".symlinks/plugins/flutter_native_splash/ios"
   gaimon:
     :path: ".symlinks/plugins/gaimon/ios"
   google_sign_in_ios:
@@ -103,6 +108,7 @@ SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_keyboard_visibility: 0339d06371254c3eb25eeb90ba8d17dca8f9c069
   flutter_native_contact_picker: bd430ba0fbf82768bb50c2c52a69a65759a8f907
+  flutter_native_splash: edf599c81f74d093a4daf8e17bd7a018854bc778
   gaimon: 7688c586f38dcc4782e6fe26f648057d280a9d8b
   google_sign_in_ios: 07375bfbf2620bc93a602c0e27160d6afc6ead38
   GoogleSignIn: d4281ab6cf21542b1cfaff85c191f230b399d2db

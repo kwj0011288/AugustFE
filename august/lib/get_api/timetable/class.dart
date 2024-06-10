@@ -74,7 +74,7 @@ class Section {
     seats = json['seats'];
     openSeats = json['open_seats'];
     waitlist = json['waitlist'];
-    holdfile = json['holdfile'];
+    holdfile = json['holdfile'] ?? 0;
   }
 
   Map<String, dynamic> toJson() {

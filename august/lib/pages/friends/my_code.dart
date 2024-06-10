@@ -26,53 +26,62 @@ class _InvitationCodePageState extends State<InvitationCodePage> {
   void initState() {
     formatExpires();
     super.initState();
-    generateCode();
+    initCode();
+
     loadProfilePhoto();
+  }
+
+  Future<void> initCode() async {
+    final prefs = await SharedPreferences.getInstance();
+    _expires = prefs.getString('codeExpires');
+    if (isCodeExpired()) {
+      await generateCode();
+    } else {
+      _code = prefs.getString('invitationCode') ?? _code;
+      formattedTime = formatExpires();
+    }
+    setState(() {}); // Update UI after verification or generation
+  }
+
+  bool isCodeExpired() {
+    if (_expires != null) {
+      final now = DateTime.now();
+      final expires = DateTime.parse(_expires!);
+      print('Now: $now, Expires: $expires'); // Debug output to check values
+      return expires.isBefore(now);
+    }
+    return true; // Assume expired if no expiry date is set
   }
 
   String formatExpires() {
     if (_expires != null) {
       final now = DateTime.now();
       final expires = DateTime.parse(_expires!);
-
-      // Calculate the difference between now and the expiration time
       final duration = expires.difference(now);
 
-      // Check if the expiration date has already passed
       if (duration.isNegative) {
         return "Expired";
       } else {
-        // Format the duration to display in days, hours, and minutes
         final days = duration.inDays;
         final hours = duration.inHours % 24;
         final minutes = duration.inMinutes % 60;
 
-        // Build a string showing the remaining time until expiration
-        String formattedTime = "";
-        if (days > 0) {
-          formattedTime += "$days days ";
-        }
-        if (hours > 0) {
-          formattedTime += "$hours hours ";
-        }
-        if (minutes > 0) {
-          formattedTime += "$minutes minutes ";
-        }
-
-        return formattedTime.trim(); // Trim any trailing space
+        return "${days}d ${hours}h ${minutes}m";
       }
     }
-
-    return "";
+    return "No expiry date";
   }
 
-  void generateCode() async {
+  Future<void> generateCode() async {
     FriendsRequestCode requestCode =
         await FriendRequestService().createFriendRequestCode();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('codeExpires', requestCode.expires);
+    await prefs.setString('invitationCode', requestCode.code);
+
     setState(() {
       _code = requestCode.code;
       _expires = requestCode.expires;
-      _url = requestCode.url;
       formattedTime = formatExpires();
     });
   }
@@ -190,7 +199,7 @@ class _InvitationCodePageState extends State<InvitationCodePage> {
             ),
             SizedBox(height: 10),
             GestureDetector(
-              onTap: () => Navigator.pop(context),
+              onTap: () => Navigator.pop(context, _code),
               child: CircleAvatar(
                 radius: 25, // Increased radius for a larger avatar
                 backgroundColor: Theme.of(context).colorScheme.primaryContainer,
