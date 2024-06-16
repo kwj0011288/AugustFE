@@ -296,6 +296,12 @@
       "languageVersion": "2.17"
     },
     {
+      "name": "flutter_snake_navigationbar",
+      "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/flutter_snake_navigationbar-0.6.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "flutter_svg",
       "rootUri": "file:///Users/one_jae_kim/.pub-cache/hosted/pub.dev/flutter_svg-2.0.10+1",
       "packageUri": "lib/",
@@ -938,7 +944,7 @@
       "languageVersion": "3.3"
     }
   ],
-  "generated": "2024-06-05T13:01:39.771974Z",
+  "generated": "2024-06-13T14:51:23.453556Z",
   "generator": "pub",
   "generatorVersion": "3.4.1",
   "flutterRoot": "file:///opt/homebrew/Caskroom/flutter/3.10.6/flutter",

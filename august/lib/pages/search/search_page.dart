@@ -132,14 +132,14 @@ class _SearchPageState extends State<SearchPage>
               Row(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(left: 20, top: 15),
+                    padding: const EdgeInsets.only(left: 12, top: 15),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           'Search',
                           style: TextStyle(
-                            fontSize: 30,
+                            fontSize: 25,
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context).colorScheme.outline,
                           ),
@@ -166,27 +166,27 @@ class _SearchPageState extends State<SearchPage>
                     ),
                   ),
                   Spacer(),
-                  Padding(
-                    padding:
-                        const EdgeInsets.only(left: 15, right: 10, top: 15),
-                    child: GestureDetector(
-                      onTap: () {
-                        HapticFeedback.mediumImpact();
-                        Navigator.pop(context);
-                      },
-                      child: CircleAvatar(
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        foregroundColor:
-                            Theme.of(context).colorScheme.background,
-                        child: Center(
-                          child: Icon(
-                            FeatherIcons.x,
-                            color: Theme.of(context).colorScheme.outline,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  // Padding(
+                  //   padding:
+                  //       const EdgeInsets.only(left: 15, right: 10, top: 15),
+                  //   child: GestureDetector(
+                  //     onTap: () {
+                  //       HapticFeedback.mediumImpact();
+                  //       Navigator.pop(context);
+                  //     },
+                  //     child: CircleAvatar(
+                  //       backgroundColor: Theme.of(context).colorScheme.primary,
+                  //       foregroundColor:
+                  //           Theme.of(context).colorScheme.background,
+                  //       child: Center(
+                  //         child: Icon(
+                  //           FeatherIcons.x,
+                  //           color: Theme.of(context).colorScheme.outline,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
               Padding(

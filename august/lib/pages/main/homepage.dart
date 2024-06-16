@@ -5,6 +5,8 @@ import 'package:august/get_api/onboard/get_semester.dart';
 import 'package:august/login/login.dart';
 import 'package:august/onboard/onboard.dart';
 import 'package:august/onboard/semester.dart';
+import 'package:august/pages/gpa/gpa_page.dart';
+import 'package:august/pages/search/search_page.dart';
 import 'package:provider/provider.dart';
 import 'package:august/pages/friends/friends_page.dart';
 import 'package:august/pages/main/schedule_page.dart';
@@ -29,7 +31,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _currentIndex = 0;
+  int _currentIndex = 1;
   String? _semester;
   bool isLoading = true;
   List<Widget> _pages = [];
@@ -159,6 +161,7 @@ class _HomePageState extends State<HomePage> {
   void _initializePages() {
     // 페이지 초기화 로직을 별도 함수로 분리하여, 필요한 경우에만 호출
     _pages = [
+      SearchPage(semester: _semester!),
       SchedulePage(
         semester: _semester ?? '202401',
         departments: widget.departments,
@@ -169,6 +172,7 @@ class _HomePageState extends State<HomePage> {
       FriendsPage(
         semester: _semester ?? 'Unknown',
       ),
+      GPAPage(semester: _semester!)
     ];
   }
 
@@ -254,7 +258,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(

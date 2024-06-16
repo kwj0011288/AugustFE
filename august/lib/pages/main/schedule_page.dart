@@ -4,7 +4,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'package:august/components/button.dart';
+import 'package:august/components/indicator/scrolling_dots_effect.dart';
+import 'package:august/components/indicator/smooth_page_indicator.dart';
 import 'package:august/components/loading.dart';
+import 'package:august/components/schedulepage/more.dart';
 import 'package:august/get_api/timetable/delete_timetable.dart';
 import 'package:august/get_api/timetable/edit_timetable.dart';
 import 'package:august/get_api/onboard/get_semester.dart';
@@ -131,7 +134,9 @@ class _SchedulePageState extends State<SchedulePage>
     isLoading = true;
 
     _dotIndicatorScrollController = ScrollController();
-    _pageController = PageController();
+    _pageController = PageController(
+      viewportFraction: 0.92,
+    );
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 500),
       vsync: this,
@@ -700,102 +705,7 @@ class _SchedulePageState extends State<SchedulePage>
                         ],
                       ),
                     ),
-                    const Spacer(),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        left: 15,
-                        right: 0,
-                        top: 15,
-                      ),
-                      child: GestureDetector(
-                        onTap: () {
-                          HapticFeedback.mediumImpact();
-                          Navigator.push(
-                            context,
-                            PageRouteBuilder(
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) =>
-                                      GPAPage(
-                                semester: _semester!,
-                                firstTimeTable: _firstTimeTable,
-                              ),
-                              transitionsBuilder: (context, animation,
-                                  secondaryAnimation, child) {
-                                var begin = const Offset(0.0, 1.0);
-                                var end = Offset.zero;
-                                var curve = Curves.ease;
-
-                                var tween = Tween(begin: begin, end: end)
-                                    .chain(CurveTween(curve: curve));
-
-                                return SlideTransition(
-                                  position: animation.drive(tween),
-                                  child: child,
-                                );
-                              },
-                            ),
-                          );
-                        },
-                        child: CircleAvatar(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primary,
-                          foregroundColor:
-                              Theme.of(context).colorScheme.background,
-                          child: Center(
-                            child: Icon(
-                              Icons.school_outlined,
-                              color: Theme.of(context).colorScheme.outline,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        left: 15,
-                        right: 0,
-                        top: 15,
-                      ),
-                      child: GestureDetector(
-                        onTap: () {
-                          HapticFeedback.mediumImpact();
-                          Navigator.push(
-                            context,
-                            PageRouteBuilder(
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) =>
-                                      SearchPage(semester: _semester!),
-                              transitionsBuilder: (context, animation,
-                                  secondaryAnimation, child) {
-                                var begin = const Offset(0.0, 1.0);
-                                var end = Offset.zero;
-                                var curve = Curves.ease;
-
-                                var tween = Tween(begin: begin, end: end)
-                                    .chain(CurveTween(curve: curve));
-
-                                return SlideTransition(
-                                  position: animation.drive(tween),
-                                  child: child,
-                                );
-                              },
-                            ),
-                          );
-                        },
-                        child: CircleAvatar(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primary,
-                          foregroundColor:
-                              Theme.of(context).colorScheme.background,
-                          child: Center(
-                            child: Icon(
-                              FeatherIcons.search,
-                              color: Theme.of(context).colorScheme.outline,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                    Spacer(),
                     Padding(
                       padding: const EdgeInsets.only(
                         left: 15,
@@ -809,8 +719,6 @@ class _SchedulePageState extends State<SchedulePage>
                         },
                         child: CircleAvatar(
                           backgroundColor: Colors.grey,
-                          foregroundColor:
-                              Theme.of(context).colorScheme.background,
                           backgroundImage: profilePhoto != null
                               ? MemoryImage(profilePhoto!)
                               : null,
@@ -1166,203 +1074,174 @@ class _SchedulePageState extends State<SchedulePage>
                                     padding: const EdgeInsets.only(top: 7),
                                     child: Row(
                                       children: [
-                                        const Spacer(),
-                                        const SizedBox(width: 10),
+                                        const SizedBox(width: 20),
+                                        AnimatedSwitcher(
+                                          duration:
+                                              const Duration(milliseconds: 250),
+                                          transitionBuilder: (Widget child,
+                                              Animation<double> animation) {
+                                            // Using a fade transition and maintaining alignment to the start
+                                            return FadeTransition(
+                                              opacity: animation,
+                                              child: AlignTransition(
+                                                alignment: Tween<Alignment>(
+                                                  begin: Alignment.centerLeft,
+                                                  end: Alignment.centerLeft,
+                                                ).animate(animation),
+                                                child: child,
+                                              ),
+                                            );
+                                          },
+                                          child: currentIndex == 0
+                                              ? Text(
+                                                  "This schedule is for the friends and GPA page.",
+                                                  key: ValueKey<int>(
+                                                      1), // Unique key to trigger animation
+                                                  style: TextStyle(
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.grey,
+                                                  ),
+                                                )
+                                              : Text(
+                                                  "Try to make this schedule the main one.             ",
+                                                  key: ValueKey<int>(
+                                                      2), // Unique key to trigger animation
+                                                  style: TextStyle(
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.grey,
+                                                  ),
+                                                ),
+                                        ),
+                                        Spacer(),
                                         Padding(
                                           padding:
                                               const EdgeInsets.only(right: 20),
-                                          child: PullDownButton(
-                                            itemBuilder:
-                                                (BuildContext context) {
-                                              return <PullDownMenuEntry>[
-                                                if (currentIndex != 0)
-                                                  PullDownMenuItem(
-                                                    title: 'Set to ☆',
-                                                    icon: FeatherIcons.star,
-                                                    onTap: () {
-                                                      if (currentIndex <
-                                                          _timetableCollection
-                                                              .length) {
-                                                        checkAccessToken();
-                                                        HapticFeedback
-                                                            .mediumImpact();
-                                                        setState(() {
-                                                          if (currentIndex >
-                                                                  0 &&
-                                                              currentIndex <
-                                                                  _timetableCollection
-                                                                      .length) {
-                                                            final currentTimetable =
-                                                                _timetableCollection
-                                                                    .removeAt(
-                                                                        currentIndex);
-                                                            _timetableCollection
-                                                                .insert(0,
-                                                                    currentTimetable);
-                                                            currentIndex = 0;
-                                                          }
-                                                        });
-
-                                                        _pageController
-                                                            .animateToPage(
-                                                          currentIndex,
-                                                          duration: const Duration(
-                                                              milliseconds:
-                                                                  500), // 애니메이션의 지속 시간을 설정합니다.
-                                                          curve: Curves
-                                                              .easeInOut, // 애니메이션의 속도 곡선을 설정합니다.
-                                                        );
-                                                        removeGPACourses();
-
-                                                        reorderTimetableIndex(
-                                                            serverIndex,
-                                                            timetableOrder);
-                                                        print(
-                                                            "Index to change $serverIndex");
-
-                                                        currentIndexProv
-                                                            .setCurrentIndex(
-                                                                currentIndex);
-                                                        saveTimetableToLocalStorage();
-                                                      }
-                                                    },
+                                          child: MoreButton(
+                                            editSchedule: () {
+                                              if (currentIndex <
+                                                  _timetableCollection.length) {
+                                                checkAccessToken();
+                                                HapticFeedback.mediumImpact();
+                                                Navigator.push(
+                                                  context,
+                                                  CupertinoPageRoute(
+                                                    fullscreenDialog: true,
+                                                    builder: (context) =>
+                                                        EditPage(
+                                                      index: serverIndex,
+                                                      semester: widget.semester,
+                                                      name:
+                                                          _timetableCollection[
+                                                                  currentIndex]
+                                                              .name,
+                                                    ),
                                                   ),
-                                                PullDownMenuItem(
-                                                  title: 'Edit Schedule',
-                                                  icon: FeatherIcons.edit2,
-                                                  onTap: () {
-                                                    if (currentIndex <
-                                                        _timetableCollection
-                                                            .length) {
-                                                      checkAccessToken();
-                                                      HapticFeedback
-                                                          .mediumImpact();
-                                                      Navigator.push(
-                                                        context,
-                                                        CupertinoPageRoute(
-                                                          builder: (context) =>
-                                                              EditPage(
-                                                            index: serverIndex,
-                                                            semester:
-                                                                widget.semester,
-                                                            name: _timetableCollection[
-                                                                    currentIndex]
-                                                                .name,
-                                                          ),
-                                                        ),
-                                                      );
-                                                      saveTimetableToLocalStorage();
+                                                );
+                                                saveTimetableToLocalStorage();
+                                              }
+                                              ;
+                                            },
+                                            editName: () {
+                                              checkAccessToken();
+                                              _editTimetableName(serverIndex);
+                                            },
+                                            remove: () async {
+                                              if (currentIndex <
+                                                  _timetableCollection.length) {
+                                                checkAccessToken();
+                                                HapticFeedback.mediumImpact();
+
+                                                await _animationController
+                                                    .forward();
+                                                setState(
+                                                  () {
+                                                    if (_timetableCollection
+                                                            .isNotEmpty &&
+                                                        currentIndex <
+                                                            _timetableCollection
+                                                                .length) {
+                                                      _timetableCollection
+                                                          .removeAt(
+                                                              currentIndex);
+                                                      if (currentIndex > 0) {
+                                                        currentIndex--;
+                                                      }
                                                     }
-                                                    ;
-                                                  },
-                                                ),
-                                                PullDownMenuItem(
-                                                  title: 'Edit Name',
-                                                  icon: FeatherIcons.type,
-                                                  onTap: () {
-                                                    checkAccessToken();
-                                                    _editTimetableName(
+                                                    if (_pageController
+                                                        .hasClients) {
+                                                      _pageController
+                                                          .animateToPage(
+                                                        currentIndex,
+                                                        duration:
+                                                            const Duration(
+                                                                milliseconds:
+                                                                    500),
+                                                        curve: Curves.easeInOut,
+                                                      );
+                                                    }
+
+                                                    String? testSemester =
+                                                        getOriginalSemester(
+                                                            _semester!);
+
+                                                    deleteTimetable(
+                                                        testSemester,
                                                         serverIndex);
                                                   },
-                                                ),
-                                                const PullDownMenuDivider
-                                                    .large(),
-                                                PullDownMenuItem(
-                                                  title: 'Remove',
-                                                  icon: FeatherIcons.trash,
-                                                  isDestructive: true,
-                                                  onTap: () async {
-                                                    if (currentIndex <
+                                                );
+                                                await Future.delayed(
+                                                    const Duration(
+                                                        milliseconds: 500));
+                                                await resetAnimations();
+                                                saveTimetableToLocalStorage();
+                                              }
+                                              saveTimetableToLocalStorage();
+                                            },
+                                            setMain: () {
+                                              if (currentIndex <
+                                                  _timetableCollection.length) {
+                                                checkAccessToken();
+                                                HapticFeedback.mediumImpact();
+                                                setState(() {
+                                                  if (currentIndex > 0 &&
+                                                      currentIndex <
+                                                          _timetableCollection
+                                                              .length) {
+                                                    final currentTimetable =
                                                         _timetableCollection
-                                                            .length) {
-                                                      checkAccessToken();
-                                                      HapticFeedback
-                                                          .mediumImpact();
+                                                            .removeAt(
+                                                                currentIndex);
+                                                    _timetableCollection.insert(
+                                                        0, currentTimetable);
+                                                    currentIndex = 0;
+                                                  }
+                                                });
 
-                                                      await _animationController
-                                                          .forward();
-                                                      setState(
-                                                        () {
-                                                          if (_timetableCollection
-                                                                  .isNotEmpty &&
-                                                              currentIndex <
-                                                                  _timetableCollection
-                                                                      .length) {
-                                                            _timetableCollection
-                                                                .removeAt(
-                                                                    currentIndex);
-                                                            if (currentIndex >
-                                                                0) {
-                                                              currentIndex--;
-                                                            }
-                                                          }
-                                                          if (_pageController
-                                                              .hasClients) {
-                                                            _pageController
-                                                                .animateToPage(
-                                                              currentIndex,
-                                                              duration:
-                                                                  const Duration(
-                                                                      milliseconds:
-                                                                          500),
-                                                              curve: Curves
-                                                                  .easeInOut,
-                                                            );
-                                                          }
+                                                _pageController.animateToPage(
+                                                  currentIndex,
+                                                  duration: const Duration(
+                                                      milliseconds:
+                                                          500), // 애니메이션의 지속 시간을 설정합니다.
+                                                  curve: Curves
+                                                      .easeInOut, // 애니메이션의 속도 곡선을 설정합니다.
+                                                );
+                                                removeGPACourses();
 
-                                                          String? testSemester =
-                                                              getOriginalSemester(
-                                                                  _semester!);
+                                                reorderTimetableIndex(
+                                                    serverIndex,
+                                                    timetableOrder);
+                                                print(
+                                                    "Index to change $serverIndex");
 
-                                                          deleteTimetable(
-                                                              testSemester,
-                                                              serverIndex);
-                                                        },
-                                                      );
-                                                      await Future.delayed(
-                                                          const Duration(
-                                                              milliseconds:
-                                                                  500));
-                                                      await resetAnimations();
-                                                      saveTimetableToLocalStorage();
-                                                    }
-                                                    saveTimetableToLocalStorage();
-                                                  },
-                                                ),
-                                              ];
+                                                currentIndexProv
+                                                    .setCurrentIndex(
+                                                        currentIndex);
+                                                saveTimetableToLocalStorage();
+                                              }
                                             },
-                                            buttonBuilder:
-                                                (BuildContext context,
-                                                    Future<void> Function()
-                                                        showMenu) {
-                                              return GestureDetector(
-                                                onTap: () {
-                                                  HapticFeedback.mediumImpact();
-                                                  showMenu();
-                                                },
-                                                child: Row(
-                                                  children: [
-                                                    Text(
-                                                      currentIndex == 0
-                                                          ? 'This schedule will be used for friends and GPA page'
-                                                          : 'Try to set this schedule as ☆',
-                                                      style: TextStyle(
-                                                        fontSize: 10,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.grey,
-                                                      ),
-                                                    ),
-                                                    SizedBox(width: 10),
-                                                    const Icon(
-                                                      FeatherIcons
-                                                          .moreHorizontal,
-                                                      size: 20,
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            },
+                                            currentIndex: currentIndex,
                                           ),
                                         ),
                                       ],
@@ -1375,7 +1254,7 @@ class _SchedulePageState extends State<SchedulePage>
                                       children: [
                                         Padding(
                                           padding:
-                                              const EdgeInsets.only(bottom: 50),
+                                              const EdgeInsets.only(bottom: 30),
                                           child: _timetableCollection[index],
                                         ),
                                       ],
@@ -1387,158 +1266,107 @@ class _SchedulePageState extends State<SchedulePage>
                           }
                         },
                       ),
-                      Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Positioned(
-                            bottom: 100,
-                            child: _timetableCollection.isNotEmpty
-                                ? Container(
-                                    height: 45,
-                                    decoration: BoxDecoration(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                      borderRadius: BorderRadius.circular(30),
+                      if (_timetableCollection.isNotEmpty)
+                        Stack(
+                          alignment: Alignment.bottomCenter,
+                          children: [
+                            Positioned(
+                              bottom: 0,
+                              child: Container(
+                                height: 20,
+                                width: 100,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  //   borderRadius: BorderRadius.circular(30),
+                                  // border: Border.all(color: Colors.white),
+                                ),
+                                child: Center(
+                                  child: SmoothPageIndicator(
+                                    controller: _pageController!,
+                                    count: _timetableCollection.length + 1,
+                                    effect: ScrollingDotsEffect(
+                                        activeStrokeWidth: 2,
+                                        activeDotScale: 1.3,
+                                        maxVisibleDots: 5,
+                                        radius: 8,
+                                        spacing: 8,
+                                        dotHeight: 8,
+                                        dotWidth: 8,
+                                        dotColor: Colors.grey,
+                                        activeDotColor: Theme.of(context)
+                                            .colorScheme
+                                            .outline),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              left: 130,
+                              bottom: 0,
+                              child: GestureDetector(
+                                onTap: () {
+                                  HapticFeedback.mediumImpact();
+                                  _pageController.animateToPage(
+                                    0,
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeInOut,
+                                  );
+                                },
+                                child: Container(
+                                  height: 20,
+                                  width: 20,
+                                  decoration: BoxDecoration(
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(30),
+                                      bottomLeft: Radius.circular(30),
                                       // border: Border.all(color: Colors.white),
                                     ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        IconButton(
-                                          icon: Icon(
-                                            FeatherIcons.star,
-                                            size: currentIndex == 0 ? 22 : 18,
-                                          ),
-                                          color: currentIndex == 0
-                                              ? Theme.of(context)
-                                                  .colorScheme
-                                                  .outline
-                                              : Colors.grey,
-                                          onPressed: () {
-                                            HapticFeedback.mediumImpact();
-                                            _pageController.animateToPage(
-                                              0,
-                                              duration: const Duration(
-                                                  milliseconds: 300),
-                                              curve: Curves.easeInOut,
-                                            );
-                                          },
-                                        ),
-                                        Container(
-                                          width: min(
-                                              _timetableCollection.length *
-                                                  20.0,
-                                              MediaQuery.of(context)
-                                                      .size
-                                                      .width -
-                                                  250),
-                                          child: Center(
-                                            child: SingleChildScrollView(
-                                              scrollDirection: Axis.horizontal,
-                                              controller:
-                                                  _dotIndicatorScrollController,
-                                              child: Row(
-                                                children: List<Widget>.generate(
-                                                  _timetableCollection.length +
-                                                      1, // +1 for the extra page
-                                                  (index) {
-                                                    if (index == 0) {
-                                                      return const SizedBox
-                                                          .shrink(); // Home 버튼을 위한 공간
-                                                    } else if (index ==
-                                                        _timetableCollection
-                                                            .length) {
-                                                      return const SizedBox
-                                                          .shrink(); // Add 버튼을 위한 공간
-                                                    } else {
-                                                      return GestureDetector(
-                                                        onTap: () {
-                                                          HapticFeedback
-                                                              .mediumImpact();
-                                                          _pageController
-                                                              .animateToPage(
-                                                            index,
-                                                            duration:
-                                                                const Duration(
-                                                                    milliseconds:
-                                                                        300),
-                                                            curve: Curves
-                                                                .easeInOut,
-                                                          );
-                                                        },
-                                                        child:
-                                                            AnimatedContainer(
-                                                          duration:
-                                                              const Duration(
-                                                                  milliseconds:
-                                                                      300),
-                                                          margin:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                                  horizontal:
-                                                                      5),
-                                                          height:
-                                                              currentIndex ==
-                                                                      index
-                                                                  ? 15
-                                                                  : 10,
-                                                          width: currentIndex ==
-                                                                  index
-                                                              ? 15
-                                                              : 10,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            shape:
-                                                                BoxShape.circle,
-                                                            color: currentIndex ==
-                                                                    index
-                                                                ? Theme.of(
-                                                                        context)
-                                                                    .colorScheme
-                                                                    .outline
-                                                                : Colors.grey,
-                                                          ),
-                                                        ),
-                                                      );
-                                                    }
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        IconButton(
-                                          icon: Icon(
-                                            FeatherIcons.plus,
-                                            size: currentIndex ==
-                                                    _timetableCollection.length
-                                                ? 25
-                                                : 20,
-                                          ),
-                                          color: currentIndex ==
-                                                  _timetableCollection.length
-                                              ? Theme.of(context)
-                                                  .colorScheme
-                                                  .outline
-                                              : Colors.grey,
-                                          onPressed: () {
-                                            HapticFeedback.mediumImpact();
-                                            _pageController.animateToPage(
-                                              _timetableCollection.length,
-                                              duration: const Duration(
-                                                  milliseconds: 300),
-                                              curve: Curves.easeInOut,
-                                            );
-                                          },
-                                        ),
-                                      ],
+                                  ),
+                                  child: Center(
+                                    child: Icon(
+                                      FeatherIcons.arrowLeft,
+                                      size: 12,
                                     ),
-                                  )
-                                : Container(),
-                          ),
-                        ],
-                      ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              right: 130,
+                              bottom: 0,
+                              child: GestureDetector(
+                                onTap: () {
+                                  HapticFeedback.mediumImpact();
+                                  _pageController?.animateToPage(
+                                    _timetableCollection.length,
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeInOut,
+                                  );
+                                },
+                                child: Container(
+                                  height: 20,
+                                  width: 20,
+                                  decoration: BoxDecoration(
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                    borderRadius: BorderRadius.only(
+                                      topRight: Radius.circular(30),
+                                      bottomRight: Radius.circular(30),
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Icon(
+                                      FeatherIcons.arrowRight,
+                                      size: 12,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                     ],
                   ),
                 ),

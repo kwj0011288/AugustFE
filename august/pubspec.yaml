@@ -66,6 +66,7 @@ dev_dependencies:
   toasty_box: 
   pull_to_refresh:
   flutter_native_splash:
+  flutter_snake_navigationbar:
   
 
 flutter_native_splash:

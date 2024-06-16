@@ -352,7 +352,7 @@ class _GPAPageState extends State<GPAPage> with TickerProviderStateMixin {
                         Text(
                           'GPA Calculator',
                           style: TextStyle(
-                            fontSize: 30,
+                            fontSize: 25,
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context).colorScheme.outline,
                           ),
