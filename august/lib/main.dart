@@ -1,6 +1,6 @@
+import 'package:august/components/provider/friends_provider.dart';
 import 'package:august/const/dark_theme.dart';
 import 'package:august/const/light_theme.dart';
-import 'package:august/get_api/friends/get_friends.dart';
 import 'package:august/get_api/onboard/get_department.dart';
 import 'package:august/login/initialpage.dart';
 import 'package:august/login/login.dart';
@@ -14,8 +14,8 @@ import 'package:flutter/material.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-import 'components/courseprovider.dart';
-import 'components/timetable.dart';
+import 'components/provider/courseprovider.dart';
+import 'components/timetable/timetable.dart';
 import 'get_api/timetable/class_grouping.dart';
 import 'get_api/onboard/get_semester.dart';
 import 'package:flutter/services.dart';
@@ -110,6 +110,7 @@ class MyApp extends StatelessWidget {
             ChangeNotifierProvider(create: (context) => SetMainState()),
             ChangeNotifierProvider(create: (context) => RemoveState()),
             ChangeNotifierProvider(create: (_) => ProfilePhotoNotifier()),
+            ChangeNotifierProvider(create: (_) => FriendsProvider()),
           ],
           child: MaterialApp(
               debugShowCheckedModeBanner: false,

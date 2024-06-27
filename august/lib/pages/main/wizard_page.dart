@@ -5,7 +5,7 @@ import 'package:august/const/customwidget.dart';
 import 'package:august/const/stringwidget.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sliding_number/sliding_number.dart';
-import 'package:august/components/button.dart';
+import 'package:august/components/home/button.dart';
 import 'package:august/get_api/wizard/send_api.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
 import 'package:flutter/cupertino.dart';

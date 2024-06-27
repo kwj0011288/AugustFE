@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:august/components/friend_button.dart';
-import 'package:august/components/loading.dart';
-import 'package:august/components/timetable.dart';
+import 'package:august/components/friends/friend_button.dart';
+import 'package:august/components/home/loading.dart';
+import 'package:august/components/timetable/timetable.dart';
 import 'package:august/const/tile_color.dart';
 import 'package:august/get_api/friends/friend_table.dart';
 import 'package:august/get_api/friends/friends_sem.dart';
+import 'package:august/get_api/friends/hangout.dart';
 import 'package:august/get_api/onboard/get_semester.dart';
 import 'package:august/get_api/timetable/schedule.dart';
 import 'package:august/login/login.dart';
@@ -50,7 +51,6 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
   List<int>? friendSemList;
   List<ScheduleList> scheduleLists = [];
   List<ScheduleList> chillLists = [];
-  List<ScheduleList> _firstTimetableCourses = [];
 
   String formatSemester(String semester) {
     String year = semester.substring(0, 4);
@@ -79,14 +79,11 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
     print('token refreshed');
 
     // Assuming `selectedSemester` and `loadTimetable` logic is correctly handled elsewhere and available here
-    if (selectedSemester != null) {
-      loadTimetable(widget.friendId!, selectedSemester!);
-    }
+    // if (selectedSemester != null) {
+    //   loadTimetable(widget.friendId!, selectedSemester!);
+    //   _loadHangout(selectedSemester!);
+    // }
 
-    // Load the first timetable regardless of the above condition
-    loadFirstTimetable();
-
-    // Load semesters
     _loadSemesters();
   }
 
@@ -95,6 +92,7 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
       try {
         var semesters =
             await FriendSemester().fetchFriendSemester(widget.friendId!);
+
         setState(() {
           friendSemList = semesters;
           if (friendSemList != null && friendSemList!.isNotEmpty) {
@@ -102,7 +100,28 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                 friendSemList!.last; // Update selected semester after loading
             loadTimetable(widget.friendId!,
                 selectedSemester!); // Load timetable after setting the semester
+            _loadHangout(selectedSemester!);
           }
+        });
+      } catch (e) {
+        print("Failed to load semesters: $e");
+      }
+    }
+  }
+
+  Future<void> _loadHangout(semester) async {
+    await checkAccessToken();
+    setState(() {
+      isLoading = true; // Start loading
+    });
+    if (widget.friendId != null) {
+      try {
+        ScheduleList hangoutList =
+            await HangoutRequest().fetchHangout(widget.friendId!, semester);
+        setState(() {
+          chillLists.clear();
+          chillLists.add(hangoutList);
+          isLoading = false;
         });
       } catch (e) {
         print("Failed to load semesters: $e");
@@ -125,9 +144,6 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
         numberOfClasses = schedules.length;
         isLoading = false; // Stop loading after data is fetched
       });
-      if (scheduleLists.isNotEmpty) {
-        findNonOverlappingTimeslots(); // Ensure this is called after data is loaded
-      }
     } catch (e) {
       // Log error or show an error message on the UI
       print('Error fetching schedule: $e');
@@ -151,101 +167,6 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
       });
     }
   }
-
-  Future<void> loadFirstTimetable() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? jsonString = prefs.getString('timetable');
-
-    if (jsonString != null) {
-      try {
-        List<dynamic> decodedJson = jsonDecode(jsonString);
-        if (decodedJson.isNotEmpty) {
-          List<dynamic> firstTimetableDataList = decodedJson[0];
-          List<ScheduleList> firstTimetableCourses = firstTimetableDataList
-              .map((e) => ScheduleList.fromJson(e as Map<String, dynamic>))
-              .toList();
-
-          setState(() {
-            _firstTimetableCourses = firstTimetableCourses;
-          });
-        }
-      } catch (e) {
-        print("Error loading timetable: $e");
-      }
-    } else {
-      print("No timetable data found in SharedPreferences.");
-    }
-  }
-
-  void findNonOverlappingTimeslots() {
-    List<ScheduleList> nonOverlapping = [];
-
-    // Log the contents of the schedules to ensure they're being loaded correctly
-    print("Schedule Lists: ${scheduleLists.length}");
-    print("First Timetable Courses: ${_firstTimetableCourses.length}");
-
-    if (scheduleLists.isEmpty || _firstTimetableCourses.isEmpty) {
-      print("One of the timetables is empty, skipping comparison.");
-      return;
-    }
-
-    // Check each course in the main schedule list
-    for (var course in scheduleLists) {
-      bool isOverlapping = false;
-
-      // Check each meeting time of the current course
-      for (var meeting in course.meetings ?? []) {
-        if (_firstTimetableCourses.any((firstCourse) {
-          return firstCourse.meetings?.any((firstMeeting) {
-                // Check if days intersect
-                bool daysOverlap = (meeting.days ?? "")
-                    .split('')
-                    .any((day) => firstMeeting.days?.contains(day) ?? false);
-                if (daysOverlap) {
-                  // Check if times overlap
-                  DateTime startA =
-                      DateTime.parse('2000-01-01 ${meeting.startTime}');
-                  DateTime endA =
-                      DateTime.parse('2000-01-01 ${meeting.endTime}');
-                  DateTime startB =
-                      DateTime.parse('2000-01-01 ${firstMeeting.startTime}');
-                  DateTime endB =
-                      DateTime.parse('2000-01-01 ${firstMeeting.endTime}');
-                  bool timesOverlap =
-                      startA.isBefore(endB) && startB.isBefore(endA);
-                  return timesOverlap;
-                }
-                return false;
-              }) ??
-              false;
-        })) {
-          isOverlapping = true;
-          break; // Break if any overlap is found
-        }
-      }
-
-      // If no overlaps are found for all meetings, add to non-overlapping list
-      if (!isOverlapping) {
-        nonOverlapping.add(course);
-      }
-    }
-
-    print("Non-overlapping courses: ${nonOverlapping.length}");
-
-    setState(() {
-      chillLists = nonOverlapping;
-    });
-  }
-
-  // @override
-  // void didUpdateWidget(covariant FriendSchedulePage oldWidget) {
-  //   super.didUpdateWidget(oldWidget);
-  //   // Check if selectedSemester has changed
-  //   if (selectedSemester != oldWidget.semesterList!.last) {
-  //     // If there is a change in the selected semester, reload the timetable
-  //     loadTimetable(widget.friendId!, selectedSemester!);
-  //   }
-  // }
 
   @override
   void dispose() {
@@ -356,6 +277,7 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                               });
                               loadTimetable(widget.friendId!,
                                   semester); // Reload timetable
+                              _loadHangout(semester);
                             }
                             Navigator.pop(context); // Close the modal sheet
                           },
@@ -478,8 +400,8 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                     ),
                   ),
                   Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(
@@ -584,25 +506,70 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                                       ),
                                     ],
                                   )
-                                : Column(
-                                    children: [
-                                      Text(
-                                        '${widget.name} and you can hang out at these times!',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                      SingleTimetable(
-                                        key: ValueKey<int>(
-                                            2), // Unique key for AnimatedSwitcher when showing chill lists
-                                        courses: chillLists,
-                                        index: 0,
-                                        forceFixedTimeRange: true,
-                                      ),
-                                    ],
-                                  )),
+                                : (chillLists.first.meetings == null)
+                                    ? Column(
+                                        children: [
+                                          Text(
+                                            'No chill time available',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                          ...List.generate(
+                                            3,
+                                            (index) => Padding(
+                                              padding:
+                                                  const EdgeInsets.all(2.0),
+                                              child: Text(
+                                                '.',
+                                                style: TextStyle(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Text(
+                                            'Maybe',
+                                            style: TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                          Text(
+                                            'you or ${widget.name} did not setup schedule yet?',
+                                            style: TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.grey,
+                                            ),
+                                          )
+                                        ],
+                                      )
+                                    : Column(
+                                        children: [
+                                          Text(
+                                            '${widget.name} and you can hang out at these times!',
+                                            style: TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                          SingleTimetable(
+                                            key: ValueKey<int>(
+                                                2), // Unique key for AnimatedSwitcher when showing chill lists
+                                            courses: chillLists,
+                                            index: 0,
+                                            forceFixedTimeRange: true,
+                                            isFriend: true,
+                                          ),
+                                        ],
+                                      )),
                       ),
                     ],
                   ),

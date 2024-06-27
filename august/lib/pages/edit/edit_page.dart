@@ -12,9 +12,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import "package:flutter_feather_icons/flutter_feather_icons.dart";
 import 'package:flutter/material.dart' hide ModalBottomSheetRoute;
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import '../../components/button.dart';
-import '../../components/courseprovider.dart';
-import '../../components/timetable.dart';
+import '../../components/home/button.dart';
+import '../../components/provider/courseprovider.dart';
+import '../../components/timetable/timetable.dart';
 import '../../get_api/timetable/schedule.dart';
 
 class EditPage extends StatefulWidget {

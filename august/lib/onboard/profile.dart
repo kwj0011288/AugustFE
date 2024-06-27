@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:path_provider/path_provider.dart';
-import 'package:august/components/button.dart';
-import 'package:august/components/courseprovider.dart';
+import 'package:august/components/home/button.dart';
+import 'package:august/components/provider/courseprovider.dart';
 import 'package:august/login/login.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -17,8 +17,9 @@ import 'package:contacts_service/contacts_service.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import "package:flutter_feather_icons/flutter_feather_icons.dart";
+import 'package:colorful_safe_area/colorful_safe_area.dart';
 import 'package:image_cropper/image_cropper.dart';
+import "package:flutter_feather_icons/flutter_feather_icons.dart";
 
 class NamePage extends StatefulWidget {
   final bool onboard;
@@ -66,12 +67,27 @@ class _NamePageState extends State<NamePage> {
       // 선택된 이미지를 크롭합니다.
       CroppedFile? croppedFile = await ImageCropper().cropImage(
         sourcePath: pickedFile.path,
-        aspectRatioPresets: [
-          CropAspectRatioPreset.square,
-          CropAspectRatioPreset.ratio3x2,
-          CropAspectRatioPreset.original,
-          CropAspectRatioPreset.ratio4x3,
-          CropAspectRatioPreset.ratio16x9
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Cropper',
+            toolbarColor: Colors.deepOrange,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.square,
+            lockAspectRatio: false,
+            aspectRatioPresets: [
+              CropAspectRatioPreset.original,
+              CropAspectRatioPreset.square,
+              CropAspectRatioPreset.ratio4x3,
+            ],
+          ),
+          IOSUiSettings(
+            title: 'Cropper',
+            aspectRatioPresets: [
+              CropAspectRatioPreset.original,
+              CropAspectRatioPreset.square,
+              CropAspectRatioPreset.ratio4x3,
+            ],
+          ),
         ],
       );
 
@@ -221,342 +237,256 @@ class _NamePageState extends State<NamePage> {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else {
           var selectedCoursesData = Provider.of<CoursesProvider>(context);
-          return ClipRRect(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-            child: Scaffold(
-              backgroundColor:
-                  widget.onboard ? Colors.transparent : Colors.transparent,
-              body: SingleChildScrollView(
+          return Scaffold(
+            body: ColorfulSafeArea(
+              child: SingleChildScrollView(
                 physics: NeverScrollableScrollPhysics(),
                 reverse: true,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    GestureDetector(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.background,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        children: [
+                          Spacer(),
+                          if (widget.onboard == false)
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  right: 20, top: 5, bottom: 10),
+                              child: GestureDetector(
+                                onTap: () {
+                                  HapticFeedback.mediumImpact();
+                                  Navigator.pop(context);
+                                },
+                                child: CircleAvatar(
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.primary,
+                                  foregroundColor:
+                                      Theme.of(context).colorScheme.background,
+                                  child: Center(
+                                    child: Icon(
+                                      FeatherIcons.x,
+                                      color:
+                                          Theme.of(context).colorScheme.outline,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      if (widget.onboard == true) SizedBox(height: 50),
+                      Text(
+                        widget.onboard ? "Who Are You?" : "Change Your Profile",
+                        style: TextStyle(
+                          fontSize: 35,
+                          color: Theme.of(context).colorScheme.outline,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 30),
+                      Text(
+                        widget.onboard
+                            ? "Set name and profile\nthat will be shown to others."
+                            : "Change name and profile\nthat will be shown to others.",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 40),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            SizedBox(
+                              width: 200,
+                              height: 200,
+                              child: CircleAvatar(
+                                backgroundColor: Colors.grey,
+                                foregroundColor:
+                                    Theme.of(context).colorScheme.background,
+                                backgroundImage: contactPhoto != null
+                                    ? MemoryImage(contactPhoto!)
+                                    : null,
+                                child: contactPhoto == null
+                                    ? Image.asset('assets/icons/memoji.png')
+                                    : null, // Only show the icon if contactPhoto is null
+                              ),
+                            ),
+                            Positioned(
+                              right: 10,
+                              bottom: 0,
+                              child: PullDownButton(
+                                itemBuilder: (BuildContext context) {
+                                  const PullDownMenuDivider.large();
+                                  return <PullDownMenuItem>[
+                                    PullDownMenuItem(
+                                      title: 'Get Memoji from Contacts',
+                                      subtitle: 'Recommended',
+                                      onTap: _pickContact,
+                                    ),
+                                    PullDownMenuItem(
+                                      title: 'Open Photo App',
+                                      onTap: getImage,
+                                    ),
+                                    PullDownMenuItem(
+                                      title: 'Use Default Image',
+                                      onTap: () async {
+                                        ByteData data = await rootBundle
+                                            .load('assets/icons/memoji.png');
+                                        Uint8List bytes =
+                                            data.buffer.asUint8List();
+                                        setState(() {
+                                          contactPhoto = bytes;
+                                        });
+                                        _saveInfo();
+                                      },
+                                    ),
+                                  ];
+                                },
+                                buttonBuilder: (BuildContext context,
+                                    Future<void> Function() showMenu) {
+                                  return Container(
+                                    height: 50,
+                                    width: 50,
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .background,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .outline,
+                                        width: 2.0,
+                                      ),
+                                    ),
+                                    child: IconButton(
+                                      onPressed: showMenu,
+                                      icon: Icon(Icons.add),
+                                      color:
+                                          Theme.of(context).colorScheme.outline,
+                                      padding: EdgeInsets.zero,
+                                      constraints: BoxConstraints(),
+                                      iconSize: 40,
+                                    ),
+                                  );
+                                },
+                                scrollController: ScrollController(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 40),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 30),
+                        child: CupertinoTextField(
+                          textAlign: TextAlign.center,
+                          controller: _nameController,
+                          padding: EdgeInsets.all(10),
+                          placeholder: "Enter Your Name",
+                          placeholderStyle: TextStyle(
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.inversePrimary,
+                            fontFamily: "Apple",
+                          ),
+                          style: TextStyle(
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.outline,
+                            fontFamily: "Apple",
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          cursorColor: Theme.of(context).colorScheme.outline,
+                          cursorHeight: 40,
+                          onChanged: (text) {
+                            setState(() {}); // 텍스트 필드의 내용이 변경될 때마다 UI 업데이트
+                          },
+                          maxLength: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            bottomNavigationBar: Padding(
+              padding: const EdgeInsets.only(
+                left: 15,
+                right: 15,
+                bottom: 60,
+              ),
+              child: widget.onboard
+                  ? GestureDetector(
                       onTap: () {
-                        if (!widget.onboard) {
-                          // Ensures that the pop action is performed only when onboard is false
-                          Navigator.pop(context); // Pops the current route
-                        }
+                        FocusScope.of(context).unfocus();
+                        Future.delayed(Duration(milliseconds: 200), () {
+                          widget.onTap();
+                          _saveAndClose();
+                        });
                       },
                       child: Container(
-                        height: MediaQuery.of(context).size.height / 1,
-                        alignment: Alignment.center,
-                      ),
-                    ),
-                    //assets/icons/profile.svg
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          top: 0, left: 10, right: 10, bottom: 25),
-                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        height: 60,
+                        width: MediaQuery.of(context).size.width - 80,
                         decoration: BoxDecoration(
-                          color: widget.onboard
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).colorScheme.background,
-                          borderRadius: BorderRadius.all(
-                              Radius.circular(30)), // 모서리를 둥글게 만듭니다.
-                          // 필요하다면 여기에 그림자나 테두리 등을 추가할 수 있습니다.
-                        ),
-                        child: Column(
+                            color: Colors.blueAccent,
+                            borderRadius: BorderRadius.circular(20)),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.only(
-                                    topLeft:
-                                        Radius.circular(20), // 상단 왼쪽 모서리 둥글게
-                                    topRight:
-                                        Radius.circular(20), // 상단 오른쪽 모서리 둥글게
-                                  ),
-                                  child: Align(
-                                    alignment: Alignment.topCenter,
-                                    heightFactor:
-                                        0.8, // 이미지의 상위 80%만 보여줍니다. 하단 20%는 잘립니다.
-                                    child: SvgPicture.asset(
-                                      'assets/icons/profile.svg',
-                                      width: MediaQuery.of(context).size.width,
-                                      // height 설정을 제거하여 전체 이미지 높이를 기준으로 잘립니다.
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      right: 10, bottom: 80),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      if (widget.onboard == false)
-                                        Container(
-                                          height: 30,
-                                          width: 30,
-                                          decoration: BoxDecoration(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .primary,
-                                            shape: BoxShape
-                                                .circle, // Ensures the container is circular
-                                          ),
-                                          child: IconButton(
-                                            icon: Icon(
-                                              FeatherIcons.x,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .outline,
-                                              size: 20,
-                                            ),
-
-                                            onPressed: () {
-                                              if (Navigator.canPop(context)) {
-                                                Navigator.pop(context);
-                                              }
-                                            },
-                                            padding: EdgeInsets.all(
-                                                5), // Remove padding to fit the icon well
-                                            constraints:
-                                                BoxConstraints(), // Remove constraints if necessary
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
                             Text(
-                              "Edit Your Profile",
+                              'NEXT',
                               style: TextStyle(
-                                fontSize: 25,
-                                color: Theme.of(context).colorScheme.outline,
-                                fontWeight: FontWeight.bold,
-                              ),
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20),
                             ),
-                            SizedBox(height: 10),
+                          ],
+                        ),
+                      ),
+                    )
+                  : GestureDetector(
+                      onTap: () {
+                        _saveAndClose();
+                        HapticFeedback.mediumImpact();
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 30),
+                        height: 55,
+                        width: MediaQuery.of(context).size.width - 80,
+                        decoration: BoxDecoration(
+                            color: Colors.blueAccent,
+                            borderRadius: BorderRadius.circular(60)),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
                             Text(
-                              "Set your name and photo!\nThis is what friend see\nwhen you share your schedules",
-                              textAlign: TextAlign.center,
+                              'DONE',
                               style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.grey,
-                                fontWeight: FontWeight.bold,
-                              ),
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20),
                             ),
-                            SizedBox(height: 10),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Stack(
-                                    alignment: Alignment.center,
-                                    children: [
-                                      SizedBox(
-                                        width: 95,
-                                        height: 95,
-                                        child: CircleAvatar(
-                                          backgroundColor: Colors.grey,
-                                          foregroundColor: Theme.of(context)
-                                              .colorScheme
-                                              .background,
-                                          backgroundImage: contactPhoto != null
-                                              ? MemoryImage(contactPhoto!)
-                                              : null,
-                                          child: contactPhoto == null
-                                              ? Image.asset(
-                                                  'assets/icons/memoji.png')
-                                              : null, // Only show the icon if contactPhoto is null
-                                        ),
-                                      ),
-                                      Positioned(
-                                        right: 0,
-                                        bottom: 0,
-                                        child: PullDownButton(
-                                          itemBuilder: (BuildContext context) {
-                                            const PullDownMenuDivider.large();
-                                            return <PullDownMenuItem>[
-                                              PullDownMenuItem(
-                                                title:
-                                                    'Get Memoji from Contacts',
-                                                subtitle: 'Recommended',
-                                                onTap: _pickContact,
-                                              ),
-                                              PullDownMenuItem(
-                                                title: 'Open Photo App',
-                                                onTap: getImage,
-                                              ),
-                                              PullDownMenuItem(
-                                                title: 'Use Default Image',
-                                                onTap: () async {
-                                                  ByteData data =
-                                                      await rootBundle.load(
-                                                          'assets/icons/memoji.png');
-                                                  Uint8List bytes =
-                                                      data.buffer.asUint8List();
-                                                  setState(() {
-                                                    contactPhoto = bytes;
-                                                  });
-                                                  _saveInfo();
-                                                },
-                                              ),
-                                            ];
-                                          },
-                                          buttonBuilder: (BuildContext context,
-                                              Future<void> Function()
-                                                  showMenu) {
-                                            return Container(
-                                              height: 30,
-                                              width: 30,
-                                              decoration: BoxDecoration(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .background,
-                                                shape: BoxShape.circle,
-                                                border: Border.all(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .outline,
-                                                  width: 2.0,
-                                                ),
-                                              ),
-                                              child: IconButton(
-                                                onPressed: showMenu,
-                                                icon: Icon(Icons.add),
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .outline,
-                                                padding: EdgeInsets.zero,
-                                                constraints: BoxConstraints(),
-                                                iconSize: 25,
-                                              ),
-                                            );
-                                          },
-                                          scrollController: ScrollController(),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(width: 20),
-                                Text(
-                                  _nameController.text.isEmpty
-                                      ? "Enter Your Name"
-                                      : _nameController.text,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    color:
-                                        Theme.of(context).colorScheme.outline,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 20),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 15),
-                              child: CupertinoTextField(
-                                controller: _nameController,
-                                padding: EdgeInsets.all(15),
-                                placeholder: "Enter Your Name",
-                                placeholderStyle: TextStyle(
-                                  color: Theme.of(context).colorScheme.outline,
-                                ),
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.outline,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .inversePrimary,
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                cursorColor:
-                                    Theme.of(context).colorScheme.outline,
-                                onChanged: (text) {
-                                  setState(
-                                      () {}); // 텍스트 필드의 내용이 변경될 때마다 UI 업데이트
-                                },
-                              ),
-                            ),
-                            SizedBox(height: 20),
-                            widget.onboard
-                                ? GestureDetector(
-                                    onTap: () {
-                                      widget.onTap();
-                                      _saveAndClose();
-                                    },
-                                    child: Container(
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 20),
-                                      height: 55,
-                                      width: MediaQuery.of(context).size.width -
-                                          80,
-                                      decoration: BoxDecoration(
-                                          color: Colors.blueAccent,
-                                          borderRadius:
-                                              BorderRadius.circular(60)),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            'NEXT',
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 20),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  )
-                                : GestureDetector(
-                                    onTap: () {
-                                      _saveAndClose();
-                                      HapticFeedback.mediumImpact();
-                                    },
-                                    child: Container(
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 30),
-                                      height: 55,
-                                      width: MediaQuery.of(context).size.width -
-                                          80,
-                                      decoration: BoxDecoration(
-                                          color: Colors.blueAccent,
-                                          borderRadius:
-                                              BorderRadius.circular(60)),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            'DONE',
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 20),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                            SizedBox(height: 20),
                           ],
                         ),
                       ),
                     ),
-                  ],
-                ),
-              ),
             ),
           );
         }

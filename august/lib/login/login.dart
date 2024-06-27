@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:august/get_api/onboard/get_user_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -102,13 +103,13 @@ Future<bool> checkAccessToken() async {
   }
 }
 
-Future<bool> initApp() async {
+Future<bool> initApp(BuildContext context) async {
   final isLoggedIn = await checkLoginStatus();
   if (!isLoggedIn) {
     final isTokenRefreshed = await refreshToken();
     if (isTokenRefreshed) {
       // 사용자 정보를 가져오고 출력
-      await fetchAndPrintUserInfo();
+      await fetchAndPrintUserInfo(context);
       await fetchUserEmail();
 
       return true; // 로그인 상태가 유효하다고 가정
@@ -119,12 +120,12 @@ Future<bool> initApp() async {
     }
   } else {
     // 이미 로그인되어 있음
-    await fetchAndPrintUserInfo();
+    await fetchAndPrintUserInfo(context);
     return true;
   }
 }
 
-Future<bool> fetchAndPrintUserInfo() async {
+Future<bool> fetchAndPrintUserInfo(BuildContext context) async {
   final prefs = await SharedPreferences.getInstance();
   final accessToken = prefs.getString('accessToken');
   if (accessToken == null) {
@@ -148,6 +149,7 @@ Future<bool> fetchAndPrintUserInfo() async {
     return true;
   } else {
     print("Failed to fetch user info.");
+
     return false;
   }
 }

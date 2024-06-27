@@ -1,4 +1,4 @@
-import 'package:august/components/button.dart';
+import 'package:august/components/home/button.dart';
 import 'package:flutter/widgets.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
 import 'package:flutter/cupertino.dart';

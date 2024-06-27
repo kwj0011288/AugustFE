@@ -117,38 +117,113 @@ class _InitialPageState extends State<InitialPage> {
   }
 
   Future<void> _checkLoginStatusAndNavigate() async {
-    Future.microtask(() => showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) {
-            return Dialog(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CircularProgressIndicator(),
-                  Text("Loading"),
-                ],
+    // Show loading indicator
+    Future.microtask(
+      () => showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Dialog(
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            child: Center(
+              child: Container(
+                width: 100, // Adjust as needed
+                height: 100, // Adjust as needed
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(100), // Adjust as needed
+                ),
+                child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: CircularProgressIndicator(
+                      color: Theme.of(context).colorScheme.outline,
+                    )),
               ),
-            );
-          },
-        ));
+            ),
+          );
+        },
+      ),
+    );
 
-    final isLoggedIn = await checkLoginStatus(); // 기존에 구현된 로그인 상태 확인
+    final isLoggedIn = await checkLoginStatus(); // Check current login status
+
     if (!isLoggedIn) {
       final isTokenRefreshed =
-          await refreshToken(); // refresh token으로 새로운 access token 요청
+          await refreshToken(); // Attempt to refresh the token
 
-      Navigator.pop(context); // 로딩 인디케이터 닫기
       if (isTokenRefreshed) {
-        _navigateToHomePage(); // Homepage로 이동
+        // If token refresh is successful, fetch user info and navigate to homepage
+        if (await fetchAndPrintUserInfo(context)) {
+          Navigator.pop(context); // Close loading indicator
+          _navigateToHomePage(); // Navigate to homepage
+        } else {
+          // If fetching user info fails, show login prompt
+          Navigator.pop(context); // Close loading indicator
+          showLoginPrompt(context);
+        }
       } else {
-        // 토큰 갱신 실패 처리, 로그인 페이지로 유도 등
+        // If token refresh fails, logout the user and show login prompt
+        logoutUser();
+        Navigator.pop(context); // Close loading indicator
       }
     } else {
-      Navigator.pop(context); // 로딩 인디케이터 닫기
-      await fetchAndPrintUserInfo(); // 사용자 정보 출력
-      _navigateToHomePage(); // Homepage로 이동
+      // If already logged in, fetch user info and navigate to homepage
+      if (await fetchAndPrintUserInfo(context)) {
+        Navigator.pop(context); // Close loading indicator
+        _navigateToHomePage(); // Navigate to homepage
+      } else {
+        // If fetching user info fails, show login prompt
+        Navigator.pop(context); // Close loading indicator
+        showLoginPrompt(context);
+      }
     }
+  }
+
+  void showLoginPrompt(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            textAlign: TextAlign.center,
+            'Failed to login',
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.outline,
+                fontSize: 20,
+                fontWeight: FontWeight.bold),
+          ),
+          actions: [
+            GestureDetector(
+              onTap: () {
+                Navigator.of(context).pop();
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 30),
+                height: 55,
+                width: MediaQuery.of(context).size.width - 80,
+                decoration: BoxDecoration(
+                    color: Colors.redAccent,
+                    borderRadius: BorderRadius.circular(60)),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'OK',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _navigateToHomePage() {

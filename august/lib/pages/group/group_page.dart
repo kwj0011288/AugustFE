@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:august/components/button.dart';
+import 'package:august/components/home/button.dart';
 import 'package:august/const/dark_theme.dart';
 import 'package:august/const/light_theme.dart';
 import 'package:august/get_api/onboard/get_semester.dart';
@@ -245,7 +245,7 @@ class _GroupPageState extends State<GroupPage> {
       /* 
       */
       body: ColorfulSafeArea(
-        bottomColor: Colors.white.withOpacity(0),
+        bottom: false,
         overflowRules: OverflowRules.all(true),
         child: Container(
           child: Column(
@@ -383,23 +383,6 @@ class _GroupPageState extends State<GroupPage> {
                   ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
-      bottomNavigationBar: Container(
-        height: MediaQuery.of(context).size.height * 0.08,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Theme.of(context).colorScheme.background.withOpacity(0.0),
-              Theme.of(context).colorScheme.background.withOpacity(0.1),
-              Theme.of(context).colorScheme.background.withOpacity(0.3),
-              Theme.of(context).colorScheme.background.withOpacity(0.5),
-              Theme.of(context).colorScheme.background.withOpacity(0.7),
-              Theme.of(context).colorScheme.background.withOpacity(1.0),
             ],
           ),
         ),

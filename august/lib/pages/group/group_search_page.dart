@@ -1,11 +1,11 @@
 import 'package:animated_hint_textfield/animated_hint_textfield.dart';
-import 'package:august/components/loading.dart';
+import 'package:august/components/home/loading.dart';
 import 'package:august/get_api/onboard/get_semester.dart';
 import 'package:august/onboard/semester.dart';
 import 'package:flutter/material.dart';
 import '../../get_api/timetable/class.dart';
 import '../../get_api/search/get_api.dart';
-import '../../components/class_tile.dart';
+import '../../components/tile/class_tile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import "package:flutter_feather_icons/flutter_feather_icons.dart";
 import 'package:flutter/services.dart';
@@ -585,23 +585,6 @@ class _GroupSearchPageState extends State<GroupSearchPage>
               ),
             ),
           ],
-        ),
-        bottomNavigationBar: Container(
-          height: MediaQuery.of(context).size.height * 0.08,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Theme.of(context).colorScheme.primaryContainer.withOpacity(0.0),
-                Theme.of(context).colorScheme.primaryContainer.withOpacity(0.1),
-                Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
-                Theme.of(context).colorScheme.primaryContainer.withOpacity(0.5),
-                Theme.of(context).colorScheme.primaryContainer.withOpacity(0.7),
-                Theme.of(context).colorScheme.primaryContainer.withOpacity(1.0),
-              ],
-            ),
-          ),
         ),
       ),
     );

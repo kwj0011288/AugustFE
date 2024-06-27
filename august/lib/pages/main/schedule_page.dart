@@ -3,11 +3,12 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
-import 'package:august/components/button.dart';
+import 'package:august/components/home/button.dart';
 import 'package:august/components/indicator/scrolling_dots_effect.dart';
 import 'package:august/components/indicator/smooth_page_indicator.dart';
-import 'package:august/components/loading.dart';
-import 'package:august/components/schedulepage/more.dart';
+import 'package:august/components/home/loading.dart';
+import 'package:august/components/profile/profile.dart';
+import 'package:august/components/home/more.dart';
 import 'package:august/get_api/timetable/delete_timetable.dart';
 import 'package:august/get_api/timetable/edit_timetable.dart';
 import 'package:august/get_api/onboard/get_semester.dart';
@@ -29,7 +30,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pull_down_button/pull_down_button.dart';
-import '../../components/timetable.dart';
+import '../../components/timetable/timetable.dart';
 import '../edit/edit_page.dart';
 import '../group/group_page.dart';
 import '../manual/manual_page.dart';
@@ -72,7 +73,6 @@ class _SchedulePageState extends State<SchedulePage>
   late AnimationController _animationController;
   late final PageController _pageController;
   late ScrollController _dotIndicatorScrollController;
-  Uint8List? profilePhoto;
   final PageDotController =
       PageController(viewportFraction: 0.8, keepPage: true);
   bool loadDone = false;
@@ -104,19 +104,6 @@ class _SchedulePageState extends State<SchedulePage>
     });
   }
 
-  Future<void> loadProfilePhoto() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    // Load name
-    // Load image
-    String? base64Image = prefs.getString('contactPhoto');
-
-    if (base64Image != null) {
-      setState(() {
-        profilePhoto = base64Decode(base64Image);
-      });
-    }
-  }
-
   String formatSemester(String semester) {
     String year = semester.substring(0, 4);
     String season = getSeasonFromSemester(semester);
@@ -135,8 +122,8 @@ class _SchedulePageState extends State<SchedulePage>
 
     _dotIndicatorScrollController = ScrollController();
     _pageController = PageController(
-      viewportFraction: 0.92,
-    );
+        // viewportFraction: 0.92,
+        );
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 500),
       vsync: this,
@@ -145,8 +132,6 @@ class _SchedulePageState extends State<SchedulePage>
     Future.delayed(Duration.zero, () async {
       try {
         await loadSemesterInfo();
-        await loadProfilePhoto();
-        _listenForPhotoChanges();
         await initializePage();
         if (mounted) {
           setState(() {
@@ -174,13 +159,6 @@ class _SchedulePageState extends State<SchedulePage>
               pageController: PageController(),
             ))
         .toList();
-    final photoNotifier =
-        Provider.of<ProfilePhotoNotifier>(context, listen: false);
-    if (photoNotifier.photo != null && mounted) {
-      setState(() {
-        profilePhoto = photoNotifier.photo;
-      });
-    }
   }
 
   @override
@@ -191,24 +169,29 @@ class _SchedulePageState extends State<SchedulePage>
     super.dispose();
   }
 
-  void _listenForPhotoChanges() {
-    final photoNotifier =
-        Provider.of<ProfilePhotoNotifier>(context, listen: false);
-    photoNotifier.addListener(() {
-      if (mounted) {
-        setState(() {
-          profilePhoto = photoNotifier.photo;
-        });
-      }
-    });
-  }
-
   void reorderTimetableIndex(int moveIndex, List<int> currentList) {
+    // Remove the index and re-insert at the beginning to reorder
     currentList.remove(moveIndex);
     currentList.insert(0, moveIndex);
     timetableOrder = currentList;
+
     String ogsem = getOriginalSemester(_semester!);
-    reorderTimetable(ogsem, timetableOrder);
+
+    // Call the reorderTimetable method
+    reorderTimetable(ogsem, timetableOrder).then((_) {
+      // After successful reordering, load timetable from the server
+      loadTimetableFromServer(int.parse(ogsem)).then((_) {
+        // When done loading, set isLoading to false
+
+        print("Timetable loaded successfully");
+      }).catchError((error) {
+        // Handle errors from loading the timetable
+        print("Error loading timetable: $error");
+      });
+    }).catchError((error) {
+      // Handle errors from reordering the timetable
+      print("Error reordering timetable: $error");
+    });
   }
 
   Future<void> initializePage() async {
@@ -236,9 +219,7 @@ class _SchedulePageState extends State<SchedulePage>
     int semesterInt = int.parse(storedSemesterString);
     if (storedSemesterString != null && !loadDone) {
       try {
-        Future loadFuture = widget.firstTime
-            ? loadTimetableFromLocalStorage()
-            : loadTimetableFromServer(semesterInt);
+        Future loadFuture = loadTimetableFromServer(semesterInt);
         await loadFuture;
       } catch (e) {
         // Handle errors, such as parsing errors or issues with loading data from the server/local storage
@@ -503,56 +484,11 @@ class _SchedulePageState extends State<SchedulePage>
         _timetableCollection[index].name = newName;
         saveTimetableToLocalStorage(); // 새 이름을 저장합니다.
       });
-      int? testindex = _timetableCollection[currentIndex].order;
+      // int? testindex = _timetableCollection[currentIndex].order;
       String? testSemester = getOriginalSemester(_semester!);
       print('testSemester: $_semester');
-      updateTimetableName(testSemester, testindex!, newName);
+      updateTimetableName(testSemester, index, newName);
     }
-  }
-
-  void _navigateToPage() async {
-    showCupertinoModalBottomSheet<Map<String, dynamic>>(
-      context: context,
-      topRadius: const Radius.circular(30),
-      duration: const Duration(milliseconds: 350),
-      backgroundColor: Colors.black.withOpacity(0.8),
-      builder: (BuildContext context) {
-        return GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () {
-            Navigator.pop(
-                context); // Close the bottom sheet when the area outside the sheet is tapped
-          },
-          child: NotificationListener<ScrollNotification>(
-            onNotification: (ScrollNotification notification) {
-              if (notification.metrics.pixels ==
-                  notification.metrics.maxScrollExtent) {}
-              return true;
-            },
-            child: DraggableScrollableSheet(
-              expand: false,
-              initialChildSize: 0.55,
-              maxChildSize: 0.85,
-              minChildSize: 0.55,
-              builder: (BuildContext context,
-                  ScrollController sheetScrollController) {
-                return GestureDetector(
-                  behavior: HitTestBehavior.translucent,
-                  onTap:
-                      () {}, // Prevent the outer GestureDetector from closing the sheet when the sheet itself is tapped
-                  child: Mypage(
-                    selectedSemester: _semester!, // Set your initial values
-                    departments: widget.departments,
-                    scrollController: sheetScrollController,
-                    isFirst: widget.firstTime,
-                  ),
-                );
-              },
-            ),
-          ),
-        );
-      },
-    );
   }
 
   Future<void> removeGPACourses() async {
@@ -622,7 +558,7 @@ class _SchedulePageState extends State<SchedulePage>
                 Row(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(left: 12, top: 15),
+                      padding: const EdgeInsets.only(left: 15, top: 15),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -637,7 +573,7 @@ class _SchedulePageState extends State<SchedulePage>
                                       if (currentIndex ==
                                           _timetableCollection.length) {
                                       } else {
-                                        _editTimetableName(currentIndex);
+                                        _editTimetableName(serverIndex);
                                       }
                                     },
                                     child: Text(
@@ -706,28 +642,28 @@ class _SchedulePageState extends State<SchedulePage>
                       ),
                     ),
                     Spacer(),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        left: 15,
-                        right: 15,
-                        top: 15,
-                      ),
-                      child: GestureDetector(
-                        onTap: () {
-                          HapticFeedback.mediumImpact();
-                          _navigateToPage();
-                        },
-                        child: CircleAvatar(
-                          backgroundColor: Colors.grey,
-                          backgroundImage: profilePhoto != null
-                              ? MemoryImage(profilePhoto!)
-                              : null,
-                          child: profilePhoto == null
-                              ? Image.asset('assets/icons/memoji.png')
-                              : null,
+                    if (_timetableCollection.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 15),
+                        child: Container(
+                          width: _timetableCollection.length < 10 ? 120 : 130,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30),
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          child: Center(
+                            child: Text(
+                              "${_timetableCollection.length.toString()} Schedules",
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.outline,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
                   ],
                 ),
                 Expanded(
@@ -738,6 +674,8 @@ class _SchedulePageState extends State<SchedulePage>
                         onPageChanged: (int value) {
                           if (value < timetableOrder.length) {
                             serverIndex = timetableOrder[value];
+                            print(
+                                "this is the order from pageview $currentIndex");
                             print("this is the order from server $serverIndex");
                           }
 
@@ -1120,6 +1058,7 @@ class _SchedulePageState extends State<SchedulePage>
                                               const EdgeInsets.only(right: 20),
                                           child: MoreButton(
                                             editSchedule: () {
+                                              HapticFeedback.lightImpact();
                                               if (currentIndex <
                                                   _timetableCollection.length) {
                                                 checkAccessToken();
@@ -1130,7 +1069,7 @@ class _SchedulePageState extends State<SchedulePage>
                                                     fullscreenDialog: true,
                                                     builder: (context) =>
                                                         EditPage(
-                                                      index: serverIndex,
+                                                      index: currentIndex,
                                                       semester: widget.semester,
                                                       name:
                                                           _timetableCollection[
@@ -1144,62 +1083,85 @@ class _SchedulePageState extends State<SchedulePage>
                                               ;
                                             },
                                             editName: () {
+                                              HapticFeedback.lightImpact();
                                               checkAccessToken();
-                                              _editTimetableName(serverIndex);
+                                              _editTimetableName(currentIndex);
                                             },
                                             remove: () async {
+                                              HapticFeedback.lightImpact();
                                               if (currentIndex <
                                                   _timetableCollection.length) {
+                                                // Trigger any access checks and user feedback
                                                 checkAccessToken();
                                                 HapticFeedback.mediumImpact();
 
+                                                // Start any animations
                                                 await _animationController
                                                     .forward();
-                                                setState(
-                                                  () {
-                                                    if (_timetableCollection
-                                                            .isNotEmpty &&
-                                                        currentIndex <
-                                                            _timetableCollection
-                                                                .length) {
-                                                      _timetableCollection
-                                                          .removeAt(
-                                                              currentIndex);
-                                                      if (currentIndex > 0) {
-                                                        currentIndex--;
-                                                      }
-                                                    }
-                                                    if (_pageController
-                                                        .hasClients) {
-                                                      _pageController
-                                                          .animateToPage(
-                                                        currentIndex,
-                                                        duration:
-                                                            const Duration(
-                                                                milliseconds:
-                                                                    500),
-                                                        curve: Curves.easeInOut,
-                                                      );
-                                                    }
 
-                                                    String? testSemester =
-                                                        getOriginalSemester(
-                                                            _semester!);
+                                                // Remove the timetable from the collection
+                                                setState(() {
+                                                  if (_timetableCollection
+                                                          .isNotEmpty &&
+                                                      currentIndex <
+                                                          _timetableCollection
+                                                              .length) {
+                                                    _timetableCollection
+                                                        .removeAt(currentIndex);
+                                                    // Adjust currentIndex if necessary
+                                                    currentIndex =
+                                                        currentIndex > 0
+                                                            ? currentIndex - 1
+                                                            : 0;
+                                                  }
+                                                });
 
-                                                    deleteTimetable(
-                                                        testSemester,
-                                                        serverIndex);
-                                                  },
-                                                );
-                                                await Future.delayed(
-                                                    const Duration(
-                                                        milliseconds: 500));
-                                                await resetAnimations();
-                                                saveTimetableToLocalStorage();
+                                                // Navigate the page controller to the new current index
+                                                if (_pageController
+                                                    .hasClients) {
+                                                  _pageController.animateToPage(
+                                                    currentIndex,
+                                                    duration: const Duration(
+                                                        milliseconds: 500),
+                                                    curve: Curves.easeInOut,
+                                                  );
+                                                }
+
+                                                // Get semester string for API call
+                                                String? testSemester =
+                                                    getOriginalSemester(
+                                                        _semester!);
+                                                print(
+                                                    'this will be deleted: $serverIndex');
+
+                                                // Attempt to delete the timetable from the server
+                                                try {
+                                                  await deleteTimetable(
+                                                      testSemester,
+                                                      serverIndex);
+                                                  print(
+                                                      "Timetable deleted successfully");
+
+                                                  // Reload the timetable from the server
+                                                  await loadTimetableFromServer(
+                                                      int.parse(testSemester));
+                                                  print(
+                                                      "Timetable reloaded successfully after delete");
+                                                } catch (error) {
+                                                  print(
+                                                      "Error during delete or reload operation: $error");
+                                                } finally {
+                                                  // Always run these regardless of success or error
+                                                  setState(() {
+                                                    isLoading = false;
+                                                  });
+                                                  await resetAnimations();
+                                                  await saveTimetableToLocalStorage();
+                                                }
                                               }
-                                              saveTimetableToLocalStorage();
                                             },
                                             setMain: () {
+                                              HapticFeedback.lightImpact();
                                               if (currentIndex <
                                                   _timetableCollection.length) {
                                                 checkAccessToken();
@@ -1228,12 +1190,13 @@ class _SchedulePageState extends State<SchedulePage>
                                                       .easeInOut, // 애니메이션의 속도 곡선을 설정합니다.
                                                 );
                                                 removeGPACourses();
-
+                                                print(
+                                                    "this is the order from the pageview $currentIndex");
                                                 reorderTimetableIndex(
                                                     serverIndex,
                                                     timetableOrder);
-                                                print(
-                                                    "Index to change $serverIndex");
+                                                // print(
+                                                //     "Index to change $serverIndex");
 
                                                 currentIndexProv
                                                     .setCurrentIndex(

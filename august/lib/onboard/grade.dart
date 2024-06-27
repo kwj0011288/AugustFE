@@ -1,5 +1,6 @@
-import 'package:august/components/button.dart';
-import 'package:august/components/courseprovider.dart';
+import 'package:august/components/home/button.dart';
+import 'package:august/components/provider/courseprovider.dart';
+import 'package:august/components/tile/onboardTile/grade_tile.dart';
 import 'package:august/get_api/onboard/get_semester.dart';
 import 'package:august/login/login.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import "package:flutter_feather_icons/flutter_feather_icons.dart";
+import 'package:colorful_safe_area/colorful_safe_area.dart';
 
 class GradePage extends StatefulWidget {
   final bool onboard;
@@ -129,7 +131,7 @@ class _GradePageState extends State<GradePage> {
   @override
   Widget build(BuildContext context) {
     print('Current selectGrade value: $_selectGrade');
-
+    List<String> grades = ['Freshman', 'Sophomore', 'Junior', 'Senior'];
     var selectedCoursesData = Provider.of<CoursesProvider>(context);
     return FutureBuilder<void>(
       future: _loadUserFuture, // This should be your future that fetches data
@@ -143,301 +145,190 @@ class _GradePageState extends State<GradePage> {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else {
           var selectedCoursesData = Provider.of<CoursesProvider>(context);
-          return ClipRRect(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-            child: Scaffold(
-              backgroundColor:
-                  widget.onboard ? Colors.transparent : Colors.transparent,
-              body: Column(
-                children: [
-                  Spacer(),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        top: 0, left: 10, right: 10, bottom: 25),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: widget.onboard
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).colorScheme.background,
-                        borderRadius: BorderRadius.all(
-                            Radius.circular(30)), // 모서리를 둥글게 만듭니다.
-                        // 필요하다면 여기에 그림자나 테두리 등을 추가할 수 있습니다.
-                      ),
-                      child: Column(
+          return Scaffold(
+            body: ColorfulSafeArea(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.background,
+                ),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
                         children: [
-                          Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(20), // 상단 왼쪽 모서리 둥글게
-                                  topRight:
-                                      Radius.circular(20), // 상단 오른쪽 모서리 둥글게
-                                ),
-                                child: Align(
-                                  alignment: Alignment.topCenter,
-                                  heightFactor:
-                                      0.8, // 이미지의 상위 80%만 보여줍니다. 하단 20%는 잘립니다.
-                                  child: SvgPicture.asset(
-                                    'assets/icons/grade.svg',
-                                    width: MediaQuery.of(context).size.width,
-                                    // height 설정을 제거하여 전체 이미지 높이를 기준으로 잘립니다.
-                                    fit: BoxFit.cover,
+                          if (widget.onboard == true)
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 20, top: 8, bottom: 8),
+                              child: GestureDetector(
+                                onTap: () {
+                                  widget.goBack();
+                                  _saveAndClose();
+                                },
+                                child: CircleAvatar(
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.primary,
+                                  foregroundColor:
+                                      Theme.of(context).colorScheme.background,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 5),
+                                    child: Center(
+                                      child: Icon(
+                                        Icons.arrow_back_ios,
+                                        size: 15,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .outline,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    right: 10, bottom: 80),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    if (widget.onboard == false)
-                                      Container(
-                                        height: 30,
-                                        width: 30,
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
-                                          shape: BoxShape
-                                              .circle, // Ensures the container is circular
-                                        ),
-                                        child: IconButton(
-                                          icon: Icon(
-                                            FeatherIcons.x,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .outline,
-                                            size: 20,
-                                          ),
-
-                                          onPressed: () {
-                                            if (Navigator.canPop(context)) {
-                                              Navigator.pop(context);
-                                            }
-                                          },
-                                          padding: EdgeInsets.all(
-                                              5), // Remove padding to fit the icon well
-                                          constraints:
-                                              BoxConstraints(), // Remove constraints if necessary
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          Text(
-                            "Select Grade",
-                            style: TextStyle(
-                              fontSize: 25,
-                              color: Theme.of(context).colorScheme.outline,
-                              fontWeight: FontWeight.bold,
                             ),
-                          ),
-                          SizedBox(height: 20),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: Text(
-                              "How much longer until I finish school? Personalize your profile and track your educational progress.",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.grey,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 20),
-                          Container(
-                            child: Form(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  PullDownButton(
-                                    itemBuilder: (BuildContext context) {
-                                      return <PullDownMenuItem>[
-                                        PullDownMenuItem(
-                                            title: 'Freshman',
-                                            onTap: () {
-                                              setState(() =>
-                                                  _selectGrade = 'Freshman');
-                                            }),
-                                        PullDownMenuItem(
-                                            title: 'Sophomore',
-                                            onTap: () {
-                                              setState(() =>
-                                                  _selectGrade = 'Sophomore');
-                                            }),
-                                        PullDownMenuItem(
-                                            title: 'Junior',
-                                            onTap: () {
-                                              setState(() =>
-                                                  _selectGrade = 'Junior');
-                                            }),
-                                        PullDownMenuItem(
-                                            title: 'Senior',
-                                            onTap: () {
-                                              setState(() =>
-                                                  _selectGrade = 'Senior');
-                                            }),
-                                      ];
-                                    },
-                                    buttonBuilder: (BuildContext context,
-                                        Future<void> Function() showMenu) {
-                                      return Container(
-                                        decoration: BoxDecoration(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .inversePrimary,
-                                            borderRadius:
-                                                BorderRadius.circular(15)),
-                                        child: TextButton(
-                                          onPressed: showMenu,
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 50, vertical: 5),
-                                            child: Text(
-                                              _selectGrade ?? "Freshman",
-                                              style: TextStyle(
-                                                fontSize: 20,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .outline,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    scrollController: ScrollController(),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 20),
-                          widget.onboard
-                              ? Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        widget.goBack();
-                                        _saveAndClose();
-                                      },
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 20),
-                                        height: 55,
-                                        width:
-                                            MediaQuery.of(context).size.width /
-                                                3,
-                                        decoration: BoxDecoration(
-                                            border: Border.all(
-                                                color: Colors.redAccent,
-                                                width: 2),
-                                            color: Colors.transparent,
-                                            borderRadius:
-                                                BorderRadius.circular(60)),
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              'BACK',
-                                              style: TextStyle(
-                                                  color: Colors.redAccent,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 20),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        widget.gonext();
-                                        _saveAndClose();
-                                      },
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 20),
-                                        height: 55,
-                                        width:
-                                            MediaQuery.of(context).size.width /
-                                                3,
-                                        decoration: BoxDecoration(
-                                            color: Colors.blueAccent,
-                                            borderRadius:
-                                                BorderRadius.circular(60)),
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              'NEXT',
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 20),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              : GestureDetector(
-                                  onTap: () {
-                                    _saveAndClose();
-                                    HapticFeedback.mediumImpact();
-                                  },
-                                  child: Container(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 30),
-                                    height: 55,
-                                    width:
-                                        MediaQuery.of(context).size.width - 80,
-                                    decoration: BoxDecoration(
-                                        color: Colors.blueAccent,
-                                        borderRadius:
-                                            BorderRadius.circular(60)),
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          'DONE',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 20),
-                                        ),
-                                      ],
+                          Spacer(),
+                          if (widget.onboard == false)
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  right: 20, top: 5, bottom: 10),
+                              child: GestureDetector(
+                                onTap: () {
+                                  HapticFeedback.mediumImpact();
+                                  Navigator.pop(context);
+                                },
+                                child: CircleAvatar(
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.primary,
+                                  foregroundColor:
+                                      Theme.of(context).colorScheme.background,
+                                  child: Center(
+                                    child: Icon(
+                                      FeatherIcons.x,
+                                      color:
+                                          Theme.of(context).colorScheme.outline,
                                     ),
                                   ),
                                 ),
-                          SizedBox(height: 20),
+                              ),
+                            ),
                         ],
                       ),
-                    ),
+                      if (widget.onboard == true) SizedBox(height: 10),
+                      Text(
+                        widget.onboard ? "Select Grade" : "Senior Yet?",
+                        style: TextStyle(
+                          fontSize: 35,
+                          color: Theme.of(context).colorScheme.outline,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Text(
+                        "How much longer until I finish school?\nChoose your grade to get started",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 40),
+                      Container(
+                        child: Form(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: grades.map((grade) {
+                              return GradeTile(
+                                grade: grade,
+                                tileColor: _selectGrade == grade
+                                    ? Theme.of(context)
+                                        .colorScheme
+                                        .primary // Selected color
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer, // Non-selected color
+                                isShadow: _selectGrade == grade,
+                                onTap: () {
+                                  setState(() {
+                                    _selectGrade = grade;
+                                  });
+                                },
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
+            ),
+            bottomNavigationBar: Padding(
+              padding: const EdgeInsets.only(
+                left: 15,
+                right: 15,
+                bottom: 60,
+              ),
+              child: widget.onboard
+                  ? GestureDetector(
+                      onTap: () {
+                        HapticFeedback.mediumImpact();
+                        widget.gonext();
+                        _saveAndClose();
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        height: 60,
+                        width: MediaQuery.of(context).size.width - 80,
+                        decoration: BoxDecoration(
+                            color: Colors.blueAccent,
+                            borderRadius: BorderRadius.circular(20)),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'NEXT',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : GestureDetector(
+                      onTap: () {
+                        _saveAndClose();
+                        HapticFeedback.mediumImpact();
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 30),
+                        height: 55,
+                        width: MediaQuery.of(context).size.width - 80,
+                        decoration: BoxDecoration(
+                            color: Colors.blueAccent,
+                            borderRadius: BorderRadius.circular(60)),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'DONE',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
             ),
           );
         }

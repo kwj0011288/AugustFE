@@ -1,5 +1,11 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:august/components/mepage/color_box.dart';
+import 'package:august/components/mepage/gpa_graph.dart';
+import 'package:august/components/mepage/info_box.dart';
+import 'package:august/components/profile/profile.dart';
+import 'package:august/components/provider/friends_provider.dart';
+import 'package:august/get_api/gpa/gpa_courses.dart';
 import 'package:august/get_api/onboard/get_semester.dart';
 import 'package:august/get_api/wizard/schedule_get.dart';
 import 'package:august/login/initialpage.dart';
@@ -23,13 +29,12 @@ import 'package:url_launcher/url_launcher.dart';
 
 class Mypage extends StatefulWidget {
   final String selectedSemester;
-  final ScrollController scrollController;
   final List<String> departments;
   final bool isFirst;
+
   const Mypage({
     Key? key,
     required this.selectedSemester,
-    required this.scrollController,
     this.departments = const [],
     required this.isFirst,
   }) : super(key: key);
@@ -40,7 +45,6 @@ class Mypage extends StatefulWidget {
 class _MypageState extends State<Mypage> {
   int bottomIndex = 0;
   String? selectedValue;
-  List<ScheduleList> _firstTimetableCourses = [];
   //info
   String _username = 'User';
   String _grade = 'Freshman';
@@ -52,6 +56,9 @@ class _MypageState extends State<Mypage> {
   String _email = 'Welcome to August';
   late Future<void> _loadUserFuture;
   Map<int, String> selectedGrades = {};
+  bool isJustGPA = true;
+  bool isJustCredit = true;
+  List<TotalGPA> totalSemester = [];
 
   String formatSemester(String semester) {
     String year = semester.substring(0, 4);
@@ -66,10 +73,30 @@ class _MypageState extends State<Mypage> {
       // Load the profile photo after the user info is loaded
       loadProfilePhoto();
     });
-    loadFirstTimetable();
-    for (int i = 0; i < _firstTimetableCourses.length; i++) {
-      selectedGrades[i] = 'GPA'; // Default value for each course
-    }
+    loadTotalGPA().then((loadedGPAList) {
+      setState(() {
+        totalSemester = loadedGPAList;
+      });
+    });
+  }
+
+  double getNumericGrade(String grade) {
+    Map<String, double> gradeToPoint = {
+      'A+': 4.0,
+      'A': 4.0,
+      'A-': 3.7,
+      'B+': 3.3,
+      'B': 3.0,
+      'B-': 2.7,
+      'C+': 2.3,
+      'C': 2.0,
+      'C-': 1.7,
+      'D+': 1.3,
+      'D': 1.0,
+      'F': 0.0,
+    };
+
+    return gradeToPoint[grade] ?? 0.0; // Returns 0.0 if grade is not found
   }
 
   Future<void> loadProfilePhoto() async {
@@ -82,190 +109,54 @@ class _MypageState extends State<Mypage> {
     }
   }
 
-  Future<void> saveSelectedGrades() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    // Convert the map to have String keys
-    Map<String, String> stringKeyMap =
-        selectedGrades.map((key, value) => MapEntry(key.toString(), value));
-    String gradesJson = jsonEncode(stringKeyMap);
-    bool saveResult = await prefs.setString('selectedGrades', gradesJson);
-
-    // 저장 성공 여부 확인
-    if (saveResult) {
-      print("Grades saved successfully.");
-    } else {
-      print("Failed to save grades.");
-    }
-  }
-
-  Future<void> loadFirstTimetable() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? jsonString = prefs.getString('timetable');
-    String? gradesJson =
-        prefs.getString('selectedGrades'); // Fetch the saved grades JSON string
-
-    if (jsonString != null) {
-      try {
-        List<dynamic> decodedJson = jsonDecode(jsonString);
-        if (decodedJson.isNotEmpty) {
-          List<dynamic> firstTimetableDataList = decodedJson[0];
-          List<ScheduleList> firstTimetableCourses = firstTimetableDataList
-              .map((e) => ScheduleList.fromJson(e as Map<String, dynamic>))
-              .toList();
-
-          setState(() {
-            _firstTimetableCourses = firstTimetableCourses;
-          });
-        }
-      } catch (e) {
-        print("Error loading timetable: $e");
-      }
-    } else {
-      print("No timetable data found in SharedPreferences.");
-    }
-
-    if (gradesJson != null) {
-      try {
-        Map<String, dynamic> gradesMap = jsonDecode(gradesJson);
-        // Convert the map with String keys back to a map with int keys
-        setState(() {
-          selectedGrades =
-              gradesMap.map((key, value) => MapEntry(int.parse(key), value));
-        });
-      } catch (e) {
-        print("Error loading grades: $e");
-      }
-    }
-  }
-
-  void _navigateToPage() async {
-    var result = await showModalBottomSheet<Map<String, dynamic>>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext context) {
-        return GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: DraggableScrollableSheet(
-            initialChildSize: 0.9,
-            maxChildSize: 1,
-            minChildSize: 0.7,
-            builder: (BuildContext context, ScrollController scrollController) {
-              var preloadedSemesters =
-                  Provider.of<SemestersProvider>(context, listen: false)
-                      .semesters;
-              return GestureDetector(
-                onTap: () {},
-                // child: ProfileEditPage(
-                //   preloadedSemesters:
-                //       preloadedSemesters, // 리스트로 다시 감싸지 않고 바로 전달
-                // ),
-              );
-            },
-          ),
-        );
-      },
-    );
-    if (result != null) {
-      setState(() {
-        // 반환된 데이터를 사용하여 상태를 업데이트
-        _username = result['name'] ?? _username;
-        _grade = result['grade'] ?? _grade;
-        _major = result['major'] ?? _major;
-        _schoolFullname = result['fullname'] ?? _schoolFullname;
-        _schoolNickname = result['nickname'] ?? _schoolNickname;
-        _semester = result['semester'] ?? _semester;
-      });
-
-      saveUserInfo(); // 상태를 업데이트한 후에 사용자 정보를 저장합니다.
-    }
-  }
-
   void _navigateToPageProfile() async {
-    var result = await showModalBottomSheet<Map<String, dynamic>>(
-      context: context,
-      enableDrag: false,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext context) {
-        return GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: DraggableScrollableSheet(
-            initialChildSize: 1,
-            maxChildSize: 1,
-            minChildSize: 1,
-            builder: (BuildContext context, ScrollController scrollController) {
-              var preloadedSemesters =
-                  Provider.of<SemestersProvider>(context, listen: false)
-                      .semesters;
-              return GestureDetector(
-                onTap: () {},
-                child: NamePage(
-                    onboard: false,
-                    onTap: () {},
-                    onPhotoUpdated: (photo) {
-                      if (photo != null) {
-                        setState(() {
-                          profilePhoto = photo;
-                          // You might also want to save the photo to SharedPreferences here
-                        });
-                      }
-                    }),
-              );
-            },
-          ),
-        );
-      },
+    var result = await Navigator.push<Map<String, dynamic>>(
+      context,
+      CupertinoPageRoute(
+          fullscreenDialog: true,
+          builder: (context) {
+            var preloadedSemesters =
+                Provider.of<SemestersProvider>(context, listen: false)
+                    .semesters;
+
+            return NamePage(
+              onboard: false,
+              onTap: () {},
+              onPhotoUpdated: (photo) {
+                if (photo != null) {
+                  setState(() {
+                    profilePhoto = photo;
+                  });
+                }
+              },
+            );
+          }),
     );
     if (result != null) {
       setState(() {
-        // 반환된 데이터를 사용하여 상태를 업데이트
         _username = result['name'] ?? _username;
       });
-
-      saveUserInfo(); // 상태를 업데이트한 후에 사용자 정보를 저장합니다.
+      saveUserInfo(); // Save updated user info after state updates
     }
   }
 
   void _navigateToPageSemester() async {
-    var result = await showModalBottomSheet<Map<String, dynamic>>(
-      context: context,
-      enableDrag: false,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext context) {
-        return GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: DraggableScrollableSheet(
-            initialChildSize: 1,
-            maxChildSize: 1,
-            minChildSize: 1,
-            builder: (BuildContext context, ScrollController scrollController) {
-              var preloadedSemesters =
-                  Provider.of<SemestersProvider>(context, listen: false)
-                      .semesters;
-              return GestureDetector(
-                onTap: () {},
-                child: SemesterPage(
-                  preloadedSemesters: preloadedSemesters,
-                  onboard: false,
-                  goBack: () {},
-                  gonext: () {},
-                ),
-              );
-            },
-          ),
-        );
-      },
+    var result = await Navigator.push<Map<String, dynamic>>(
+      context,
+      CupertinoPageRoute(
+          fullscreenDialog: true,
+          builder: (context) {
+            var preloadedSemesters =
+                Provider.of<SemestersProvider>(context, listen: false)
+                    .semesters;
+
+            return SemesterPage(
+              preloadedSemesters: preloadedSemesters,
+              onboard: false,
+              goBack: () {},
+              gonext: () {},
+            );
+          }),
     );
     if (result != null) {
       setState(() {
@@ -278,39 +169,24 @@ class _MypageState extends State<Mypage> {
   }
 
   void _navigateToPageMajor() async {
-    var result = await showModalBottomSheet<Map<String, dynamic>>(
-      context: context,
-      enableDrag: false,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext context) {
-        return GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: DraggableScrollableSheet(
-            initialChildSize: 1,
-            maxChildSize: 1,
-            minChildSize: 1,
-            builder: (BuildContext context, ScrollController scrollController) {
-              var preloadedSemesters =
-                  Provider.of<SemestersProvider>(context, listen: false)
-                      .semesters;
-              return GestureDetector(
-                onTap: () {},
-                child: MajorPage(
-                  onboard: false,
-                  goBack: () {},
-                  gonext: () {},
-                  preloadedDepartments: widget.departments,
-                ),
-              );
-            },
-          ),
-        );
-      },
+    var result = await Navigator.push<Map<String, dynamic>>(
+      context,
+      CupertinoPageRoute(
+          fullscreenDialog: true,
+          builder: (context) {
+            var preloadedSemesters =
+                Provider.of<SemestersProvider>(context, listen: false)
+                    .semesters;
+
+            return MajorPage(
+              onboard: false,
+              goBack: () {},
+              gonext: () {},
+              preloadedDepartments: widget.departments,
+            );
+          }),
     );
+
     if (result != null) {
       setState(() {
         _major = result['major'] ?? _major;
@@ -321,37 +197,21 @@ class _MypageState extends State<Mypage> {
   }
 
   void _navigateToPageUniv() async {
-    var result = await showModalBottomSheet<Map<String, dynamic>>(
-      context: context,
-      enableDrag: false,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext context) {
-        return GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: DraggableScrollableSheet(
-            initialChildSize: 1,
-            maxChildSize: 1,
-            minChildSize: 1,
-            builder: (BuildContext context, ScrollController scrollController) {
-              var preloadedSemesters =
-                  Provider.of<SemestersProvider>(context, listen: false)
-                      .semesters;
-              return GestureDetector(
-                onTap: () {},
-                child: UnivPage(
-                  onboard: false,
-                  goBack: () {},
-                  gonext: () {},
-                ),
-              );
-            },
-          ),
-        );
-      },
+    var result = await Navigator.push<Map<String, dynamic>>(
+      context,
+      CupertinoPageRoute(
+          fullscreenDialog: true,
+          builder: (context) {
+            var preloadedSemesters =
+                Provider.of<SemestersProvider>(context, listen: false)
+                    .semesters;
+
+            return UnivPage(
+              onboard: false,
+              goBack: () {},
+              gonext: () {},
+            );
+          }),
     );
     if (result != null) {
       setState(() {
@@ -368,37 +228,21 @@ class _MypageState extends State<Mypage> {
   }
 
   void _navigateToPageGrade() async {
-    var result = await showModalBottomSheet<Map<String, dynamic>>(
-      context: context,
-      isScrollControlled: true,
-      enableDrag: false,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext context) {
-        return GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: DraggableScrollableSheet(
-            initialChildSize: 1,
-            maxChildSize: 1,
-            minChildSize: 1,
-            builder: (BuildContext context, ScrollController scrollController) {
-              var preloadedSemesters =
-                  Provider.of<SemestersProvider>(context, listen: false)
-                      .semesters;
-              return GestureDetector(
-                onTap: () {},
-                child: GradePage(
-                  onboard: false,
-                  goBack: () {},
-                  gonext: () {},
-                ),
-              );
-            },
-          ),
-        );
-      },
+    var result = await Navigator.push<Map<String, dynamic>>(
+      context,
+      CupertinoPageRoute(
+          fullscreenDialog: true,
+          builder: (context) {
+            var preloadedSemesters =
+                Provider.of<SemestersProvider>(context, listen: false)
+                    .semesters;
+
+            return GradePage(
+              onboard: false,
+              goBack: () {},
+              gonext: () {},
+            );
+          }),
     );
     if (result != null) {
       setState(() {
@@ -440,25 +284,35 @@ class _MypageState extends State<Mypage> {
 
   Future<void> loadUserInfo() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    _username = prefs.getString('name') ?? 'User'; //이거랑
-    _grade = prefs.getString('grade') ?? 'Freshman'; // 이거랑
-    _major = prefs.getString('major') ?? 'LTSC'; //이거랑
-    _schoolFullname = prefs.getString('fullname') ?? 'Unknown'; //이거랑
-    _schoolNickname = prefs.getString('nickname') ?? 'Unknown'; //이거랑
-    _email = prefs.getString('userEmail') ?? _email;
-    // Fetch the semester and convert it
-    String? storedSemester = prefs.getString('semester');
-    if (storedSemester != null) {
-      try {
-        _semester = (storedSemester);
-      } catch (e) {
-        _semester = '202008'; // Use a default value in case of an exception
-      }
-    } else {
-      _semester = '202008'; // Use a default value if there's no stored value
+
+    // Define a helper function to check if all required fields are not null.
+    bool allFieldsLoaded() {
+      return prefs.getString('name') != null &&
+          prefs.getString('grade') != null &&
+          prefs.getString('major') != null &&
+          prefs.getString('fullname') != null &&
+          prefs.getString('nickname') != null &&
+          prefs.getString('userEmail') != null;
     }
 
-    setState(() {}); // Update the UI with the new values
+    // Wait for all fields to be loaded.
+    while (!allFieldsLoaded()) {
+      await Future.delayed(
+          Duration(seconds: 1)); // Wait for 1 second before checking again.
+      prefs
+          .reload(); // Optionally reload preferences if they could be updated externally.
+    }
+
+    // Once all fields are loaded, assign them.
+    _username = prefs.getString('name') ?? 'User';
+    _grade = prefs.getString('grade') ?? 'Freshman';
+    _major = prefs.getString('major') ?? 'LTSC';
+    _schoolFullname = prefs.getString('fullname') ?? 'Unknown';
+    _schoolNickname = prefs.getString('nickname') ?? 'Unknown';
+    _email = prefs.getString('userEmail') ?? _email;
+
+    // Update the UI if necessary.
+    setState(() {});
   }
 
   double calculateTextWidth(
@@ -557,60 +411,19 @@ class _MypageState extends State<Mypage> {
     );
   }
 
-  int getTotalCredits() {
-    int totalCredits = 0;
-    for (var course in _firstTimetableCourses) {
-      totalCredits += course.credits ?? 0;
-    }
-    return totalCredits;
-  }
-
-  int getCourseCount() {
-    return _firstTimetableCourses.length;
-  }
-
-  double getNumericGrade(String grade) {
-    Map<String, double> gradeToPoint = {
-      'A+': 4.0,
-      'A': 4.0,
-      'A-': 3.7,
-      'B+': 3.3,
-      'B': 3.0,
-      'B-': 2.7,
-      'C+': 2.3,
-      'C': 2.0,
-      'C-': 1.7,
-      'D+': 1.3,
-      'D': 1.0,
-      'F': 0.0,
-    };
-
-    return gradeToPoint[grade] ?? 0.0; // Returns 0.0 if grade is not found
-  }
-
-  double calculateTotalGPA() {
-    double totalGradePoints = 0.0;
-    int totalCredits = 0;
-
-    for (int i = 0; i < _firstTimetableCourses.length; i++) {
-      String grade = selectedGrades[i] ?? "-";
-      double numericGrade = getNumericGrade(grade);
-      int courseCredits = _firstTimetableCourses[i].credits ?? 0;
-
-      totalGradePoints += numericGrade * courseCredits;
-      totalCredits += courseCredits;
-    }
-
-    if (totalCredits == 0) {
-      return 0.0; // Avoid division by zero
-    }
-
-    return totalGradePoints / totalCredits;
+  Future<List<TotalGPA>> loadTotalGPA() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> gpaStringList = prefs.getStringList('totalGPA') ?? [];
+    List<TotalGPA> totalGPAList = gpaStringList
+        .map((gpaString) => TotalGPA.fromJson(jsonDecode(gpaString)))
+        .toList();
+    return totalGPAList;
   }
 
   @override
   Widget build(BuildContext context) {
-    //print("for mepage" + _semester);
+    int friendsCount = Provider.of<FriendsProvider>(context).friendsCount;
+
     return FutureBuilder(
       future: _loadUserFuture,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -635,25 +448,21 @@ class _MypageState extends State<Mypage> {
                       Row(
                         children: [
                           GestureDetector(
-                            onTap: () {
-                              _navigateToPageProfile();
-                            },
-                            child: CircleAvatar(
-                              backgroundColor: Colors.grey,
-                              foregroundColor:
-                                  Theme.of(context).colorScheme.background,
-                              backgroundImage: profilePhoto != null
-                                  ? MemoryImage(profilePhoto!)
-                                  : null,
-                              child: profilePhoto == null
-                                  ? Image.asset('assets/icons/memoji.png')
-                                  : null,
-                            ),
-                          ),
+                              onTap: () {
+                                checkAccessToken();
+                                HapticFeedback.lightImpact();
+                                _navigateToPageProfile();
+                              },
+                              child: ProfileWidget(
+                                selectedSemester: _semester,
+                                isFirst: widget.isFirst,
+                                isBottomBar: false,
+                              )),
                           SizedBox(width: 10),
                           GestureDetector(
                             onTap: () {
-                              HapticFeedback.mediumImpact();
+                              checkAccessToken();
+                              HapticFeedback.lightImpact();
                               _navigateToPageProfile();
                             },
                             child: Column(
@@ -694,12 +503,11 @@ class _MypageState extends State<Mypage> {
                               Consumer<SavedSemesterProvider>(
                                 builder: (context, semesterProvider, child) {
                                   return buildButton(
-                                    semesterProvider.selectedSemester.isNotEmpty
-                                        ? (semesterProvider.selectedSemester)
-                                        : "Select Semester",
+                                    '${semesterProvider.selectedSemester}',
                                     Color(0xFFe5fff9),
                                     () {
-                                      HapticFeedback.mediumImpact();
+                                      checkAccessToken();
+                                      HapticFeedback.lightImpact();
                                       _navigateToPageSemester();
                                     },
                                   );
@@ -709,7 +517,8 @@ class _MypageState extends State<Mypage> {
                                 width: 10,
                               ),
                               buildButton((('$_grade')), Color(0xFFffe6ea), () {
-                                HapticFeedback.mediumImpact();
+                                checkAccessToken();
+                                HapticFeedback.lightImpact();
                                 _navigateToPageGrade();
                               }),
                               SizedBox(
@@ -719,7 +528,8 @@ class _MypageState extends State<Mypage> {
                                 '$_major',
                                 Color(0xFFe3ecff),
                                 () {
-                                  HapticFeedback.mediumImpact();
+                                  checkAccessToken();
+                                  HapticFeedback.lightImpact();
                                   _navigateToPageMajor();
                                 },
                               ),
@@ -732,503 +542,221 @@ class _MypageState extends State<Mypage> {
                 ),
                 leadingWidth: 500,
                 toolbarHeight: 110,
-                actions: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 15, bottom: 40),
-                    child: Container(
-                      height: 35,
-                      width: 35,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary,
-                        shape: BoxShape
-                            .circle, // Ensures the container is circular
-                      ),
-                      child: IconButton(
-                        icon: Icon(
-                          FeatherIcons.x,
-                          color: Theme.of(context).colorScheme.outline,
-                          size: 20,
-                        ),
-
-                        onPressed: () {
-                          if (Navigator.canPop(context)) {
-                            Navigator.pop(context);
-                          }
-                        },
-                        padding: EdgeInsets.all(
-                            5), // Remove padding to fit the icon well
-                        constraints:
-                            BoxConstraints(), // Remove constraints if necessary
-                      ),
-                    ),
-                  ),
-                ],
               ),
               body: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                 child: ColorfulSafeArea(
                   bottomColor: Colors.white.withOpacity(0),
                   overflowRules: OverflowRules.only(bottom: true),
                   child: SingleChildScrollView(
-                    controller: widget.scrollController,
+                    controller: ScrollController(),
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(
-                          height: 5,
+                        Text(
+                          "About Me",
+                          style: TextStyle(
+                            fontSize: 25,
+                            color: Theme.of(context).colorScheme.outline,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        Column(
-                          children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 20),
-                                decoration: BoxDecoration(
-                                  color:
-                                      Theme.of(context).colorScheme.background,
-                                  borderRadius: BorderRadius.circular(20),
-                                  border:
-                                      Border.all(color: Colors.grey.shade600),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color:
-                                          Theme.of(context).colorScheme.shadow,
-                                      blurRadius: 10,
-                                      offset: Offset(6, 4),
-                                    ),
-                                    BoxShadow(
-                                      color:
-                                          Theme.of(context).colorScheme.shadow,
-                                      blurRadius: 10,
-                                      offset: Offset(-2, 0),
-                                    ),
-                                  ],
+                        SingleChildScrollView(
+                          controller: ScrollController(),
+                          scrollDirection: Axis.horizontal,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 10),
+                            child: Row(
+                              children: [
+                                InfoWidget(
+                                  onTap: () {
+                                    checkAccessToken();
+                                    HapticFeedback.lightImpact();
+                                    _navigateToPageUniv();
+                                  },
+                                  isSchool: true,
+                                  isFrirend: false,
+                                  photo: 'assets/test/umd.png',
+                                  info: "$_schoolNickname",
+                                  subInfo: "$_schoolFullname",
                                 ),
+                                SizedBox(width: 20),
+                                InfoWidget(
+                                  onTap: () {},
+                                  isSchool: false,
+                                  isFrirend: true,
+                                  photo: 'assets/memoji/Memoji1.png',
+                                  info: "Friends",
+                                  subInfo: "${friendsCount} friends",
+                                ),
+                                SizedBox(width: 20),
+                                InfoWidget(
+                                  onTap: () =>
+                                      setState(() => isJustGPA = !isJustGPA),
+                                  isSchool: true,
+                                  isFrirend: false,
+                                  photo: 'assets/memoji/Memoji1.png',
+                                  info: isJustGPA ? "GPA" : "Total GPA",
+                                  subInfo: isJustGPA ? "0.00" : "3.33",
+                                  isIcon: true,
+                                ),
+                                SizedBox(width: 20),
+                                InfoWidget(
+                                  onTap: () => setState(
+                                      () => isJustCredit = !isJustCredit),
+                                  isSchool: true,
+                                  isFrirend: false,
+                                  photo: 'assets/memoji/Memoji1.png',
+                                  info:
+                                      isJustCredit ? "Credit" : "Total Credit",
+                                  subInfo: isJustCredit
+                                      ? "0 credits"
+                                      : "135 credits",
+                                  isIcon: true,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: Row(
+                            children: [
+                              Text(
+                                "GPA",
+                                style: TextStyle(
+                                  fontSize: 25,
+                                  color: Theme.of(context).colorScheme.outline,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Spacer(),
+                              GestureDetector(
+                                onTap: () {
+                                  checkAccessToken();
+                                  HapticFeedback.lightImpact();
+                                  Navigator.push(
+                                    context,
+                                    CupertinoPageRoute(
+                                      fullscreenDialog: true,
+                                      builder: (context) =>
+                                          GPAPage(semester: _semester),
+                                    ),
+                                  );
+                                },
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "About Me",
-                                        style: TextStyle(
-                                          fontSize: 25,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .outline,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 15,
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () {
-                                              HapticFeedback.mediumImpact();
-                                              _navigateToPageUniv();
-                                            },
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "School",
-                                                  style: TextStyle(
-                                                    fontSize: 15,
-                                                    color: Colors.grey,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  height: 3,
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Text(
-                                                      "$_schoolNickname",
-                                                      style: TextStyle(
-                                                        fontSize: 25,
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .outline,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    Icon(Icons
-                                                        .keyboard_arrow_right),
-                                                  ],
-                                                ),
-                                                Text(
-                                                  "$_schoolFullname",
-                                                  style: TextStyle(
-                                                    fontSize: 15,
-                                                    color: Colors.grey,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          Spacer(),
-                                          GestureDetector(
-                                            onTap: () {
-                                              HapticFeedback.mediumImpact();
-                                              Navigator.push(
-                                                context,
-                                                PageRouteBuilder(
-                                                  pageBuilder: (context,
-                                                          animation,
-                                                          secondaryAnimation) =>
-                                                      GPAPage(
-                                                          semester: _semester!),
-                                                  transitionsBuilder: (context,
-                                                      animation,
-                                                      secondaryAnimation,
-                                                      child) {
-                                                    var begin =
-                                                        Offset(0.0, 1.0);
-                                                    var end = Offset.zero;
-                                                    var curve = Curves.ease;
-
-                                                    var tween = Tween(
-                                                            begin: begin,
-                                                            end: end)
-                                                        .chain(CurveTween(
-                                                            curve: curve));
-
-                                                    return SlideTransition(
-                                                      position: animation
-                                                          .drive(tween),
-                                                      child: child,
-                                                    );
-                                                  },
-                                                ),
-                                              );
-                                            },
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "Credits",
-                                                  style: TextStyle(
-                                                    fontSize: 15,
-                                                    color: Colors.grey,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  height: 3,
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Icon(
-                                                      Icons.school_outlined,
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .outline,
-                                                      size: 22,
-                                                    ),
-                                                    SizedBox(width: 5),
-                                                    Text(
-                                                      "${getTotalCredits()}",
-                                                      style: TextStyle(
-                                                        fontSize: 25,
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .outline,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                Text(
-                                                  " ",
-                                                  style: TextStyle(
-                                                    fontSize: 15,
-                                                    color: Colors.grey,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: 30,
-                                      ),
-                                      Row(
-                                        children: [
-                                          Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                "Friends",
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  color: Colors.grey,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                height: 3,
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Icon(Icons.people),
-                                                  SizedBox(width: 5),
-                                                  Text(
-                                                    "0",
-                                                    style: TextStyle(
-                                                      fontSize: 20,
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .outline,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                          Spacer(),
-                                          Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                "Courses",
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  color: Colors.grey,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                height: 3,
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Icon(
-                                                    FeatherIcons.archive,
-                                                    size: 20,
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .outline,
-                                                  ),
-                                                  SizedBox(width: 10),
-                                                  Text(
-                                                    "${getCourseCount()}",
-                                                    style: TextStyle(
-                                                      fontSize: 20,
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .outline,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                          Spacer(),
-                                          GestureDetector(
-                                            onTap: () {
-                                              HapticFeedback.mediumImpact();
-                                              Navigator.push(
-                                                context,
-                                                PageRouteBuilder(
-                                                  pageBuilder: (context,
-                                                          animation,
-                                                          secondaryAnimation) =>
-                                                      GPAPage(
-                                                          semester: _semester!),
-                                                  transitionsBuilder: (context,
-                                                      animation,
-                                                      secondaryAnimation,
-                                                      child) {
-                                                    var begin =
-                                                        Offset(0.0, 1.0);
-                                                    var end = Offset.zero;
-                                                    var curve = Curves.ease;
-
-                                                    var tween = Tween(
-                                                            begin: begin,
-                                                            end: end)
-                                                        .chain(CurveTween(
-                                                            curve: curve));
-
-                                                    return SlideTransition(
-                                                      position: animation
-                                                          .drive(tween),
-                                                      child: child,
-                                                    );
-                                                  },
-                                                ),
-                                              );
-                                            },
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "GPA",
-                                                  style: TextStyle(
-                                                    fontSize: 15,
-                                                    color: Colors.grey,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  height: 3,
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Text(
-                                                      "${calculateTotalGPA().toStringAsFixed(2)}",
-                                                      style: TextStyle(
-                                                        fontSize: 20,
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .outline,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 20),
-                        Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                              ),
-                              child: GestureDetector(
-                                onTap: () {},
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 20),
-                                  decoration: BoxDecoration(
-                                    color: Color.fromARGB(255, 9, 9, 45),
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                        color:
-                                            Color.fromARGB(255, 170, 169, 255)),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .shadow,
-                                        blurRadius: 10,
-                                        offset: Offset(6, 4),
-                                      ),
-                                      BoxShadow(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .shadow,
-                                        blurRadius: 10,
-                                        offset: Offset(-2, 0),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Container(
-                                              alignment: Alignment.center,
-                                              height: 30,
-                                              width: 75,
-                                              decoration: BoxDecoration(
-                                                color: Color(0xFF191975),
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              child: Text(
-                                                "Premium",
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  color: Color.fromARGB(
-                                                      255, 170, 169, 255),
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(width: 20),
-                                            Text(
-                                              "Complete your school life",
-                                              style: TextStyle(
-                                                fontSize: 18,
-                                                color: Color.fromARGB(
-                                                    255, 170, 169, 255),
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          height: 10,
-                                        ),
-                                        Text(
-                                          "Upgrade to remove Ad's & Invite more friends",
+                                  padding: const EdgeInsets.only(right: 10),
+                                  child: Container(
+                                    height: 30,
+                                    width: 50,
+                                    decoration: BoxDecoration(
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Center(
+                                      child: Text('More',
                                           style: TextStyle(
-                                            fontSize: 16,
-                                            color: Color.fromARGB(
-                                                255, 170, 169, 255),
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .outline,
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold)),
                                     ),
                                   ),
                                 ),
+                              )
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 10, right: 10, bottom: 10),
+                          child: GPAGraph(
+                            chartData: totalSemester
+                                .map((data) =>
+                                    GraphData(data.semester, data.grade))
+                                .toList(),
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Change Schedule Colors ",
+                                style: TextStyle(
+                                  fontSize: 25,
+                                  color: Theme.of(context).colorScheme.outline,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
+                              Text(
+                                "Not working",
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: Theme.of(context).colorScheme.outline,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        /* 
+                         Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: Text(
+                            "Change Schedule Colors ",
+                            style: TextStyle(
+                              fontSize: 25,
+                              color: Theme.of(context).colorScheme.outline,
+                              fontWeight: FontWeight.bold,
                             ),
-                          ],
+                          ),
+                        ),
+                        */
+                        SingleChildScrollView(
+                          controller: ScrollController(),
+                          scrollDirection: Axis.horizontal,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                SelectColorWidget(
+                                    title: "Vivid",
+                                    color: Color.fromARGB(255, 237, 190, 187),
+                                    onTap: () {}),
+                                SizedBox(width: 10),
+                                SelectColorWidget(
+                                    title: "second",
+                                    color: const Color.fromARGB(
+                                        255, 202, 226, 246),
+                                    onTap: () {}),
+                                SizedBox(width: 10),
+                                SelectColorWidget(
+                                    title: "thrid",
+                                    color: const Color.fromARGB(
+                                        255, 202, 252, 203),
+                                    onTap: () {}),
+                                SizedBox(width: 10),
+                                SelectColorWidget(
+                                  title: "fourth",
+                                  color:
+                                      const Color.fromARGB(255, 246, 243, 216),
+                                  onTap: () {},
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                         SizedBox(height: 20),
                         Column(
@@ -1236,14 +764,15 @@ class _MypageState extends State<Mypage> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Padding(
-                              padding: const EdgeInsets.only(right: 0, top: 0),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
                               child: Container(
-                                width: 300.0, // 원하는 크기 설정
+                                width: MediaQuery.sizeOf(context).width,
                                 height: 50.0, // 원하는 크기 설정
                                 decoration: BoxDecoration(
                                     color:
                                         Theme.of(context).colorScheme.primary,
-                                    borderRadius: BorderRadius.circular(30)),
+                                    borderRadius: BorderRadius.circular(20)),
                                 child: Center(
                                     child: TextButton(
                                   child: Text(
@@ -1264,9 +793,8 @@ class _MypageState extends State<Mypage> {
                               'Sign out',
                               Color.fromARGB(255, 243, 154, 168),
                               () async {
+                                HapticFeedback.lightImpact();
                                 await logoutUser();
-
-                                // 로그아웃 후 InitialPage로 이동
                                 Navigator.pushReplacement(
                                   context,
                                   CupertinoPageRoute(

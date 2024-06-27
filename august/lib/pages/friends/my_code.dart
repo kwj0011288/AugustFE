@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:august/components/number_box.dart';
+import 'package:august/components/friends/number_box.dart';
 import 'package:august/get_api/friends/invitation_code.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:animated_hint_textfield/animated_hint_textfield.dart';
-import 'package:august/components/simple_course_tile.dart';
+import 'package:august/components/tile/simple_course_tile.dart';
 import 'package:august/const/dark_theme.dart';
 import 'package:august/const/light_theme.dart';
 import 'package:august/get_api/onboard/get_semester.dart';
@@ -10,8 +10,8 @@ import 'package:august/onboard/semester.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../components/courseprovider.dart';
-import '../../components/loading.dart';
+import '../../components/provider/courseprovider.dart';
+import '../../components/home/loading.dart';
 import '../../get_api/timetable/class.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../get_api/timetable/schedule.dart';

@@ -1,13 +1,15 @@
 import 'package:animated_hint_textfield/animated_hint_textfield.dart';
-import 'package:august/components/search_tile.dart';
+import 'package:august/components/tile/search_tile.dart';
 import 'package:august/get_api/onboard/get_semester.dart';
 import 'package:august/get_api/search/simple_sections.dart';
 import 'package:august/onboard/semester.dart';
+import 'package:august/pages/main/homepage.dart';
+import 'package:august/pages/profile/me_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import '../../components/loading.dart';
+import '../../components/home/loading.dart';
 import '../../get_api/timetable/class.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
 import 'package:intl/intl.dart';
@@ -65,6 +67,48 @@ class _SearchPageState extends State<SearchPage>
     String year = semester.substring(0, 4);
     String season = getSeasonFromSemester(semester);
     return "$season $year";
+  }
+
+  void _navigateToPageSemester() async {
+    var result = await showModalBottomSheet<Map<String, dynamic>>(
+      context: context,
+      enableDrag: false,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: DraggableScrollableSheet(
+            initialChildSize: 1,
+            maxChildSize: 1,
+            minChildSize: 1,
+            builder: (BuildContext context, ScrollController scrollController) {
+              var preloadedSemesters =
+                  Provider.of<SemestersProvider>(context, listen: false)
+                      .semesters;
+              return GestureDetector(
+                onTap: () {},
+                child: SemesterPage(
+                  preloadedSemesters: preloadedSemesters,
+                  onboard: false,
+                  goBack: () {},
+                  gonext: () {},
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // Remove a specific key
+    await prefs.remove('timetable');
+    await prefs.setBool('loadDone', false);
+    print("Timetable data cleared successfully.");
   }
 
   @override
@@ -132,7 +176,7 @@ class _SearchPageState extends State<SearchPage>
               Row(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(left: 12, top: 15),
+                    padding: const EdgeInsets.only(left: 15, top: 15),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -146,6 +190,7 @@ class _SearchPageState extends State<SearchPage>
                         ),
                         GestureDetector(
                           onTap: () {
+                            _navigateToPageSemester();
                             HapticFeedback.mediumImpact();
                           },
                           child: Row(
@@ -158,6 +203,11 @@ class _SearchPageState extends State<SearchPage>
                                         fontSize: 15, color: Colors.grey),
                                   );
                                 },
+                              ),
+                              const Icon(
+                                Icons.keyboard_arrow_right,
+                                color: Colors.grey,
+                                size: 15,
                               ),
                             ],
                           ),

@@ -24,6 +24,9 @@ ThemeData lightTheme = ThemeData(
     tertiary: Colors.black.withOpacity(0.04), //로딩 안쪽
 
     onSecondary: Color.fromARGB(255, 216, 215, 215),
+    /* --- 그래프 색 */
+
+    scrim: Colors.grey.shade200,
   ),
 );
 

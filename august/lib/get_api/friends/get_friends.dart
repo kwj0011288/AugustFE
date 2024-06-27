@@ -29,25 +29,24 @@ class FriendInfo {
 }
 
 class FriendInfos {
-  final String baseUrl = 'http://augustapp.one/';
-
   var url = Uri.parse('http://augustapp.one/friends/');
 
   Future<List<FriendInfo>> fetchFriends() async {
     final prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString('accessToken');
     if (accessToken == null) {
-      print('Access token not found');
+      throw Exception('Access token not found');
     }
 
     final response = await http.get(
       url,
       headers: {
         'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
       },
     );
 
-    if (response.statusCode == 200) {
+    if (response.statusCode >= 200 && response.statusCode < 300) {
       // Explicitly decode the response body as UTF-8
       String responseBody = utf8.decode(response.bodyBytes);
       List<dynamic> jsonList = jsonDecode(responseBody);
@@ -58,7 +57,7 @@ class FriendInfos {
       throw Exception(
           'Unauthorized request: Please check your authentication token.');
     } else {
-      throw Exception('Failed to load friends');
+      throw Exception('Failed to load friends: ${response.body}');
     }
   }
 }

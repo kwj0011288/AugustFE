@@ -1,6 +1,7 @@
 import 'dart:convert';
-import 'package:august/components/add_friend.dart';
-import 'package:august/components/number_box.dart';
+import 'package:august/components/friends/add_friend.dart';
+import 'package:august/components/friends/number_box.dart';
+import 'package:august/components/provider/friends_provider.dart';
 import 'package:august/get_api/friends/delete_friend.dart';
 import 'package:august/get_api/friends/friends_sem.dart';
 import 'package:august/get_api/friends/verify_friend.dart';
@@ -66,7 +67,7 @@ class _FriendsPageState extends State<FriendsPage>
     _listenForPhotoChanges(); // Listen for photo changes if using a Provider
     //refresh button
     _refreshFriendsController = AnimationController(
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(seconds: 1),
       vsync: this,
     );
 
@@ -80,7 +81,7 @@ class _FriendsPageState extends State<FriendsPage>
 
     //for trashcan jiggle
     _jiggleController = AnimationController(
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 1500),
       vsync: this,
     )..repeat(reverse: true);
   }
@@ -121,6 +122,8 @@ class _FriendsPageState extends State<FriendsPage>
           friends = fetchedFriends;
           isLoading = false;
         });
+        Provider.of<FriendsProvider>(context, listen: false)
+            .setFriendsCount(friends.length);
       }
     } catch (e) {
       if (mounted) {
@@ -428,8 +431,8 @@ class _FriendsPageState extends State<FriendsPage>
 
   void _onRefresh() async {
     try {
+      HapticFeedback.mediumImpact();
       await loadFriends();
-
       _refreshController.refreshCompleted();
     } catch (error) {
       _refreshController.refreshFailed();
@@ -444,8 +447,6 @@ class _FriendsPageState extends State<FriendsPage>
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 5),
         child: ColorfulSafeArea(
-          bottomColor: Colors.white.withOpacity(0),
-          overflowRules: OverflowRules.only(bottom: true),
           child: SmartRefresher(
             enablePullDown: true,
             onRefresh: _onRefresh,
@@ -472,7 +473,7 @@ class _FriendsPageState extends State<FriendsPage>
                             ),
                           ),
                           Text(
-                            'Are you extrovert?',
+                            'Are you an extrovert?',
                             style: TextStyle(fontSize: 15, color: Colors.grey),
                           ),
                         ],
@@ -480,8 +481,7 @@ class _FriendsPageState extends State<FriendsPage>
                     ),
                     Spacer(),
                     Padding(
-                      padding:
-                          const EdgeInsets.only(left: 15, right: 15, top: 15),
+                      padding: const EdgeInsets.only(left: 15, right: 15),
                       child: GestureDetector(
                         onTap: () async {
                           HapticFeedback.mediumImpact();
@@ -533,39 +533,43 @@ class _FriendsPageState extends State<FriendsPage>
                     ),
                   ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10, right: 10),
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: GestureDetector(
-                            onTap: () {
-                              toggleisEdit(friends.length);
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 5),
-                              child: AnimatedContainer(
-                                duration: Duration(milliseconds: 300),
-                                width: 60,
-                                height: 35,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(30),
-                                  color: isEdit
-                                      ? Colors.blueAccent
-                                      : Theme.of(context).colorScheme.primary,
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    isEdit ? 'Done' : 'Edit',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      color:
-                                          Theme.of(context).colorScheme.outline,
-                                      fontWeight: FontWeight.bold,
+                if (friends.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10, right: 10),
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: GestureDetector(
+                              onTap: () {
+                                HapticFeedback.mediumImpact();
+                                toggleisEdit(friends.length);
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 5),
+                                child: AnimatedContainer(
+                                  duration: Duration(milliseconds: 300),
+                                  height: 30,
+                                  width: 50,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: isEdit
+                                        ? Colors.blueAccent
+                                        : Theme.of(context).colorScheme.primary,
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      isEdit ? 'Done' : 'Edit',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .outline,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -573,39 +577,42 @@ class _FriendsPageState extends State<FriendsPage>
                             ),
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 10, top: 10),
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: GestureDetector(
-                            onTap: () async {
-                              final SharedPreferences prefs =
-                                  await SharedPreferences.getInstance();
-                              loadFriends();
-                              await prefs.remove('codeExpires');
-                              await prefs.remove('invitationCode');
-                              _refreshFriendsController!.forward(from: 0.0);
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 5, right: 15),
-                              child: AnimatedContainer(
-                                duration: Duration(milliseconds: 300),
-                                width: 35,
-                                height: 35,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(30),
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                                child: Center(
-                                  child: RotationTransition(
-                                    turns: Tween(begin: 0.0, end: 1.0)
-                                        .animate(_refreshFriendsController!),
-                                    child: Icon(
-                                      Icons.refresh,
-                                      color:
-                                          Theme.of(context).colorScheme.outline,
-                                      size: 25,
+                        Padding(
+                          padding: const EdgeInsets.only(right: 10, top: 10),
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: GestureDetector(
+                              onTap: () async {
+                                final SharedPreferences prefs =
+                                    await SharedPreferences.getInstance();
+                                loadFriends();
+                                await prefs.remove('codeExpires');
+                                await prefs.remove('invitationCode');
+                                _refreshFriendsController!.forward(from: 0.0);
+                              },
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 5, right: 15),
+                                child: AnimatedContainer(
+                                  duration: Duration(milliseconds: 300),
+                                  width: 30,
+                                  height: 30,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(30),
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
+                                  child: Center(
+                                    child: RotationTransition(
+                                      turns: Tween(begin: 0.0, end: 1.0)
+                                          .animate(_refreshFriendsController!),
+                                      child: Icon(
+                                        Icons.refresh,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .outline,
+                                        size: 23,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -613,10 +620,9 @@ class _FriendsPageState extends State<FriendsPage>
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
                 isLoading
                     ? Container()
                     : friends.isNotEmpty
@@ -631,7 +637,7 @@ class _FriendsPageState extends State<FriendsPage>
                                 crossAxisCount: 2, // 한 줄에 표시할 항목의 수
                                 crossAxisSpacing: 20.0, // 가로 간격
                                 mainAxisSpacing: 20.0, // 세로 간격
-                                childAspectRatio: (10 / 10.5), // 가로 세로 비율 조정
+                                childAspectRatio: (10 / 11), // 가로 세로 비율 조정
                               ),
                               itemBuilder: (context, index) {
                                 if (index == friends.length) {
@@ -640,7 +646,7 @@ class _FriendsPageState extends State<FriendsPage>
                                       color: Theme.of(context)
                                           .colorScheme
                                           .primaryContainer,
-                                      borderRadius: BorderRadius.circular(30),
+                                      borderRadius: BorderRadius.circular(10),
                                       boxShadow: [
                                         BoxShadow(
                                           color: Theme.of(context)
@@ -687,7 +693,7 @@ class _FriendsPageState extends State<FriendsPage>
                                         color: Theme.of(context)
                                             .colorScheme
                                             .primaryContainer,
-                                        borderRadius: BorderRadius.circular(30),
+                                        borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: Column(
                                         mainAxisAlignment:
@@ -768,7 +774,7 @@ class _FriendsPageState extends State<FriendsPage>
                                           : Theme.of(context)
                                               .colorScheme
                                               .primaryContainer,
-                                      borderRadius: BorderRadius.circular(30),
+                                      borderRadius: BorderRadius.circular(10),
                                       boxShadow: [
                                         BoxShadow(
                                           color: Theme.of(context)
@@ -787,39 +793,56 @@ class _FriendsPageState extends State<FriendsPage>
                                       ],
                                     ),
                                     child: (!isEdit)
-                                        ? Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Container(
-                                                width:
-                                                    95, // 이미지의 가로 크기를 80으로 설정
-                                                height:
-                                                    95, // 이미지의 세로 크기를 80으로 설정
-                                                child: ClipOval(
-                                                  child: friends[index]
+                                        ? Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                CircleAvatar(
+                                                  maxRadius: 50,
+                                                  backgroundImage: friends[
+                                                                  index]
                                                               .profileImage !=
                                                           null
-                                                      ? Image.network(
+                                                      ? NetworkImage(
                                                           friends[index]
-                                                              .profileImage!,
-                                                          fit: BoxFit.cover)
-                                                      : Icon(Icons.person,
-                                                          size:
-                                                              70), // 기본 아이콘 표시
+                                                              .profileImage!)
+                                                      : null,
+                                                  child: friends[index]
+                                                              .profileImage ==
+                                                          null
+                                                      ? Icon(Icons.person,
+                                                          size: 45)
+                                                      : null,
                                                 ),
-                                              ),
-                                              SizedBox(height: 10),
-                                              Text(
-                                                friends[index].name,
-                                                style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
+                                                SizedBox(height: 5),
+                                                Text(
+                                                  friends[index].name,
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .outline,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                 ),
-                                                overflow: TextOverflow.ellipsis,
-                                                maxLines: 1,
-                                              ), // 이름 표시
-                                            ],
+                                                Text(
+                                                  friends[index].department,
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.grey,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           )
                                         : Padding(
                                             padding: const EdgeInsets.all(8.0),

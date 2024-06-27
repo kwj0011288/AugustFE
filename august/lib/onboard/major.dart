@@ -1,3 +1,4 @@
+import 'package:august/components/tile/onboardTile/major_tile.dart';
 import 'package:august/login/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,6 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:august/get_api/onboard/get_department.dart'; // Make sure this import is correct
 import "package:flutter_feather_icons/flutter_feather_icons.dart";
 import 'package:flutter_svg/svg.dart';
+import 'package:colorful_safe_area/colorful_safe_area.dart';
+import 'package:animated_hint_textfield/animated_hint_textfield.dart';
 
 class MajorPage extends StatefulWidget {
   final bool onboard;
@@ -25,23 +28,44 @@ class MajorPage extends StatefulWidget {
 }
 
 class _MajorPageState extends State<MajorPage> {
-  String? _selectedMajor;
   String? _selectedMajorFullname;
   String? _selectedMajorNickname;
   int? _selectedMajorIndex;
+  List<String> filteredDepartments = [];
 
+  TextEditingController searchController = TextEditingController();
   @override
   void initState() {
     super.initState();
-    // Print the preloaded departments to the console
+    filteredDepartments = widget.preloadedDepartments;
     print("Preloaded Departments: ${widget.preloadedDepartments}");
-
+    //  _selectedMajorIndex = 1;
     if (widget.preloadedDepartments.isEmpty) {
       // If the preloaded departments list is empty, fetch the departments
       fetchDepartments().then((departments) {
         setState(() {
           widget.preloadedDepartments = departments;
         });
+      });
+    }
+  }
+
+  void _filterDepartments(String query) {
+    if (query.isEmpty) {
+      setState(() {
+        filteredDepartments = widget.preloadedDepartments;
+      });
+    } else {
+      setState(() {
+        filteredDepartments = widget.preloadedDepartments.where((dept) {
+          final parts = dept.split(', ');
+          final fullnameAndNickname = parts.sublist(1).join(", ");
+
+          final nickname = fullnameAndNickname.contains("(")
+              ? fullnameAndNickname.split(" (")[1].replaceAll(")", "")
+              : '';
+          return nickname.toLowerCase().contains(query.toLowerCase());
+        }).toList();
       });
     }
   }
@@ -64,7 +88,6 @@ class _MajorPageState extends State<MajorPage> {
       _selectedMajorIndex = id;
       _selectedMajorFullname = fullName;
       _selectedMajorNickname = nickname;
-      _selectedMajor = "$fullName ($nickname)"; // UI에 표시될 문자열 업데이트
     });
 
     // 선택된 전공의 fullname 출력 (디버깅 목적)
@@ -120,278 +143,242 @@ class _MajorPageState extends State<MajorPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-      child: Scaffold(
-        resizeToAvoidBottomInset: true,
-        backgroundColor:
-            widget.onboard ? Colors.transparent : Colors.transparent,
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Spacer(),
-            Padding(
-              padding: const EdgeInsets.only(
-                  top: 0, left: 10, right: 10, bottom: 25),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: widget.onboard
-                      ? Theme.of(context).colorScheme.primary
-                      : Theme.of(context).colorScheme.background,
-                  borderRadius:
-                      BorderRadius.all(Radius.circular(30)), // 모서리를 둥글게 만듭니다.
-                  // 필요하다면 여기에 그림자나 테두리 등을 추가할 수 있습니다.
-                ),
-                child: Column(
+    return Scaffold(
+      body: ColorfulSafeArea(
+        child: Center(
+          child: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.background,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Row(
                   children: [
-                    Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(20), // 상단 왼쪽 모서리 둥글게
-                            topRight: Radius.circular(20), // 상단 오른쪽 모서리 둥글게
-                          ),
-                          child: Align(
-                            alignment: Alignment.topCenter,
-                            heightFactor:
-                                0.8, // 이미지의 상위 80%만 보여줍니다. 하단 20%는 잘립니다.
-                            child: SvgPicture.asset(
-                              'assets/icons/major.svg',
-                              width: MediaQuery.of(context).size.width,
-                              // height 설정을 제거하여 전체 이미지 높이를 기준으로 잘립니다.
-                              fit: BoxFit.cover,
+                    if (widget.onboard == true)
+                      Padding(
+                        padding:
+                            const EdgeInsets.only(left: 20, top: 8, bottom: 8),
+                        child: GestureDetector(
+                          onTap: () {
+                            widget.goBack();
+                            _saveAndClose();
+                          },
+                          child: CircleAvatar(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary,
+                            foregroundColor:
+                                Theme.of(context).colorScheme.background,
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 5),
+                              child: Center(
+                                child: Icon(
+                                  Icons.arrow_back_ios,
+                                  size: 15,
+                                  color: Theme.of(context).colorScheme.outline,
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(right: 10, bottom: 80),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              if (widget.onboard == false)
-                                Container(
-                                  height: 30,
-                                  width: 30,
-                                  decoration: BoxDecoration(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                    shape: BoxShape
-                                        .circle, // Ensures the container is circular
-                                  ),
-                                  child: IconButton(
-                                    icon: Icon(
-                                      FeatherIcons.x,
-                                      color:
-                                          Theme.of(context).colorScheme.outline,
-                                      size: 20,
-                                    ),
-
-                                    onPressed: () {
-                                      if (Navigator.canPop(context)) {
-                                        Navigator.pop(context);
-                                      }
-                                    },
-                                    padding: EdgeInsets.all(
-                                        5), // Remove padding to fit the icon well
-                                    constraints:
-                                        BoxConstraints(), // Remove constraints if necessary
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Text(
-                      "Select Major",
-                      style: TextStyle(
-                        fontSize: 25,
-                        color: Theme.of(context).colorScheme.outline,
-                        fontWeight: FontWeight.bold,
                       ),
-                    ),
-                    SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Text(
-                        "Selected Semester is used for\nCourse search, Schedule Creation, and sharing schedules with friends.",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    Container(
-                      child: Form(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            PullDownButton(
-                              itemBuilder: (BuildContext context) {
-                                return widget.preloadedDepartments.map((dept) {
-                                  final parts = dept.split(', ');
-                                  final fullnameAndNickname = parts
-                                      .sublist(1)
-                                      .join(", "); // ID 이후 부분 재조합
-                                  final fullname =
-                                      fullnameAndNickname.split(" (")[0];
-                                  final nickname =
-                                      fullnameAndNickname.contains("(")
-                                          ? fullnameAndNickname
-                                              .split(" (")[1]
-                                              .replaceAll(")", "")
-                                          : '';
-                                  final displayFullName = fullname;
-                                  final displayNickName = nickname;
-
-                                  return PullDownMenuItem(
-                                    title: displayNickName,
-                                    onTap: () => _selectMajor(dept),
-                                    subtitle: displayFullName,
-                                  );
-                                }).toList();
-                              },
-                              buttonBuilder: (BuildContext context,
-                                  Future<void> Function() showMenu) {
-                                return Container(
-                                  decoration: BoxDecoration(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .inversePrimary,
-                                      borderRadius: BorderRadius.circular(15)),
-                                  child: TextButton(
-                                    onPressed: showMenu,
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 50, vertical: 5),
-                                      child: Text(
-                                        _selectedMajorNickname ??
-                                            "Select Major",
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .outline,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                              scrollController: ScrollController(),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    widget.onboard
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  widget.goBack();
-                                  _saveAndClose();
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  height: 55,
-                                  width: MediaQuery.of(context).size.width / 3,
-                                  decoration: BoxDecoration(
-                                      border: Border.all(
-                                          color: Colors.redAccent, width: 2),
-                                      color: Colors.transparent,
-                                      borderRadius: BorderRadius.circular(60)),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'BACK',
-                                        style: TextStyle(
-                                            color: Colors.redAccent,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 20),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  widget.gonext();
-                                  _saveAndClose();
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  height: 55,
-                                  width: MediaQuery.of(context).size.width / 3,
-                                  decoration: BoxDecoration(
-                                      color: Colors.blueAccent,
-                                      borderRadius: BorderRadius.circular(60)),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'NEXT',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 20),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          )
-                        : GestureDetector(
-                            onTap: () {
-                              _saveAndClose();
-                              HapticFeedback.mediumImpact();
-                            },
-                            child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 30),
-                              height: 55,
-                              width: MediaQuery.of(context).size.width - 80,
-                              decoration: BoxDecoration(
-                                  color: Colors.blueAccent,
-                                  borderRadius: BorderRadius.circular(60)),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'DONE',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20),
-                                  ),
-                                ],
+                    Spacer(),
+                    if (widget.onboard == false)
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            right: 20, top: 5, bottom: 10),
+                        child: GestureDetector(
+                          onTap: () {
+                            HapticFeedback.mediumImpact();
+                            Navigator.pop(context);
+                          },
+                          child: CircleAvatar(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary,
+                            foregroundColor:
+                                Theme.of(context).colorScheme.background,
+                            child: Center(
+                              child: Icon(
+                                FeatherIcons.x,
+                                color: Theme.of(context).colorScheme.outline,
                               ),
                             ),
                           ),
-                    SizedBox(height: 20),
+                        ),
+                      ),
                   ],
                 ),
-              ),
+                if (widget.onboard == true) SizedBox(height: 10),
+                Text(
+                  widget.onboard ? "Select Major" : "Change Major",
+                  style: TextStyle(
+                    fontSize: 35,
+                    color: Theme.of(context).colorScheme.outline,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Text(
+                    "Selected Semester is used for\nCourse search, and Schedule Creation.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.grey,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(
+                      top: 15.0, bottom: 15.0, left: 10.0, right: 10.0),
+                  child: AnimatedTextField(
+                      animationType: Animationtype.typer,
+                      cursorColor: Theme.of(context).colorScheme.outline,
+                      controller: searchController,
+                      hintTexts: const [
+                        'CMSC',
+                        'BMGT',
+                        'INST',
+                        'HIST',
+                        'BIOL',
+                        'MATH',
+                      ],
+                      animationDuration: Duration(milliseconds: 100000),
+                      hintTextStyle: const TextStyle(
+                        color: Colors.grey,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      decoration: InputDecoration(
+                        fillColor: Theme.of(context).colorScheme.primary,
+                        filled: true, // 배경색 채우기 활성화
+                        contentPadding: EdgeInsets.symmetric(vertical: 15.0),
+                        border: OutlineInputBorder(
+                          // 기본 테두리 설정
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none, // 둘레 색 없애기
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          // 포커스 됐을 때의 테두리 설정
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none, // 둘레 색 없애기
+                        ),
+                        prefixIcon: Icon(
+                          FeatherIcons.search,
+                          size: 25.0,
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                      ),
+                      onChanged: _filterDepartments,
+                      onSubmitted: (value) {
+                        // This is called when the done button is pressed.
+                        FocusScope.of(context).unfocus();
+                      },
+                      textInputAction: TextInputAction.done),
+                ),
+                Expanded(
+                  child: Scrollbar(
+                    thumbVisibility: true,
+                    child: ListView.builder(
+                      itemCount: filteredDepartments.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final parts = filteredDepartments[index].split(', ');
+                        final fullnameAndNickname = parts.sublist(1).join(", ");
+                        final fullname = fullnameAndNickname.split(" (")[0];
+                        final nickname = fullnameAndNickname.contains("(")
+                            ? fullnameAndNickname
+                                .split(" (")[1]
+                                .replaceAll(")", "")
+                            : '';
+                        return MajorTile(
+                          fullname: fullname,
+                          nickname: nickname,
+                          tileColor: _selectedMajorNickname == nickname
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).colorScheme.primaryContainer,
+                          isShadow: _selectedMajorNickname == nickname,
+                          onTap: () {
+                            setState(() {
+                              _selectMajor(filteredDepartments[index]);
+                              _selectedMajorNickname = nickname;
+                              _selectedMajorFullname = fullname;
+                            });
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.only(
+          left: 15,
+          right: 15,
+          bottom: 60,
+          top: 20,
+        ),
+        child: widget.onboard
+            ? GestureDetector(
+                onTap: () {
+                  HapticFeedback.mediumImpact();
+                  widget.gonext();
+                  _saveAndClose();
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  height: 60,
+                  width: MediaQuery.of(context).size.width - 80,
+                  decoration: BoxDecoration(
+                      color: Colors.blueAccent,
+                      borderRadius: BorderRadius.circular(20)),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'NEXT',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            : GestureDetector(
+                onTap: () {
+                  _saveAndClose();
+                  HapticFeedback.mediumImpact();
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 30),
+                  height: 55,
+                  width: MediaQuery.of(context).size.width - 80,
+                  decoration: BoxDecoration(
+                      color: Colors.blueAccent,
+                      borderRadius: BorderRadius.circular(60)),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'DONE',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
       ),
     );
   }

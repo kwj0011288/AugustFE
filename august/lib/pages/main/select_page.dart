@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:august/components/button.dart';
-import 'package:august/components/timetable.dart';
+import 'package:august/components/home/button.dart';
+import 'package:august/components/timetable/timetable.dart';
 import 'package:august/get_api/onboard/get_semester.dart';
 import 'package:august/get_api/timetable/send_timetable.dart';
 import 'package:august/get_api/timetable/schedule.dart';
@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../components/courseprovider.dart';
+import '../../components/provider/courseprovider.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 
 class SelectPage extends StatefulWidget {

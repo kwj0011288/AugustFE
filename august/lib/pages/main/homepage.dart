@@ -1,4 +1,4 @@
-import 'package:august/components/my_bottombar.dart';
+import 'package:august/components/home/my_bottombar.dart';
 import 'package:august/const/save_image.dart';
 import 'package:august/get_api/friends/get_friends.dart';
 import 'package:august/get_api/onboard/get_semester.dart';
@@ -6,6 +6,7 @@ import 'package:august/login/login.dart';
 import 'package:august/onboard/onboard.dart';
 import 'package:august/onboard/semester.dart';
 import 'package:august/pages/gpa/gpa_page.dart';
+import 'package:august/pages/profile/me_page.dart';
 import 'package:august/pages/search/search_page.dart';
 import 'package:provider/provider.dart';
 import 'package:august/pages/friends/friends_page.dart';
@@ -61,25 +62,23 @@ class _HomePageState extends State<HomePage> {
   void checkAndShowOnBoarding() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool? onBoard = prefs.getBool('hasSeenOnboard') ?? false;
-    if (isFirst! || !onBoard!) {
-      await showModalBottomSheet(
-        backgroundColor: Colors.transparent,
-        context: context,
-        isScrollControlled: true,
+    if (isFirst || !onBoard) {
+      await Navigator.of(context).push(MaterialPageRoute(
+        fullscreenDialog: true,
         builder: (_) => OnBoardPage(
           preloadedSemesters: widget.preloadedSemesters,
-          onBoardingComplete: () {
+          onBoardingComplete: () async {
             Navigator.of(context).pop(); // Dismiss the OnBoardPage
             // Optionally refresh the HomePage or perform other actions
           },
           departments: widget.departments,
         ),
-      ).then((_) async {
-        // Set hasSeenOnboard to true after the OnBoardPage is dismissed
-        prefs.setBool('hasSeenOnboard', true);
-        await prefs.setBool('isFirst', false);
-        print('isFirst updated to: $isFirst');
-      });
+      ));
+      // Set hasSeenOnboard to true after the OnBoardPage is dismissed
+      prefs.setBool('hasSeenOnboard', true);
+      await prefs.setBool('isFirst', false);
+      print('isFirst updated to: $isFirst');
+      //logger.log('isFirst updated to: $isFirst');
     }
   }
 
@@ -96,9 +95,12 @@ class _HomePageState extends State<HomePage> {
     // isFirst 값이 로컬ㄹ에 저장되었는지 확인
     bool? hasCheckedFirst = prefs.getBool('hasCheckedFirst');
     if (hasCheckedFirst == null) {
+      await fetchAndSetUserInfo(true);
       // 앱이 처음 실행되는 경우, isFirst 값을 계산하여 저장
       String dateJoined = userInfo?['dateJoined'] ?? '2021-01-01T00:00:00.000Z';
-      isFirst = isTodayOrWithin30Days(dateJoined);
+      print(dateJoined);
+      print('dateJoined: $dateJoined');
+      isFirst = isTodayOrWithin5min(dateJoined);
       await prefs.setBool('hasCheckedFirst', true);
       await prefs.setBool('isFirst', isFirst);
     } else {
@@ -142,20 +144,21 @@ class _HomePageState extends State<HomePage> {
     return "$season $year";
   }
 
-  bool isTodayOrWithin30Days(String dateJoinedStr) {
+  bool isTodayOrWithin5min(String dateJoinedStr) {
     DateTime dateJoined = DateFormat("yyyy-MM-ddTHH:mm:ss.SSS'Z'")
         .parseUtc(dateJoinedStr)
         .toLocal();
     DateTime now = DateTime.now();
+    print(now);
 
     // 현재 시간과 dateJoined의 날짜, 시간, 분을 비교하여 10분 이내 차이나는지 확인
     Duration difference = now.difference(dateJoined);
-    bool isTodayAndWithin10Minutes = now.year == dateJoined.year &&
+    bool isTodayAndWithin5Minutes = now.year == dateJoined.year &&
         now.month == dateJoined.month &&
         now.day == dateJoined.day &&
-        difference.inMinutes.abs() <= 10;
+        difference.inMinutes.abs() <= 5;
 
-    return isTodayAndWithin10Minutes;
+    return isTodayAndWithin5Minutes;
   }
 
   void _initializePages() {
@@ -172,7 +175,11 @@ class _HomePageState extends State<HomePage> {
       FriendsPage(
         semester: _semester ?? 'Unknown',
       ),
-      GPAPage(semester: _semester!)
+      Mypage(
+        selectedSemester: _semester!,
+        isFirst: isFirst,
+        departments: widget.departments,
+      )
     ];
   }
 
@@ -197,10 +204,12 @@ class _HomePageState extends State<HomePage> {
       await prefs.setString('grade', displayGrade); // 수정된 부분: 변환된 학년 정보 사용
       await prefs.setString(
           'major', userDetails.department?.nickname ?? 'Unknown');
+
       await prefs.setString(
           'fullname', userDetails.institution?.fullName ?? 'Unknown');
       await prefs.setString(
           'nickname', userDetails.institution?.nickname ?? 'Unknown');
+
       await prefs.setString('userEmail', userDetails.email);
 
       if (widget.preloadedSemesters.isNotEmpty) {
@@ -293,6 +302,8 @@ class _HomePageState extends State<HomePage> {
                 });
               }
             },
+            semester: _semester ?? '202401',
+            isFirst: isFirst,
           ),
         ),
       ),

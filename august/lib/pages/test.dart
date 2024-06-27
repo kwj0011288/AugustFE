@@ -1,4 +1,4 @@
-import 'package:august/components/initial_face.dart';
+import 'package:august/components/profile/initial_face.dart';
 import 'package:flutter/material.dart';
 
 class MyWidget extends StatefulWidget {

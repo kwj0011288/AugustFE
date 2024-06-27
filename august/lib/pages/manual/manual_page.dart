@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 import 'package:august/get_api/onboard/get_semester.dart';
+import 'package:august/get_api/timetable/send_timetable.dart';
 import 'package:august/pages/main/homepage.dart';
 import 'package:august/pages/manual/manual_search_page.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
@@ -12,9 +13,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import "package:flutter_feather_icons/flutter_feather_icons.dart";
 import 'package:flutter/material.dart' hide ModalBottomSheetRoute;
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import '../../components/button.dart';
-import '../../components/courseprovider.dart';
-import '../../components/timetable.dart';
+import '../../components/home/button.dart';
+import '../../components/provider/courseprovider.dart';
+import '../../components/timetable/timetable.dart';
 import '../../get_api/timetable/class.dart';
 import '../../get_api/timetable/schedule.dart';
 
@@ -200,39 +201,28 @@ class _ManualPageState extends State<ManualPage> {
                   onTap: () async {
                     List<List<ScheduleList>> copiedCoursesData =
                         List.from(provider.selectedCoursesData);
-                    await saveTimetableToLocalStorage(
-                      copiedCoursesData,
-                    );
 
-                    provider.createNewTimetable();
+                    List<int> sectionIds = copiedCoursesData
+                        .expand((courses) => courses)
+                        .where((course) => course.id != null)
+                        .map((course) => course.id!)
+                        .toList();
+                    int ogsem = int.parse(getOriginalSemester(_semester!));
 
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomePage()
+                    sendTimetableToServer(ogsem, "Manual", sectionIds)
+                        .then((_) {
+                      // First, handle provider-related operations
+                      provider.createNewTimetable();
+                      provider.resetSelectedCoursesData();
+                      copiedCoursesData.clear();
+                      provider.clearSelectedCourses();
 
-                          // SchedulePage(
-                          //   selectedCoursesData: copiedCoursesData.isNotEmpty
-                          //       ? copiedCoursesData
-                          //       : [],
-                          //   semester: selectedRawSemester,
-                          // ),
-                          ),
-                    ).then(
-                      (_) {
-                        // Check if new courses have been added.
-                        if (provider.selectedCoursesData.length >
-                            copiedCoursesData.length) {
-                          for (int i = copiedCoursesData.length;
-                              i < provider.selectedCoursesData.length;
-                              i++) {
-                            for (var course
-                                in provider.selectedCoursesData[i]) {
-                              provider.addCourseToCurrentTimetable(course);
-                            }
-                          }
-                        }
-                      },
-                    );
+                      // After all provider operations are complete, navigate to HomePage
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => HomePage()),
+                      );
+                    });
                   },
                   borderColor: Colors.blueAccent,
                 ),
