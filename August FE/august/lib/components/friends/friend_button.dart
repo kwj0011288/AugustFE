@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:august/components/home/button.dart';
+import 'package:august/const/font/font.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -37,8 +38,8 @@ Widget buildButton(String text, Color buttonColor, final VoidCallback onTap,
             child: Text(
               text,
               key: ValueKey<String>(text), // Unique key for AnimatedSwitcher
-              style: TextStyle(
-                  color: textColor, fontSize: 15, fontWeight: textWeight),
+              style:
+                  AugustFont.subText4(color: textColor, textWeight: textWeight),
             ),
           ),
         ),

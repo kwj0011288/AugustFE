@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:august/components/friends/number_box.dart';
+import 'package:august/const/font/font.dart';
 import 'package:august/get_api/friends/invitation_code.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -143,10 +144,8 @@ class _InvitationCodePageState extends State<InvitationCodePage> {
                   SizedBox(height: 10),
                   Text(
                     "Shareable Code",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: AugustFont.head2(
+                        color: Theme.of(context).colorScheme.outline),
                   ),
                   SizedBox(height: 10),
                   Column(
@@ -160,10 +159,8 @@ class _InvitationCodePageState extends State<InvitationCodePage> {
                           formattedTime?.isEmpty ?? true
                               ? "Expires in 0 days 0 hours 0 minutes"
                               : "Expires in $formattedTime",
-                          style: TextStyle(
+                          style: AugustFont.captionSmallBold(
                             color: Colors.grey,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
@@ -188,9 +185,8 @@ class _InvitationCodePageState extends State<InvitationCodePage> {
                     },
                     child: Text(
                       "Click here to copy code",
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
+                      style: AugustFont.subText2(
+                        color: Theme.of(context).colorScheme.outline,
                       ),
                     ),
                   ),

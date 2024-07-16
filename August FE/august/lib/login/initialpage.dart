@@ -1,6 +1,7 @@
 import 'dart:io';
 
-import 'package:august/const/device_util.dart';
+import 'package:august/const/device/device_util.dart';
+import 'package:august/const/font/font.dart';
 import 'package:august/login/login.dart';
 import 'package:august/pages/main/homepage.dart';
 import 'package:flutter/cupertino.dart';
@@ -30,8 +31,9 @@ class InitialPage extends StatefulWidget {
 
 class _InitialPageState extends State<InitialPage> {
   final GoogleSignIn _googleSignIn = GoogleSignIn(
-    clientId:
-        '469588470984-or2haks4c471937fblbnc1j26061n6d1.apps.googleusercontent.com',
+    clientId: Platform.isIOS
+        ? '469588470984-or2haks4c471937fblbnc1j26061n6d1.apps.googleusercontent.com'
+        : '469588470984-87et979ds37bt4svf5mv6tfe64i9ue21.apps.googleusercontent.com',
     scopes: <String>[
       'email',
       'https://www.googleapis.com/auth/userinfo.profile',
@@ -56,7 +58,9 @@ class _InitialPageState extends State<InitialPage> {
       String requestBody =
           jsonEncode({'access_token': accessToken, 'id_token': idToken});
       final response = await http.post(
-        Uri.parse('https://augustapp.one/users/google/login/callback/'),
+        Uri.parse(Platform.isIOS
+            ? 'https://augustapp.one/users/google/login/callback/ios/'
+            : 'https://augustapp.one/users/google/login/callback/android/'),
         headers: {'Content-Type': 'application/json'},
         body: requestBody,
       );
@@ -182,8 +186,8 @@ class _InitialPageState extends State<InitialPage> {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Spacer(),
           introText(),
@@ -318,7 +322,6 @@ class _InitialPageState extends State<InitialPage> {
         fontWeight: FontWeight.bold,
         fontSize: 35,
         color: Theme.of(context).colorScheme.outline,
-        fontFamily: 'Apple',
         height: 1.5,
         letterSpacing: 1.2,
       ),
@@ -333,14 +336,8 @@ class _InitialPageState extends State<InitialPage> {
           children: [
             TextSpan(
               text: 'Share ',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 35,
-                color: Theme.of(context).colorScheme.outline,
-                fontFamily: 'Apple',
-                height: 1.5,
-                letterSpacing: 1.2,
-              ),
+              style: AugustFont.intial(
+                  color: Theme.of(context).colorScheme.outline),
             ),
             WidgetSpan(
               child: Lottie.asset(
@@ -351,34 +348,17 @@ class _InitialPageState extends State<InitialPage> {
             ),
             TextSpan(
               text: ' School life \n',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 35,
-                color: Theme.of(context).colorScheme.outline,
-                fontFamily: 'Apple',
-                letterSpacing: 1.2,
-              ),
+              style: AugustFont.intial(
+                  color: Theme.of(context).colorScheme.outline),
             ),
             TextSpan(
               text: 'With ',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 35,
-                color: Colors.grey,
-                fontFamily: 'Apple',
-                letterSpacing: 1.2,
-              ),
+              style: AugustFont.intial(color: Colors.grey),
             ),
             TextSpan(
               text: ' Autocreated ',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 35,
-                color: Theme.of(context).colorScheme.outline,
-                fontFamily: 'Apple',
-                height: 1.5,
-                letterSpacing: 1.2,
-              ),
+              style: AugustFont.intial(
+                  color: Theme.of(context).colorScheme.outline),
             ),
             WidgetSpan(
               child: Transform(
@@ -393,14 +373,8 @@ class _InitialPageState extends State<InitialPage> {
             ),
             TextSpan(
               text: 'Schedules!',
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.outline,
-                fontWeight: FontWeight.bold,
-                fontSize: 35,
-                fontFamily: 'Apple',
-                height: 1.5,
-                letterSpacing: 1.2,
-              ),
+              style: AugustFont.intial(
+                  color: Theme.of(context).colorScheme.outline),
             ),
           ],
         ),
@@ -423,8 +397,8 @@ class _InitialPageState extends State<InitialPage> {
         textStyle: TextStyle(
           fontSize: 18,
           color: Theme.of(context).colorScheme.background,
-          fontWeight: FontWeight.normal,
-          fontFamily: 'Apple',
+          fontFamily: 'Nanum',
+          fontWeight: FontWeight.w600,
         ),
         width: MediaQuery.of(context).size.width,
         height: 56.0,
@@ -446,8 +420,8 @@ class _InitialPageState extends State<InitialPage> {
         textStyle: TextStyle(
           fontSize: 18,
           color: Colors.black,
-          fontWeight: FontWeight.normal,
-          fontFamily: 'Apple',
+          fontWeight: FontWeight.w600,
+          fontFamily: 'Nanum',
         ),
         width: MediaQuery.of(context).size.width,
         height: 60,
@@ -457,23 +431,15 @@ class _InitialPageState extends State<InitialPage> {
 
   Widget policyTerms() {
     return Text.rich(
+      textAlign: TextAlign.center,
       TextSpan(
         text:
             'By signing up for an account in August, you confirm that\nyou have read and agreed to our ',
-        style: TextStyle(
-          color: Colors.grey,
-          fontSize: 12,
-          fontWeight: FontWeight.normal,
-          fontFamily: 'Apple',
-        ),
+        style: AugustFont.captionSmall(color: Colors.grey),
         children: <TextSpan>[
           TextSpan(
             text: 'Terms of Use',
-            style: TextStyle(
-              decoration: TextDecoration.underline,
-              decorationColor: Colors.grey,
-              color: Colors.grey,
-            ),
+            style: AugustFont.captionSmallUnderline(color: Colors.grey),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
                 print('Terms of Use clicked');
@@ -481,30 +447,15 @@ class _InitialPageState extends State<InitialPage> {
           ),
           TextSpan(
             text: ' and ',
-            style: TextStyle(
-              color: Colors.grey,
-              fontFamily: 'Apple',
-            ),
+            style: AugustFont.captionSmall(color: Colors.grey),
           ),
           TextSpan(
             text: 'Privacy Policy',
-            style: TextStyle(
-              decoration: TextDecoration.underline,
-              decorationColor: Colors.grey,
-              color: Colors.grey,
-              fontFamily: 'Apple',
-            ),
+            style: AugustFont.captionSmallUnderline(color: Colors.grey),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
                 print('Policy clicked');
               },
-          ),
-          TextSpan(
-            text: '.',
-            style: TextStyle(
-              color: Colors.grey,
-              fontFamily: 'Apple',
-            ),
           ),
         ],
       ),

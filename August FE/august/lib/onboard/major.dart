@@ -1,4 +1,5 @@
 import 'package:august/components/tile/onboardTile/major_tile.dart';
+import 'package:august/const/font/font.dart';
 import 'package:august/login/login.dart';
 import 'package:august/provider/department_provider.dart';
 import 'package:flutter/material.dart';
@@ -219,11 +220,8 @@ class _MajorPageState extends State<MajorPage> {
                 if (widget.onboard == true) SizedBox(height: 10),
                 Text(
                   widget.onboard ? "Select Major" : "Change Major",
-                  style: TextStyle(
-                    fontSize: 35,
-                    color: Theme.of(context).colorScheme.outline,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AugustFont.head3(
+                      color: Theme.of(context).colorScheme.outline),
                 ),
                 SizedBox(height: 20),
                 Padding(
@@ -231,17 +229,16 @@ class _MajorPageState extends State<MajorPage> {
                   child: Text(
                     "Selected Semester is used for\nCourse search, and Schedule Creation.",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: AugustFont.head4(color: Colors.grey),
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.only(
                       top: 15.0, bottom: 15.0, left: 10.0, right: 10.0),
                   child: AnimatedTextField(
+                      style: AugustFont.textField(
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
                       animationType: Animationtype.typer,
                       cursorColor: Theme.of(context).colorScheme.outline,
                       controller: searchController,
@@ -254,9 +251,8 @@ class _MajorPageState extends State<MajorPage> {
                         'MATH',
                       ],
                       animationDuration: Duration(milliseconds: 500),
-                      hintTextStyle: const TextStyle(
+                      hintTextStyle: AugustFont.textField(
                         color: Colors.grey,
-                        overflow: TextOverflow.ellipsis,
                       ),
                       decoration: InputDecoration(
                         fillColor: Theme.of(context).colorScheme.primary,
@@ -357,10 +353,7 @@ class _MajorPageState extends State<MajorPage> {
                     children: [
                       Text(
                         'NEXT',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20),
+                        style: AugustFont.head2(color: Colors.white),
                       ),
                     ],
                   ),
@@ -384,10 +377,7 @@ class _MajorPageState extends State<MajorPage> {
                     children: [
                       Text(
                         'DONE',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20),
+                        style: AugustFont.head2(color: Colors.white),
                       ),
                     ],
                   ),

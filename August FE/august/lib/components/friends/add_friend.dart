@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:august/const/tile_color.dart';
+import 'package:august/const/colors/tile_color.dart';
 import 'package:flutter/material.dart';
 
 Widget animationFriend(Color color, String imagePath) {

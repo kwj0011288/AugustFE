@@ -1,10 +1,11 @@
 import 'dart:convert';
 
 import 'package:animated_hint_textfield/animated_hint_textfield.dart';
+import 'package:august/const/font/font.dart';
 import 'package:august/provider/courseprovider.dart';
 import 'package:august/components/tile/simple_course_tile.dart';
-import 'package:august/const/dark_theme.dart';
-import 'package:august/const/light_theme.dart';
+import 'package:august/const/theme/dark_theme.dart';
+import 'package:august/const/theme/light_theme.dart';
 import 'package:august/get_api/onboard/get_semester.dart';
 import 'package:august/onboard/semester.dart';
 import 'package:august/provider/semester_provider.dart';
@@ -281,20 +282,15 @@ class _EditSearchPageState extends State<EditSearchPage>
                       padding: const EdgeInsets.only(left: 20, top: 20),
                       child: Text(
                         'Search',
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: AugustFont.head3(
+                            color: Theme.of(context).colorScheme.outline),
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 23, bottom: 0),
                       child: Text(
                         formatSemester(widget.semester),
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: AugustFont.subText(color: Colors.grey),
                       ),
                     ),
                   ],
@@ -332,6 +328,9 @@ class _EditSearchPageState extends State<EditSearchPage>
                 padding: EdgeInsets.only(
                     top: 15.0, bottom: 10.0, left: 15.0, right: 15.0),
                 child: AnimatedTextField(
+                    style: AugustFont.textField(
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
                     controller: _keywordController,
                     animationType: Animationtype.typer,
                     cursorColor: Theme.of(context).colorScheme.outline,
@@ -344,9 +343,8 @@ class _EditSearchPageState extends State<EditSearchPage>
                       'KORA201 ',
                     ],
                     animationDuration: Duration(milliseconds: 500),
-                    hintTextStyle: const TextStyle(
+                    hintTextStyle: AugustFont.textField(
                       color: Colors.grey,
-                      overflow: TextOverflow.ellipsis,
                     ),
                     decoration: InputDecoration(
                       fillColor: Theme.of(context).colorScheme.primary,
@@ -410,12 +408,10 @@ class _EditSearchPageState extends State<EditSearchPage>
                                 builder: (context, semesterProvider, child) {
                                   return Text(
                                     'Recent',
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .outline,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
+                                    style: AugustFont.head2(
+                                      color:
+                                          Theme.of(context).colorScheme.outline,
+                                    ),
                                     textAlign: TextAlign.center,
                                   );
                                 },
@@ -429,9 +425,8 @@ class _EditSearchPageState extends State<EditSearchPage>
                             padding: const EdgeInsets.all(20.0),
                             child: Text(
                               'No recent searches',
-                              style: TextStyle(
+                              style: AugustFont.subText2(
                                 color: Theme.of(context).colorScheme.onSurface,
-                                fontSize: 16,
                               ),
                             ),
                           )
@@ -467,11 +462,11 @@ class _EditSearchPageState extends State<EditSearchPage>
                                       ),
                                       label: Text(
                                         _searchKeywords[index],
-                                        style: TextStyle(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .outline,
-                                            fontSize: 15),
+                                        style: AugustFont.chip(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outline,
+                                        ),
                                       ),
                                       onDeleted: () {
                                         _deleteSearchKeyword(_searchKeywords[
@@ -509,10 +504,9 @@ class _EditSearchPageState extends State<EditSearchPage>
                     return Center(
                       child: Text(
                         'No courses found.\nPlease try another keyword.',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.outline,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold),
+                        style: AugustFont.head2(
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     );

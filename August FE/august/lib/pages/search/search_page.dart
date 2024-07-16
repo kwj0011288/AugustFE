@@ -1,5 +1,7 @@
 import 'package:animated_hint_textfield/animated_hint_textfield.dart';
 import 'package:august/components/tile/search_tile.dart';
+import 'package:august/const/font/font.dart';
+import 'package:august/const/icons/icons.dart';
 import 'package:august/get_api/onboard/get_semester.dart';
 import 'package:august/get_api/search/simple_sections.dart';
 import 'package:august/onboard/semester.dart';
@@ -153,9 +155,7 @@ class _SearchPageState extends State<SearchPage>
                       children: [
                         Text(
                           'Search',
-                          style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
+                          style: AugustFont.head1(
                             color: Theme.of(context).colorScheme.outline,
                           ),
                         ),
@@ -169,14 +169,17 @@ class _SearchPageState extends State<SearchPage>
                               Consumer<SemesterProvider>(
                                 builder: (context, semesterProvider, child) {
                                   return Text(
-                                    formatSemester(semesterProvider.semester),
-                                    style: TextStyle(
-                                        fontSize: 15, color: Colors.grey),
-                                  );
+                                      formatSemester(semesterProvider.semester),
+                                      style: AugustFont.subText(
+                                        color: Colors.grey,
+                                      )
+                                      // style: TextStyle(
+                                      //     fontSize: 15, color: Colors.grey),
+                                      );
                                 },
                               ),
-                              const Icon(
-                                Icons.keyboard_arrow_right,
+                              Icon(
+                                AugustIcons.arrowRight,
                                 color: Colors.grey,
                                 size: 15,
                               ),
@@ -187,33 +190,15 @@ class _SearchPageState extends State<SearchPage>
                     ),
                   ),
                   Spacer(),
-                  // Padding(
-                  //   padding:
-                  //       const EdgeInsets.only(left: 15, right: 10, top: 15),
-                  //   child: GestureDetector(
-                  //     onTap: () {
-                  //       HapticFeedback.mediumImpact();
-                  //       Navigator.pop(context);
-                  //     },
-                  //     child: CircleAvatar(
-                  //       backgroundColor: Theme.of(context).colorScheme.primary,
-                  //       foregroundColor:
-                  //           Theme.of(context).colorScheme.background,
-                  //       child: Center(
-                  //         child: Icon(
-                  //           FeatherIcons.x,
-                  //           color: Theme.of(context).colorScheme.outline,
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
                 ],
               ),
               Padding(
                 padding: EdgeInsets.only(
                     top: 15.0, bottom: 15.0, left: 10.0, right: 10.0),
                 child: AnimatedTextField(
+                    style: AugustFont.textField(
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
                     animationType: Animationtype.typer,
                     cursorColor: Theme.of(context).colorScheme.outline,
                     controller: _keywordController,
@@ -226,9 +211,8 @@ class _SearchPageState extends State<SearchPage>
                       'KORA201 ',
                     ],
                     animationDuration: Duration(milliseconds: 500),
-                    hintTextStyle: const TextStyle(
+                    hintTextStyle: AugustFont.textField(
                       color: Colors.grey,
-                      overflow: TextOverflow.ellipsis,
                     ),
                     decoration: InputDecoration(
                       fillColor: Theme.of(context).colorScheme.primary,
@@ -245,7 +229,7 @@ class _SearchPageState extends State<SearchPage>
                         borderSide: BorderSide.none, // 둘레 색 없애기
                       ),
                       prefixIcon: Icon(
-                        FeatherIcons.search,
+                        AugustIcons.search,
                         size: 25.0,
                         color: Theme.of(context).colorScheme.outline,
                       ),
@@ -261,7 +245,7 @@ class _SearchPageState extends State<SearchPage>
                           });
                         },
                         icon: Icon(
-                          FeatherIcons.delete,
+                          AugustIcons.delete,
                           size: 20,
                           color: Theme.of(context).colorScheme.outline,
                         ),
@@ -291,12 +275,17 @@ class _SearchPageState extends State<SearchPage>
                                   builder: (context, semesterProvider, child) {
                                     return Text(
                                       'Recent',
-                                      style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .outline,
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold),
+                                      style: AugustFont.head2(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .outline,
+                                      ),
+                                      // style: TextStyle(
+                                      //     color: Theme.of(context)
+                                      //         .colorScheme
+                                      //         .outline,
+                                      //     fontSize: 20,
+                                      //     fontWeight: FontWeight.bold),
                                       textAlign: TextAlign.center,
                                     );
                                   },
@@ -310,11 +299,15 @@ class _SearchPageState extends State<SearchPage>
                               padding: const EdgeInsets.all(20.0),
                               child: Text(
                                 'No recent searches',
-                                style: TextStyle(
+                                style: AugustFont.subText2(
                                   color:
                                       Theme.of(context).colorScheme.onSurface,
-                                  fontSize: 16,
                                 ),
+                                // style: TextStyle(
+                                //   color:
+                                //       Theme.of(context).colorScheme.onSurface,
+                                //   fontSize: 16,
+                                // ),
                               ),
                             )
                           else
@@ -349,11 +342,16 @@ class _SearchPageState extends State<SearchPage>
                                         ),
                                         label: Text(
                                           _searchKeywords[index],
-                                          style: TextStyle(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .outline,
-                                              fontSize: 15),
+                                          style: AugustFont.chip(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .outline,
+                                          ),
+                                          // style: TextStyle(
+                                          //     color: Theme.of(context)
+                                          //         .colorScheme
+                                          //         .outline,
+                                          //     fontSize: 15),
                                         ),
                                         onDeleted: () {
                                           _deleteSearchKeyword(_searchKeywords[
@@ -391,10 +389,9 @@ class _SearchPageState extends State<SearchPage>
                       return Center(
                         child: Text(
                           'No courses found.\nPlease try another keyword.',
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.outline,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold),
+                          style: AugustFont.head2(
+                            color: Theme.of(context).colorScheme.outline,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       );

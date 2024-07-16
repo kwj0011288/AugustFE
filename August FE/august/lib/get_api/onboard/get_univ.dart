@@ -5,11 +5,12 @@ class Institution {
   final int id; // ID 속성 추가
   final String fullName;
   final String nickname;
-
+  final String logo;
   Institution({
     required this.id, // ID를 필수 인자로 추가
     required this.fullName,
     required this.nickname,
+    required this.logo,
   });
 
   // Factory constructor for creating an instance from a map
@@ -18,6 +19,7 @@ class Institution {
       id: json['id'], // JSON에서 id를 읽어옴
       fullName: json['full_name'],
       nickname: json['nickname'],
+      logo: json['logo'],
     );
   }
 }

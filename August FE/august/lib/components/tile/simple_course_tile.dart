@@ -1,8 +1,9 @@
 import 'package:august/components/home/button.dart';
+import 'package:august/const/font/font.dart';
 import 'package:august/provider/course_color_provider.dart';
 import 'package:august/const/colors/modify_color.dart';
-import 'package:august/const/dark_theme.dart';
-import 'package:august/const/light_theme.dart';
+import 'package:august/const/theme/dark_theme.dart';
+import 'package:august/const/theme/light_theme.dart';
 import 'package:flutter/material.dart';
 import '../../get_api/timetable/class.dart';
 import 'package:provider/provider.dart';
@@ -54,12 +55,12 @@ class _ClassTileState extends State<SimepleCourseTile> {
   Widget seatButton(String text, Color buttonColor, final VoidCallback onTap) {
     TextStyle buttonTextStyle = TextStyle(
       // Define your text style here
-      fontSize: 9.5,
+      fontSize: 10,
       fontWeight: FontWeight.bold,
     );
 
     double textWidth = calculateTextWidth(text, buttonTextStyle, context);
-    double buttonWidth = textWidth; // Add some padding to the text width
+    double buttonWidth = textWidth - 20; // Add some padding to the text width
 
     return Container(
       width: buttonWidth,
@@ -73,14 +74,12 @@ class _ClassTileState extends State<SimepleCourseTile> {
         child: InkWell(
           onTap: onTap,
           child: Container(
-            child: Center(
+            padding: EdgeInsets.only(left: 5),
+            child: Align(
+              alignment: Alignment.centerLeft,
               child: Text(
                 text,
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w400,
-                ),
+                style: AugustFont.captionSmall(color: Colors.black),
               ),
             ),
           ),
@@ -128,10 +127,7 @@ class _ClassTileState extends State<SimepleCourseTile> {
                   padding: const EdgeInsets.only(left: 5),
                   child: Text(
                     widget.sectionCode,
-                    style: TextStyle(
-                        fontSize: 17,
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold),
+                    style: AugustFont.searchedTitle(color: Colors.black),
                   ),
                 ),
                 subtitle: Padding(
@@ -146,9 +142,8 @@ class _ClassTileState extends State<SimepleCourseTile> {
                           maxLines: 1, // 최대 라인을 한 줄로 제한합니다.
                           overflow:
                               TextOverflow.ellipsis, // 긴 텍스트는 ...으로 생략되게 합니다.
-                          style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black), // 원하는 스타일을 적용합니다.
+                          style: AugustFont.searchedCourseTitle(
+                              color: Colors.black),
                         ),
                       ),
                       SizedBox(
@@ -158,10 +153,7 @@ class _ClassTileState extends State<SimepleCourseTile> {
                         padding: const EdgeInsets.only(left: 5),
                         child: Text(
                           widget.instructorName,
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold),
+                          style: AugustFont.searchedProf(color: Colors.black),
                         ),
                       ),
                       SizedBox(
@@ -171,10 +163,7 @@ class _ClassTileState extends State<SimepleCourseTile> {
                         padding: const EdgeInsets.only(left: 5),
                         child: Text(
                           widget.meetingTimes,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.black,
-                          ),
+                          style: AugustFont.searchedTime(color: Colors.black),
                         ),
                       ),
                       Padding(

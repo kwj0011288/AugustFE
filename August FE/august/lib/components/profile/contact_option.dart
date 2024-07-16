@@ -1,3 +1,4 @@
+import 'package:august/const/font/font.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -235,12 +236,10 @@ class _PopupMenuContentState extends State<PopupMenuContent>
                                   ),
                                   Text(
                                     'Fill from Contacts',
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .outline,
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.normal),
+                                    style: AugustFont.subText3(
+                                      color:
+                                          Theme.of(context).colorScheme.outline,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -277,12 +276,10 @@ class _PopupMenuContentState extends State<PopupMenuContent>
                                   ),
                                   Text(
                                     'Open Photos',
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .outline,
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.normal),
+                                    style: AugustFont.subText3(
+                                      color:
+                                          Theme.of(context).colorScheme.outline,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -323,12 +320,10 @@ class _PopupMenuContentState extends State<PopupMenuContent>
                                   ),
                                   Text(
                                     'Default',
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .outline,
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.normal),
+                                    style: AugustFont.subText3(
+                                      color:
+                                          Theme.of(context).colorScheme.outline,
+                                    ),
                                   ),
                                 ],
                               ),

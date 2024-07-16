@@ -1,7 +1,7 @@
 import 'package:august/provider/course_color_provider.dart';
 import 'package:august/provider/friends_provider.dart';
-import 'package:august/const/dark_theme.dart';
-import 'package:august/const/light_theme.dart';
+import 'package:august/const/theme/dark_theme.dart';
+import 'package:august/const/theme/light_theme.dart';
 import 'package:august/get_api/onboard/get_department.dart';
 import 'package:august/login/initialpage.dart';
 import 'package:august/login/login.dart';
@@ -47,7 +47,7 @@ void main() async {
     await prefs.remove('contactPhoto');
     await prefs.remove('codeExpires');
     await prefs.remove('invitationCode');
-    //await prefs.clear();
+    // await prefs.clear();
   } else {
     preloadedSemesters = ["Error"];
     departments = ["Error"];

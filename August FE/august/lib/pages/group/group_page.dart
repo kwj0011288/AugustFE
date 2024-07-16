@@ -1,10 +1,8 @@
-import 'dart:convert';
 import 'package:august/components/home/button.dart';
+import 'package:august/const/font/font.dart';
+import 'package:august/const/icons/icons.dart';
 import 'package:august/provider/course_color_provider.dart';
 import 'package:august/const/colors/modify_color.dart';
-import 'package:august/const/dark_theme.dart';
-import 'package:august/const/light_theme.dart';
-import 'package:august/get_api/onboard/get_semester.dart';
 import 'package:august/pages/group/group_search_page.dart';
 import 'package:august/pages/main/wizard_page.dart';
 import 'package:august/provider/semester_provider.dart';
@@ -14,8 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../get_api/timetable/class.dart';
 import '../../get_api/timetable/add_course_to_group.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import "package:flutter_feather_icons/flutter_feather_icons.dart";
 import 'package:flutter/material.dart' hide ModalBottomSheetRoute;
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
@@ -79,7 +75,7 @@ class _GroupPageState extends State<GroupPage> {
                 padding: const EdgeInsets.only(left: 5),
                 child: Center(
                   child: Icon(
-                    Icons.arrow_back_ios,
+                    AugustIcons.backButton,
                     size: 15,
                     color: Theme.of(context).colorScheme.outline,
                   ),
@@ -238,10 +234,8 @@ class _GroupPageState extends State<GroupPage> {
                 padding: const EdgeInsets.only(left: 20, bottom: 0),
                 child: Text(
                   'Group',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AugustFont.head3(
+                      color: Theme.of(context).colorScheme.outline),
                 ),
               ),
               Expanded(
@@ -252,10 +246,8 @@ class _GroupPageState extends State<GroupPage> {
                         padding: const EdgeInsets.only(left: 22, bottom: 10),
                         child: Text(
                           'Add at least one course in each class block.\nOne course will be selected out of each block,\nthen we will create all possible schedules,\nbased on the selections you made.',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.normal,
-                          ),
+                          style: AugustFont.captionNormal(
+                              color: Theme.of(context).colorScheme.outline),
                         ),
                       ),
                     ),
@@ -283,10 +275,7 @@ class _GroupPageState extends State<GroupPage> {
                                                 .colorScheme
                                                 .shadow,
                                             blurRadius: 10,
-                                            offset: Offset(
-                                              4,
-                                              8,
-                                            ),
+                                            offset: Offset(4, 8),
                                           )
                                         ],
                                       ),
@@ -298,13 +287,9 @@ class _GroupPageState extends State<GroupPage> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            'Class Block ${entry.key + 1}',
-                                            style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black),
-                                          ),
+                                          Text('Class Block ${entry.key + 1}',
+                                              style: AugustFont.head4(
+                                                  color: Colors.black)),
                                           SizedBox(height: 5),
                                           Divider(
                                               thickness: 1, color: Colors.grey),
@@ -335,7 +320,7 @@ class _GroupPageState extends State<GroupPage> {
                                           _navigateToPage(entry.key);
                                         },
                                         icon: Icon(
-                                          FeatherIcons.plusSquare,
+                                          AugustIcons.addCourses,
                                           color: Colors.black,
                                           size: 20,
                                         ),
@@ -350,7 +335,7 @@ class _GroupPageState extends State<GroupPage> {
                                           _removeContainer(entry.key);
                                         },
                                         icon: Icon(
-                                          FeatherIcons.trash,
+                                          AugustIcons.deleteCourses,
                                           color: Colors.black,
                                           size: 20,
                                         ),

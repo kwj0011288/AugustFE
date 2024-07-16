@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:august/const/customwidget.dart';
-import 'package:august/const/stringwidget.dart';
+import 'package:august/const/customs/customwidget.dart';
+import 'package:august/const/customs/stringwidget.dart';
+import 'package:august/const/font/font.dart';
+import 'package:august/const/icons/icons.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sliding_number/sliding_number.dart';
 import 'package:august/components/home/button.dart';
@@ -11,7 +13,6 @@ import 'package:colorful_safe_area/colorful_safe_area.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 import 'dart:math' as math;
 import '../../get_api/timetable/class.dart';
 import '../../get_api/wizard/get_count.dart';
@@ -141,18 +142,14 @@ class _GeneratePageState extends State<GeneratePage> {
                 title: Text(
                   textAlign: TextAlign.center,
                   'Too many possibilities!',
-                  style: TextStyle(
-                      color: Theme.of(context).colorScheme.outline,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold),
+                  style: AugustFont.head2(
+                      color: Theme.of(context).colorScheme.outline),
                 ),
                 content: Text(
                   textAlign: TextAlign.center,
                   'Please adjust options to\nminimize the possibilities',
-                  style: TextStyle(
-                      color: Theme.of(context).colorScheme.outline,
-                      fontSize: 15,
-                      fontWeight: FontWeight.normal),
+                  style: AugustFont.subText2(
+                      color: Theme.of(context).colorScheme.outline),
                 ),
                 actions: <Widget>[
                   GestureDetector(
@@ -172,10 +169,7 @@ class _GeneratePageState extends State<GeneratePage> {
                         children: [
                           Text(
                             'OK',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20),
+                            style: AugustFont.head2(color: Colors.white),
                           ),
                         ],
                       ),
@@ -390,7 +384,7 @@ class _GeneratePageState extends State<GeneratePage> {
                 padding: const EdgeInsets.only(left: 5),
                 child: Center(
                   child: Icon(
-                    Icons.arrow_back_ios,
+                    AugustIcons.backButton,
                     size: 15,
                     color: Theme.of(context).colorScheme.outline,
                   ),
@@ -402,10 +396,7 @@ class _GeneratePageState extends State<GeneratePage> {
         titleSpacing: 0.0,
         title: Text(
           "Wizard",
-          style: TextStyle(
-              color: Theme.of(context).colorScheme.outline,
-              fontSize: 18,
-              fontWeight: FontWeight.bold),
+          style: AugustFont.head4(color: Theme.of(context).colorScheme.outline),
         ),
         actions: [
           Column(
@@ -460,20 +451,18 @@ class _GeneratePageState extends State<GeneratePage> {
                                 title: Text(
                                   textAlign: TextAlign.center,
                                   'More than 1000 Schedules Created!',
-                                  style: TextStyle(
-                                      color:
-                                          Theme.of(context).colorScheme.outline,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold),
+                                  style: AugustFont.head2(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .outline),
                                 ),
                                 content: Text(
                                   textAlign: TextAlign.center,
-                                  'Please Try to Adjust the Options to Minimize the Possibilities',
-                                  style: TextStyle(
-                                      color:
-                                          Theme.of(context).colorScheme.outline,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.normal),
+                                  'Please try to adjust the options to minimize the possibilities',
+                                  style: AugustFont.subText2(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .outline),
                                 ),
                                 actions: <Widget>[
                                   GestureDetector(
@@ -498,10 +487,8 @@ class _GeneratePageState extends State<GeneratePage> {
                                         children: [
                                           Text(
                                             'OK',
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 20),
+                                            style: AugustFont.head2(
+                                                color: Colors.white),
                                           ),
                                         ],
                                       ),
@@ -524,86 +511,122 @@ class _GeneratePageState extends State<GeneratePage> {
                               context: context,
                               builder: (BuildContext context) {
                                 return AlertDialog(
-                                    title: Text('No schedules created.'),
-                                    content: Text('Try to adjust the options.'),
-                                    actions: <Widget>[
-                                      TextButton(
-                                          child: Text(
-                                            'OK',
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          })
-                                    ]);
+                                  title: Text(
+                                    textAlign: TextAlign.center,
+                                    'No schedules created.',
+                                    style: AugustFont.head2(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .outline),
+                                  ),
+                                  content: Text(
+                                    textAlign: TextAlign.center,
+                                    'Please try to adjust the options to minimize the possibilities',
+                                    style: AugustFont.subText2(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .outline),
+                                  ),
+                                  actions: <Widget>[
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.of(context).pop(); // 팝업 닫기
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 30),
+                                        height: 55,
+                                        width:
+                                            MediaQuery.of(context).size.width -
+                                                80,
+                                        decoration: BoxDecoration(
+                                            color: Colors.redAccent,
+                                            borderRadius:
+                                                BorderRadius.circular(60)),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              'OK',
+                                              style: AugustFont.head2(
+                                                  color: Colors.white),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
                               });
                           return;
                         } else {
                           HapticFeedback.mediumImpact();
                           Navigator.pop(context);
 
-                          showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                    title: Text('Schedules Found'),
-                                    content: SingleChildScrollView(
-                                        // Make sure it's scrollable for long data
-                                        child: Text(jsonData.toString())),
-                                    actions: <Widget>[
-                                      TextButton(
-                                          child: Text('Copy',
-                                              style: TextStyle(
-                                                  color: Colors.black)),
-                                          onPressed: () {
-                                            Clipboard.setData(ClipboardData(
-                                                    text: jsonData.toString()))
-                                                .then((_) {
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(SnackBar(
-                                                      content: Text(
-                                                          'Data copied to clipboard!')));
-                                            });
-                                          }),
-                                      TextButton(
-                                          child: Text('Done',
-                                              style: TextStyle(
-                                                  color: Colors.black)),
-                                          onPressed: () {
-                                            Navigator.of(context)
-                                                .pop(); // Close the dialog
-                                            List<List<ScheduleList>>
-                                                fetchedCourses =
-                                                convertToGroupLists(
-                                                    fetchedRawData);
-                                            Navigator.push(
-                                                context,
-                                                CupertinoPageRoute(
-                                                    builder: (context) =>
-                                                        SelectPage(
-                                                          selectedCoursesData:
-                                                              fetchedCourses,
-                                                        )));
-                                          })
-                                    ]);
-                              });
+                          //   showDialog(
+                          //       context: context,
+                          //       builder: (BuildContext context) {
+                          //         return AlertDialog(
+                          //             title: Text('Schedules Found'),
+                          //             content: SingleChildScrollView(
+                          //                 // Make sure it's scrollable for long data
+                          //                 child: Text(jsonData.toString())),
+                          //             actions: <Widget>[
+                          //               TextButton(
+                          //                   child: Text('Copy',
+                          //                       style: TextStyle(
+                          //                           color: Colors.black)),
+                          //                   onPressed: () {
+                          //                     Clipboard.setData(ClipboardData(
+                          //                             text: jsonData.toString()))
+                          //                         .then((_) {
+                          //                       ScaffoldMessenger.of(context)
+                          //                           .showSnackBar(SnackBar(
+                          //                               content: Text(
+                          //                                   'Data copied to clipboard!')));
+                          //                     });
+                          //                   }),
+                          //               TextButton(
+                          //                   child: Text('Done',
+                          //                       style: TextStyle(
+                          //                           color: Colors.black)),
+                          //                   onPressed: () {
+                          //                     Navigator.of(context)
+                          //                         .pop(); // Close the dialog
+                          //                     List<List<ScheduleList>>
+                          //                         fetchedCourses =
+                          //                         convertToGroupLists(
+                          //                             fetchedRawData);
+                          //                     Navigator.push(
+                          //                         context,
+                          //                         CupertinoPageRoute(
+                          //                             builder: (context) =>
+                          //                                 SelectPage(
+                          //                                   selectedCoursesData:
+                          //                                       fetchedCourses,
+                          //                                 )));
+                          //                   })
+                          //             ]);
+                          //       });
+                          // }
+                          List<List<ScheduleList>> fetchedCourses =
+                              convertToGroupLists(fetchedRawData);
+
+                          HapticFeedback.mediumImpact();
+
+                          HapticFeedback.mediumImpact();
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => SelectPage(
+                                selectedCoursesData: fetchedCourses,
+                              ),
+                            ),
+                          );
                         }
-                        // List<List<ScheduleList>> fetchedCourses =
-                        //     convertToGroupLists(fetchedRawData);
-
-                        // HapticFeedback.mediumImpact();
-                        // Navigator.pop(context);
-
-                        // HapticFeedback.mediumImpact();
-                        // Navigator.push(
-                        //   context,
-                        //   CupertinoPageRoute(
-                        //       builder: (context) => SelectPage(
-                        //             selectedCoursesData: fetchedCourses,
-                        //             semesters: [],
-                        //           )),
-                        // );
                       } catch (e) {
                         HapticFeedback.mediumImpact();
                         Navigator.pop(context);
@@ -654,12 +677,10 @@ class _GeneratePageState extends State<GeneratePage> {
                                 animatedTexts: [
                                   TypewriterAnimatedText(
                                     "Calculating...",
-                                    textStyle: TextStyle(
-                                      color:
-                                          Theme.of(context).colorScheme.outline,
-                                      fontSize: 60,
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                    textStyle: AugustFont.scheduleLoading(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .outline),
                                     textAlign: TextAlign.center,
                                     speed: Duration(milliseconds: 100),
                                   ),
@@ -694,13 +715,10 @@ class _GeneratePageState extends State<GeneratePage> {
                                     CustomSlidingNumber(
                                       number: snapshot.data ?? 0,
                                       curve: Curves.linear,
-                                      style: TextStyle(
-                                        fontSize: 100,
-                                        fontWeight: FontWeight.w500,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .outline,
-                                      ),
+                                      style: AugustFont.scheduleCount(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outline),
                                     ),
                                   ],
                                 ),
@@ -717,10 +735,9 @@ class _GeneratePageState extends State<GeneratePage> {
                               padding: const EdgeInsets.only(top: 0),
                               child: Text(
                                 'SCHEDULES CREATED',
-                                style: TextStyle(
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: AugustFont.head1(
+                                    color:
+                                        Theme.of(context).colorScheme.outline),
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -740,11 +757,9 @@ class _GeneratePageState extends State<GeneratePage> {
                                 number: 1000,
                                 duration: const Duration(milliseconds: 1000),
                                 curve: Curves.easeOutQuint,
-                                style: TextStyle(
-                                  fontSize: 100,
-                                  fontWeight: FontWeight.w500,
-                                  color: Theme.of(context).colorScheme.outline,
-                                ),
+                                style: AugustFont.scheduleCount(
+                                    color:
+                                        Theme.of(context).colorScheme.outline),
                               ),
                             ),
                           ),
@@ -752,10 +767,8 @@ class _GeneratePageState extends State<GeneratePage> {
                             padding: const EdgeInsets.only(top: 0),
                             child: Text(
                               'SCHEDULES CREATED',
-                              style: TextStyle(
-                                fontSize: 25,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: AugustFont.head1(
+                                  color: Theme.of(context).colorScheme.outline),
                               textAlign: TextAlign.center,
                             ),
                           ),
@@ -765,7 +778,12 @@ class _GeneratePageState extends State<GeneratePage> {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
                         Navigator.pop(context);
                       });
-                      return Text('Error');
+                      return Text(
+                        'Error',
+                        style: AugustFont.head1(
+                            color: Theme.of(context).colorScheme.outline),
+                        textAlign: TextAlign.center,
+                      );
                     } else {
                       return Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -779,23 +797,22 @@ class _GeneratePageState extends State<GeneratePage> {
                                 number: snapshot.data ?? 0,
                                 duration: const Duration(milliseconds: 1000),
                                 curve: Curves.easeOutQuint,
-                                style: TextStyle(
-                                  fontSize: 100,
-                                  fontWeight: FontWeight.w500,
-                                  color: Theme.of(context).colorScheme.outline,
-                                ),
+                                style: AugustFont.scheduleCount(
+                                    color:
+                                        Theme.of(context).colorScheme.outline),
                               ),
                             ),
                           ),
                           Padding(
                             padding: const EdgeInsets.only(top: 0),
-                            child: Text(
-                              'SCHEDULES CREATED',
-                              style: TextStyle(
-                                fontSize: 25,
-                                fontWeight: FontWeight.bold,
+                            child: Center(
+                              child: Text(
+                                'SCHEDULES CREATED',
+                                style: AugustFont.head1(
+                                    color:
+                                        Theme.of(context).colorScheme.outline),
+                                textAlign: TextAlign.center,
                               ),
-                              textAlign: TextAlign.center,
                             ),
                           ),
                         ],
@@ -815,11 +832,9 @@ class _GeneratePageState extends State<GeneratePage> {
                       const EdgeInsets.only(left: 15, right: 15, bottom: 10),
                   child: Text(
                     'Calculating the number of possible timetables may take up to 30 seconds.',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey,
-                    ),
+                    style: AugustFont.captionSmall(
+                        color: Theme.of(context).colorScheme.outline),
+                    textAlign: TextAlign.center,
                   ),
                 ),
                 Padding(
@@ -849,20 +864,12 @@ class _GeneratePageState extends State<GeneratePage> {
                               children: <TextSpan>[
                                 TextSpan(
                                   text: 'Class starts at  ',
-                                  style: TextStyle(
-                                    fontFamily: 'Apple',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                    color: Colors.grey,
-                                  ),
+                                  style: AugustFont.head5(color: Colors.grey),
                                 ),
                                 TextSpan(
                                   text: formatForFirstSlider(Duration(
                                       minutes: _currentSliderValue1.round())),
-                                  style: TextStyle(
-                                    fontFamily: 'Apple',
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 20,
+                                  style: AugustFont.head2(
                                     color:
                                         Theme.of(context).colorScheme.outline,
                                   ),
@@ -915,31 +922,18 @@ class _GeneratePageState extends State<GeneratePage> {
                               children: <TextSpan>[
                                 TextSpan(
                                   text: 'Allow  ',
-                                  style: TextStyle(
-                                    fontFamily: 'Apple',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                    color: Colors.grey,
-                                  ),
+                                  style: AugustFont.head5(color: Colors.grey),
                                 ),
                                 TextSpan(
                                   text: _currentSliderValue4.round().toString(),
-                                  style: TextStyle(
-                                    fontFamily: 'Apple',
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 20,
+                                  style: AugustFont.head2(
                                     color:
                                         Theme.of(context).colorScheme.outline,
                                   ),
                                 ),
                                 TextSpan(
                                   text: '  lectures in a row',
-                                  style: TextStyle(
-                                    fontFamily: 'Apple',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                    color: Colors.grey,
-                                  ),
+                                  style: AugustFont.head5(color: Colors.grey),
                                 ),
                               ],
                             ),
@@ -987,22 +981,14 @@ class _GeneratePageState extends State<GeneratePage> {
                                   text: TextSpan(
                                     children: <TextSpan>[
                                       TextSpan(
-                                        text: 'Min. Break  :  ',
-                                        style: TextStyle(
-                                          fontFamily: 'Apple',
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 20,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
+                                          text: 'Min. Break  :  ',
+                                          style: AugustFont.head5(
+                                              color: Colors.grey)),
                                       TextSpan(
                                         text: formatDuration(Duration(
                                             minutes:
                                                 _currentSliderValue2.round())),
-                                        style: TextStyle(
-                                          fontFamily: 'Apple',
-                                          fontWeight: FontWeight.w800,
-                                          fontSize: 20,
+                                        style: AugustFont.head2(
                                           color: Theme.of(context)
                                               .colorScheme
                                               .outline,
@@ -1048,21 +1034,14 @@ class _GeneratePageState extends State<GeneratePage> {
                                     children: <TextSpan>[
                                       TextSpan(
                                         text: 'Max. Break  :  ',
-                                        style: TextStyle(
-                                          fontFamily: 'Apple',
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 20,
-                                          color: Colors.grey,
-                                        ),
+                                        style: AugustFont.head5(
+                                            color: Colors.grey),
                                       ),
                                       TextSpan(
                                         text: formatDurationInHours(Duration(
                                             minutes:
                                                 _currentSliderValue3.round())),
-                                        style: TextStyle(
-                                          fontFamily: 'Apple',
-                                          fontWeight: FontWeight.w800,
-                                          fontSize: 20,
+                                        style: AugustFont.head2(
                                           color: Theme.of(context)
                                               .colorScheme
                                               .outline,
@@ -1144,19 +1123,16 @@ class _GeneratePageState extends State<GeneratePage> {
                                               isButton2Pressed
                                                   ? 'Disallow'
                                                   : 'Allow',
-                                              style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .outline,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 18),
+                                              style: AugustFont.head2(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .outline,
+                                              ),
                                             ),
                                           ),
                                           Text(
                                             'One Class In a Day',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
+                                            style: AugustFont.subText(
                                               color: Theme.of(context)
                                                   .colorScheme
                                                   .outline,
@@ -1205,21 +1181,18 @@ class _GeneratePageState extends State<GeneratePage> {
                                                 isButton3Pressed
                                                     ? 'Only'
                                                     : 'All',
-                                                style: TextStyle(
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .outline,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 18),
+                                                style: AugustFont.head2(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .outline,
+                                                ),
                                               ),
                                             ),
                                             Text(
                                               isButton3Pressed
                                                   ? 'Open Section'
                                                   : "Available Section",
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
+                                              style: AugustFont.subText(
                                                 color: Theme.of(context)
                                                     .colorScheme
                                                     .outline,

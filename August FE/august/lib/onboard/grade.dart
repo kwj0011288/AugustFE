@@ -1,4 +1,5 @@
 import 'package:august/components/home/button.dart';
+import 'package:august/const/font/font.dart';
 import 'package:august/provider/courseprovider.dart';
 import 'package:august/components/tile/onboardTile/grade_tile.dart';
 import 'package:august/get_api/onboard/get_semester.dart';
@@ -217,11 +218,8 @@ class _GradePageState extends State<GradePage> {
                       if (widget.onboard == true) SizedBox(height: 10),
                       Text(
                         widget.onboard ? "Select Grade" : "Senior Yet?",
-                        style: TextStyle(
-                          fontSize: 35,
-                          color: Theme.of(context).colorScheme.outline,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: AugustFont.head3(
+                            color: Theme.of(context).colorScheme.outline),
                       ),
                       SizedBox(
                         height: 20,
@@ -229,11 +227,7 @@ class _GradePageState extends State<GradePage> {
                       Text(
                         "How much longer until I finish school?\nChoose your grade to get started",
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: AugustFont.head4(color: Colors.grey),
                       ),
                       SizedBox(height: 40),
                       Container(
@@ -293,10 +287,7 @@ class _GradePageState extends State<GradePage> {
                           children: [
                             Text(
                               'NEXT',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20),
+                              style: AugustFont.head2(color: Colors.white),
                             ),
                           ],
                         ),
@@ -320,10 +311,7 @@ class _GradePageState extends State<GradePage> {
                           children: [
                             Text(
                               'DONE',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20),
+                              style: AugustFont.head2(color: Colors.white),
                             ),
                           ],
                         ),

@@ -1,4 +1,5 @@
 import 'package:august/components/home/button.dart';
+import 'package:august/const/font/font.dart';
 import 'package:august/provider/courseprovider.dart';
 import 'package:august/components/tile/onboardTile/sem_tile.dart';
 import 'package:august/components/tile/onboardTile/univ_tile.dart';
@@ -123,11 +124,8 @@ class _SemesterPageState extends State<SemesterPage> {
               if (widget.onboard == true) SizedBox(height: 10),
               Text(
                 widget.onboard ? "Select Semester" : "Change Semester",
-                style: TextStyle(
-                  fontSize: 35,
-                  color: Theme.of(context).colorScheme.outline,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: AugustFont.head3(
+                    color: Theme.of(context).colorScheme.outline),
               ),
               SizedBox(height: 20),
               Padding(
@@ -135,11 +133,7 @@ class _SemesterPageState extends State<SemesterPage> {
                 child: Text(
                   "Selected Semester is used for\nCourse search, and Schedule Creation.",
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.grey,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AugustFont.head4(color: Colors.grey),
                 ),
               ),
               SizedBox(height: 40),
@@ -206,10 +200,7 @@ class _SemesterPageState extends State<SemesterPage> {
                     children: [
                       Text(
                         'NEXT',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20),
+                        style: AugustFont.head2(color: Colors.white),
                       ),
                     ],
                   ),
@@ -248,10 +239,7 @@ class _SemesterPageState extends State<SemesterPage> {
                     children: [
                       Text(
                         'DONE',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20),
+                        style: AugustFont.head2(color: Colors.white),
                       ),
                     ],
                   ),

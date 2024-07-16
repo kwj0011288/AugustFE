@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:august/login/load_institution.dart';
 import 'package:http/http.dart' as http;
 
 import '../timetable/class.dart';
@@ -7,14 +8,16 @@ import '../timetable/class.dart';
 class FetchClass {
   var data = [];
   List<CourseList> results = [];
+
   String fetchurl = "https://augustapp.one/sections/simple-sections/";
   Future<List<CourseList>> getClassList({
     required String semester,
     required String querytype,
     required String query,
   }) async {
+    int schoolId = await getSchoolId();
     var url = Uri.parse(
-        "$fetchurl?semester=$semester&querytype=$querytype&query=$query");
+        "$fetchurl?semester=$semester&querytype=$querytype&query=$query&institution_id=$schoolId");
     print('Request url: $url');
 
     var response = await http.get(url);
@@ -41,8 +44,9 @@ class FetchGroup {
     required String querytype,
     required String query,
   }) async {
+    int schoolId = await getSchoolId();
     var url = Uri.parse(
-        "$fetchurl?semester=$semester&querytype=$querytype&query=$query");
+        "$fetchurl?semester=$semester&querytype=$querytype&query=$query&institution_id=$schoolId");
     print('Request url: $url');
 
     var response = await http.get(url);

@@ -1,4 +1,5 @@
 import 'package:august/get_api/timetable/class.dart';
+import 'package:august/login/load_institution.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -11,16 +12,13 @@ class FetchCourse {
     required String semester,
     required String querytype,
     required String query,
-    int? institutionId,
   }) async {
     Map<String, String> queryParams = {}; // Add this line to define queryParams
 
-    if (institutionId != null) {
-      queryParams['institution_id'] = institutionId.toString();
-    }
+    int schoolId = await getSchoolId();
 
     var url = Uri.parse(
-        "$fetchurl?semester=$semester&querytype=$querytype&query=$query");
+        "$fetchurl?semester=$semester&querytype=$querytype&query=$query&institution_id=$schoolId");
     print('Request url: $url');
 
     var response = await http.get(url);

@@ -1,14 +1,19 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:august/login/load_institution.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 // 지원하는 모든 학기 목록을 가져오는 함수
 // 지원하는 모든 학기 목록을 가져오는 함수
+
 Future<List<String>> fetchAllSemesters() async {
-  final response =
-      await http.get(Uri.parse('https://augustapp.one/semesters/'));
+  // get school id
+  int schoolId = await getSchoolId();
+
+  final response = await http.get(
+      Uri.parse('https://augustapp.one/semesters/?institution_id=$schoolId'));
 
   if (response.statusCode == 200) {
     // Convert the list of int to a list of String

@@ -1,7 +1,7 @@
 import 'package:august/components/home/my_bottombar.dart';
 import 'package:august/components/profile/profile.dart';
-import 'package:august/const/device_util.dart';
-import 'package:august/const/save_image.dart';
+import 'package:august/const/device/device_util.dart';
+import 'package:august/const/customs/save_image.dart';
 import 'package:august/login/login.dart';
 import 'package:august/onboard/onboard.dart';
 import "package:flutter_feather_icons/flutter_feather_icons.dart";
@@ -162,6 +162,7 @@ class _HomePageState extends State<HomePage> {
           'fullname', userDetails.institution?.fullName ?? 'Unknown');
       await prefs.setString(
           'nickname', userDetails.institution?.nickname ?? 'Unknown');
+      await prefs.setString('logo', userDetails.institution?.logo ?? 'Unknown');
 
       await prefs.setString('userEmail', userDetails.email);
 
@@ -179,6 +180,7 @@ class _HomePageState extends State<HomePage> {
               userDetails.institution?.fullName ?? 'Unknown',
           'institution_nickname':
               userDetails.institution?.nickname ?? 'Unknown',
+          'logo': userDetails.institution?.logo ?? 'Unknown',
           'department_fullname': userDetails.department?.fullName ?? 'Unknown',
           'department_nickname': userDetails.department?.nickname ?? 'Unknown',
           'contactPhoto': userDetails.profileImage,

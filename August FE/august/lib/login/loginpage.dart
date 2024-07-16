@@ -165,7 +165,7 @@ class _LoginPageState extends State<LoginPage> {
                     hintText: "Enter Email",
                     hintStyle: TextStyle(
                       color: Colors.grey[400],
-                      fontFamily: 'Apple',
+                      fontFamily: 'Nanum',
                     ),
                   ),
                 ),
@@ -203,7 +203,7 @@ class _LoginPageState extends State<LoginPage> {
                         hintText: "Password",
                         hintStyle: TextStyle(
                           color: Colors.grey[400],
-                          fontFamily: 'Apple',
+                          fontFamily: 'Nanum',
                         ),
                         suffixIcon: IconButton(
                           icon:

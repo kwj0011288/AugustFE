@@ -41,15 +41,20 @@ class Institution {
   final int id;
   final String fullName;
   final String nickname;
+  final String logo;
 
   Institution(
-      {required this.id, required this.fullName, required this.nickname});
+      {required this.id,
+      required this.fullName,
+      required this.nickname,
+      required this.logo});
 
   factory Institution.fromJson(Map<String, dynamic> json) {
     return Institution(
       id: json['id'],
       fullName: json['full_name'],
       nickname: json['nickname'],
+      logo: json['inst_logo'] != null ? json['inst_logo'] : '',
     );
   }
 }

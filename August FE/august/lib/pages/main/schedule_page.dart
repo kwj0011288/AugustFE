@@ -2,14 +2,13 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
-import 'package:august/components/home/button.dart';
 import 'package:august/components/indicator/scrolling_dots_effect.dart';
 import 'package:august/components/indicator/smooth_page_indicator.dart';
 import 'package:august/components/home/loading.dart';
-import 'package:august/components/profile/profile.dart';
 import 'package:august/components/home/more.dart';
-import 'package:august/const/device_util.dart';
+import 'package:august/const/device/device_util.dart';
+import 'package:august/const/font/font.dart';
+import 'package:august/const/icons/icons.dart';
 import 'package:august/get_api/timetable/delete_timetable.dart';
 import 'package:august/get_api/timetable/edit_timetable.dart';
 import 'package:august/get_api/onboard/get_semester.dart';
@@ -17,10 +16,7 @@ import 'package:august/get_api/onboard/get_timetables.dart';
 import 'package:august/get_api/timetable/schedule.dart';
 import 'package:august/get_api/timetable/set_timetable_name.dart';
 import 'package:august/login/login.dart';
-import 'package:august/onboard/profile.dart';
 import 'package:august/onboard/semester.dart';
-import 'package:august/pages/gpa/gpa_page.dart';
-import 'package:august/pages/main/homepage.dart';
 import 'package:august/pages/search/search_page.dart';
 import 'package:august/provider/semester_provider.dart';
 import 'package:avatar_glow/avatar_glow.dart';
@@ -28,19 +24,14 @@ import 'package:colorful_safe_area/colorful_safe_area.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:pull_down_button/pull_down_button.dart';
 import '../../components/timetable/timetable.dart';
 import '../edit/edit_page.dart';
 import '../group/group_page.dart';
 import '../manual/manual_page.dart';
-import '../profile/me_page.dart';
 import "package:flutter_feather_icons/flutter_feather_icons.dart";
 import 'package:flutter/material.dart' hide ModalBottomSheetRoute;
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class SchedulePage extends StatefulWidget {
   SchedulePage({
@@ -265,23 +256,18 @@ class _SchedulePageState extends State<SchedulePage>
               children: <Widget>[
                 Text(
                   "Edit Timetable Name",
-                  style: TextStyle(
-                    fontSize: 25,
-                    color: Theme.of(context).colorScheme.outline,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AugustFont.head1(
+                      color: Theme.of(context).colorScheme.outline),
                 ),
                 const SizedBox(height: 10),
                 CupertinoTextField(
                   autofocus: true,
                   controller: nameController,
                   placeholder: "",
-                  placeholderStyle: TextStyle(
-                    color: Theme.of(context).colorScheme.outline,
-                  ),
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.outline,
-                  ),
+                  placeholderStyle: AugustFont.textField2(
+                      color: Theme.of(context).colorScheme.outline),
+                  style: AugustFont.textField2(
+                      color: Theme.of(context).colorScheme.outline),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.inversePrimary,
                     borderRadius: BorderRadius.circular(15),
@@ -456,11 +442,13 @@ class _SchedulePageState extends State<SchedulePage>
               if (value >= 7 && value < _timetableCollection.length) {
                 double scrollToPosition =
                     (value - 7) * 20.0; // '20.0'은 도트와 여백의 크기에 따라 조정해야 할 수 있습니다.
-                _dotIndicatorScrollController.animateTo(
-                  scrollToPosition,
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-                );
+                if (_dotIndicatorScrollController.hasClients) {
+                  _dotIndicatorScrollController.animateTo(
+                    scrollToPosition,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
+                }
               }
             },
             itemCount: _timetableCollection.length + 1,
@@ -509,9 +497,7 @@ class _SchedulePageState extends State<SchedulePage>
                                       "This schedule is for the friends and GPA page.",
                                       key: ValueKey<int>(
                                           1), // Unique key to trigger animation
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold,
+                                      style: AugustFont.captionSmallBold(
                                         color: Colors.grey,
                                       ),
                                     )
@@ -519,9 +505,7 @@ class _SchedulePageState extends State<SchedulePage>
                                       "Try to make this schedule the main one.             ",
                                       key: ValueKey<int>(
                                           2), // Unique key to trigger animation
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold,
+                                      style: AugustFont.captionSmallBold(
                                         color: Colors.grey,
                                       ),
                                     ),
@@ -658,8 +642,6 @@ class _SchedulePageState extends State<SchedulePage>
             );
             print("this is the order from the pageview $currentIndex");
             reorderTimetableIndex(serverIndex, timetableOrder);
-            // print(
-            //     "Index to change $serverIndex");
 
             currentIndexProv.setCurrentIndex(currentIndex);
           }
@@ -708,8 +690,7 @@ class _SchedulePageState extends State<SchedulePage>
                                 borderRadius: BorderRadius.circular(20)),
                             child: GestureDetector(
                               onTap: () {
-                                Navigator.pop(
-                                    context); // Close the bottom sheet
+                                Navigator.pop(context);
                                 Navigator.push(
                                     context,
                                     CupertinoPageRoute(
@@ -717,19 +698,19 @@ class _SchedulePageState extends State<SchedulePage>
                               },
                               child: Container(
                                 width: MediaQuery.of(context).size.width,
-                                height: 300, // 컨테이너의 높이 조정
+                                height: 300,
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 20),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: <Widget>[
-                                    const Text(
+                                    Text(
                                       'Pick Your Favorite!',
-                                      style: TextStyle(
-                                        fontSize: 25,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                      style: AugustFont.head1(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outline),
                                       textAlign: TextAlign.center,
                                     ),
                                     const SizedBox(height: 20),
@@ -772,19 +753,16 @@ class _SchedulePageState extends State<SchedulePage>
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.center,
                                               children: [
-                                                const Icon(FeatherIcons.layout,
+                                                Icon(AugustIcons.autoCreate,
                                                     size: 70,
                                                     color: Colors.blueAccent),
                                                 const SizedBox(height: 5),
                                                 Text(
                                                   'Auto\nGenerate',
-                                                  style: TextStyle(
-                                                    fontSize: 20,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .outline,
-                                                  ),
+                                                  style: AugustFont.head2(
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .outline),
                                                   textAlign: TextAlign.center,
                                                 ),
                                               ],
@@ -838,22 +816,18 @@ class _SchedulePageState extends State<SchedulePage>
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.center,
                                                 children: [
-                                                  const Icon(
-                                                    FeatherIcons.search,
+                                                  Icon(
+                                                    AugustIcons.manuallyCreate,
                                                     size: 70,
                                                     color: Colors.amberAccent,
                                                   ),
                                                   const SizedBox(height: 5),
                                                   Text(
                                                     'Manually\nCreate',
-                                                    style: TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .outline,
-                                                    ),
+                                                    style: AugustFont.head2(
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .outline),
                                                     textAlign: TextAlign.center,
                                                   ),
                                                 ],
@@ -871,8 +845,8 @@ class _SchedulePageState extends State<SchedulePage>
                         },
                       );
                     },
-                    icon: const Icon(
-                      FeatherIcons.plus,
+                    icon: Icon(
+                      AugustIcons.add,
                       size: 40,
                     ),
                     color: Colors.white, // 아이콘 색상 설정
@@ -884,20 +858,14 @@ class _SchedulePageState extends State<SchedulePage>
                 _timetableCollection.length > 1
                     ? 'Create More'
                     : 'Start Scheduling',
-                textAlign: TextAlign.center, // 텍스트를 가운데 정렬
-                style: TextStyle(
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.outline,
-                ),
+                textAlign: TextAlign.center,
+                style: AugustFont.head1(
+                    color: Theme.of(context).colorScheme.outline),
               ),
-              const Text(
-                'Create your schedules.\nTap the plus button to get started.',
-                textAlign: TextAlign.center, // 텍스트를 가운데 정렬
-                style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.normal,
-                    color: Colors.grey),
+              Text(
+                'Create your schedules\nTap the plus button to get started',
+                textAlign: TextAlign.center,
+                style: AugustFont.subText(color: Colors.grey),
               ),
             ],
           ),
@@ -935,12 +903,11 @@ class _SchedulePageState extends State<SchedulePage>
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(30),
                       bottomLeft: Radius.circular(30),
-                      // border: Border.all(color: Colors.white),
                     ),
                   ),
                   child: Center(
                     child: Icon(
-                      FeatherIcons.arrowLeft,
+                      AugustIcons.bottomLeft,
                       size: 12,
                     ),
                   ),
@@ -956,7 +923,7 @@ class _SchedulePageState extends State<SchedulePage>
             ),
             child: Center(
               child: SmoothPageIndicator(
-                controller: _pageController!,
+                controller: _pageController,
                 count: _timetableCollection.length + 1,
                 effect: ScrollingDotsEffect(
                     activeStrokeWidth: 2,
@@ -994,7 +961,7 @@ class _SchedulePageState extends State<SchedulePage>
                   ),
                   child: Center(
                     child: Icon(
-                      FeatherIcons.arrowRight,
+                      AugustIcons.bottomRight,
                       size: 12,
                     ),
                   ),
@@ -1047,11 +1014,8 @@ class _SchedulePageState extends State<SchedulePage>
                                       : _timetableCollection[currentIndex]
                                               .name ??
                                           "Schedule",
-                      style: TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.outline,
-                      ),
+                      style: AugustFont.head1(
+                          color: Theme.of(context).colorScheme.outline),
                     ),
                   ),
                 ],
@@ -1081,20 +1045,18 @@ class _SchedulePageState extends State<SchedulePage>
                   // Wrap child with a FadeTransition
                   return FadeTransition(opacity: animation, child: child);
                 },
-                // Wrap both Text and Icon in a Row to animate them together
+
                 child: Row(
-                  key: ValueKey<String>(
-                      semesterProvider.semester), // Key to trigger animation
-                  mainAxisSize: MainAxisSize
-                      .min, // Ensure the Row only takes necessary space
+                  key: ValueKey<String>(semesterProvider.semester),
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       formatSemester(semesterProvider.semester),
-                      style: const TextStyle(fontSize: 15, color: Colors.grey),
+                      style: AugustFont.subText(color: Colors.grey),
                     ),
                     if (formatSemester(semesterProvider.semester) != " ")
-                      const Icon(
-                        Icons.keyboard_arrow_right,
+                      Icon(
+                        AugustIcons.arrowRight,
                         color: Colors.grey,
                         size: 15,
                       ),
@@ -1121,11 +1083,8 @@ class _SchedulePageState extends State<SchedulePage>
         child: Center(
           child: Text(
             "${_timetableCollection.length.toString()} Schedules",
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.outline,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: AugustFont.mainPageCount(
+                color: Theme.of(context).colorScheme.outline),
           ),
         ),
       ),

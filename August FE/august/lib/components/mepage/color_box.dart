@@ -1,3 +1,4 @@
+import 'package:august/const/font/font.dart';
 import 'package:flutter/material.dart';
 
 class SelectColorWidget extends StatefulWidget {
@@ -53,9 +54,7 @@ class _SelectColorWidgetState extends State<SelectColorWidget> {
           child: Center(
             child: Text(
               widget.title,
-              style: TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
+              style: AugustFont.head3(
                 color: Colors.black,
               ),
               textAlign: TextAlign.center,

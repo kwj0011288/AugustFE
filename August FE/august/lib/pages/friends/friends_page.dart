@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:august/components/friends/add_friend.dart';
 import 'package:august/components/friends/number_box.dart';
+import 'package:august/const/font/font.dart';
 import 'package:august/provider/friends_provider.dart';
 import 'package:august/get_api/friends/delete_friend.dart';
 import 'package:august/get_api/friends/friends_sem.dart';
@@ -240,10 +241,8 @@ class _FriendsPageState extends State<FriendsPage>
           children: <Widget>[
             Text(
               "Invitation Code?",
-              style: TextStyle(
-                fontSize: 25,
+              style: AugustFont.head1(
                 color: Theme.of(context).colorScheme.outline,
-                fontWeight: FontWeight.bold,
               ),
             ),
             SizedBox(height: 15),
@@ -261,9 +260,7 @@ class _FriendsPageState extends State<FriendsPage>
                     placeholderStyle: TextStyle(
                       color: Theme.of(context).colorScheme.outline,
                     ),
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                    style: AugustFont.head2(
                       color: Theme.of(context).colorScheme.outline,
                     ),
                     decoration: BoxDecoration(
@@ -303,9 +300,7 @@ class _FriendsPageState extends State<FriendsPage>
                     ),
                     child: Text(
                       'Done',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                      style: AugustFont.head6(
                         color: Theme.of(context).colorScheme.outline,
                       ),
                     ),
@@ -456,15 +451,12 @@ class _FriendsPageState extends State<FriendsPage>
                         children: [
                           Text(
                             friends.length.toString() + ' Friends',
-                            style: TextStyle(
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.outline,
-                            ),
+                            style: AugustFont.head1(
+                                color: Theme.of(context).colorScheme.outline),
                           ),
                           Text(
                             'Are you an extrovert?',
-                            style: TextStyle(fontSize: 15, color: Colors.grey),
+                            style: AugustFont.subText(color: Colors.grey),
                           ),
                         ],
                       ),
@@ -511,10 +503,8 @@ class _FriendsPageState extends State<FriendsPage>
                           child: Center(
                             child: Text(
                               'My Code',
-                              style: TextStyle(
+                              style: AugustFont.head4(
                                 color: Theme.of(context).colorScheme.outline,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
@@ -553,12 +543,10 @@ class _FriendsPageState extends State<FriendsPage>
                                   child: Center(
                                     child: Text(
                                       isEdit ? 'Done' : 'Edit',
-                                      style: TextStyle(
-                                        fontSize: 15,
+                                      style: AugustFont.subText(
                                         color: Theme.of(context)
                                             .colorScheme
                                             .outline,
-                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ),
@@ -696,9 +684,7 @@ class _FriendsPageState extends State<FriendsPage>
                                             SizedBox(height: 10),
                                             Text(
                                               'Add Friends',
-                                              style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
+                                              style: AugustFont.head4(
                                                 color: Theme.of(context)
                                                     .colorScheme
                                                     .outline,
@@ -815,26 +801,66 @@ class _FriendsPageState extends State<FriendsPage>
                                                   SizedBox(height: 5),
                                                   Text(
                                                     friends[index].name,
-                                                    style: TextStyle(
-                                                      fontSize: 18,
+                                                    style: AugustFont.head6(
                                                       color: Theme.of(context)
                                                           .colorScheme
                                                           .outline,
-                                                      fontWeight:
-                                                          FontWeight.bold,
                                                     ),
                                                     maxLines: 1,
                                                     overflow:
                                                         TextOverflow.ellipsis,
                                                   ),
-                                                  Text(
-                                                    friends[index].department,
-                                                    style: TextStyle(
-                                                      fontSize: 12,
-                                                      color: Colors.grey,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Text(
+                                                        friends[index]
+                                                            .department,
+                                                        style: AugustFont
+                                                            .captionBold(
+                                                          color: Colors.grey,
+                                                        ),
+                                                      ),
+                                                      SizedBox(width: 5),
+                                                      Text(
+                                                        '|',
+                                                        style: AugustFont
+                                                            .captionSmall(
+                                                          color: Colors.grey,
+                                                        ),
+                                                      ),
+                                                      SizedBox(width: 5),
+                                                      Text(
+                                                        friends[index]
+                                                            .yearInSchool,
+                                                        style: AugustFont
+                                                            .captionBold(
+                                                          color: Colors.grey,
+                                                        ),
+                                                      ),
+                                                      SizedBox(width: 5),
+                                                      Text(
+                                                        '|',
+                                                        style: AugustFont
+                                                            .captionSmall(
+                                                          color: Colors.grey,
+                                                        ),
+                                                      ),
+                                                      SizedBox(width: 5),
+                                                      Text(
+                                                        friends[index]
+                                                            .yearInSchool,
+                                                        style: AugustFont
+                                                            .captionBold(
+                                                          color: Colors.grey,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ],
                                               ),
@@ -859,11 +885,9 @@ class _FriendsPageState extends State<FriendsPage>
                                                   ),
                                                   Text(
                                                     friends[index].name,
-                                                    style: TextStyle(
-                                                        fontSize: 20,
-                                                        color: Colors.black,
-                                                        fontWeight:
-                                                            FontWeight.bold),
+                                                    style: AugustFont.head6(
+                                                      color: Colors.black,
+                                                    ),
                                                     overflow:
                                                         TextOverflow.ellipsis,
                                                     maxLines: 1,
@@ -886,9 +910,7 @@ class _FriendsPageState extends State<FriendsPage>
                               children: [
                                 Text(
                                   'Wanna Invite Friends?',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
+                                  style: AugustFont.head2(
                                     color:
                                         Theme.of(context).colorScheme.outline,
                                   ),
@@ -914,9 +936,7 @@ class _FriendsPageState extends State<FriendsPage>
                                       child: Center(
                                         child: Text(
                                           'Click here to Add Friends',
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
+                                          style: AugustFont.head4(
                                             color: Theme.of(context)
                                                 .colorScheme
                                                 .outline,

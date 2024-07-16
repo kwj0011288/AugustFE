@@ -1,3 +1,4 @@
+import 'package:august/const/font/font.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bouncing_widgets/custom_bounce_widget.dart';
@@ -59,11 +60,8 @@ class _GradeTileState extends State<GradeTile> {
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Text(
                   widget.grade,
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Theme.of(context).colorScheme.outline,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AugustFont.head2(
+                      color: Theme.of(context).colorScheme.outline),
                 ),
               ),
             ],

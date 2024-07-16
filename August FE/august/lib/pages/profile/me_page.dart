@@ -8,6 +8,7 @@ import 'package:august/components/mepage/gpa_graph.dart';
 import 'package:august/components/mepage/info_box.dart';
 import 'package:august/components/mepage/premium.dart';
 import 'package:august/components/profile/profile.dart';
+import 'package:august/const/font/font.dart';
 import 'package:august/provider/course_color_provider.dart';
 import 'package:august/provider/friends_provider.dart';
 import 'package:august/get_api/gpa/gpa_courses.dart';
@@ -53,6 +54,7 @@ class _MypageState extends State<Mypage> {
   String _major = 'LTSC';
   String _schoolFullname = 'Unknown';
   String _schoolNickname = 'Unknown';
+  String _schoolLogo = 'Unknown';
   String _semester = 'Unknown';
   Uint8List? profilePhoto;
   String _email = 'Welcome to August';
@@ -197,6 +199,7 @@ class _MypageState extends State<Mypage> {
 
         _schoolFullname = result['fullname'] ?? _schoolFullname;
         _schoolNickname = result['nickname'] ?? _schoolNickname;
+        _schoolLogo = result['logo'] ?? _schoolLogo;
       });
 
       saveUserInfo(); // 상태를 업데이트한 후에 사용자 정보를 저장합니다.
@@ -269,10 +272,8 @@ class _MypageState extends State<Mypage> {
 
     // Wait for all fields to be loaded.
     while (!allFieldsLoaded()) {
-      await Future.delayed(
-          Duration(seconds: 1)); // Wait for 1 second before checking again.
-      prefs
-          .reload(); // Optionally reload preferences if they could be updated externally.
+      await Future.delayed(Duration(seconds: 1));
+      prefs.reload();
     }
 
     // Once all fields are loaded, assign them.
@@ -281,6 +282,7 @@ class _MypageState extends State<Mypage> {
     _major = prefs.getString('major') ?? 'LTSC';
     _schoolFullname = prefs.getString('fullname') ?? 'Unknown';
     _schoolNickname = prefs.getString('nickname') ?? 'Unknown';
+    _schoolLogo = prefs.getString('logo') ?? 'Unknown';
     _email = prefs.getString('userEmail') ?? _email;
 
     // Update the UI if necessary.
@@ -301,8 +303,7 @@ class _MypageState extends State<Mypage> {
   Widget buildButton(String text, Color buttonColor, final VoidCallback onTap) {
     TextStyle buttonTextStyle = TextStyle(
       // Define your text style here
-      fontSize: 16,
-      fontWeight: FontWeight.bold,
+      fontSize: 15,
     );
 
     double textWidth = calculateTextWidth(text, buttonTextStyle, context);
@@ -326,14 +327,10 @@ class _MypageState extends State<Mypage> {
               children: [
                 SizedBox(width: 5),
                 Center(
-                  child: Text(
-                    text,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
+                  child: Text(text,
+                      style: AugustFont.chip2(
+                        color: Colors.black,
+                      )),
                 ),
                 Icon(Icons.keyboard_arrow_right, color: Colors.black, size: 18)
               ],
@@ -370,11 +367,7 @@ class _MypageState extends State<Mypage> {
             child: Center(
               child: Text(
                 text,
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w400,
-                ),
+                style: AugustFont.chip2(color: Colors.black),
               ),
             ),
           ),
@@ -394,6 +387,7 @@ class _MypageState extends State<Mypage> {
 
   @override
   Widget build(BuildContext context) {
+    print('this is school logo $_schoolLogo');
     int friendsCount = Provider.of<FriendsProvider>(context).friendsCount;
     var colorProvider = Provider.of<CourseColorProvider>(context);
     return FutureBuilder(
@@ -443,18 +437,14 @@ class _MypageState extends State<Mypage> {
                               children: [
                                 Text(
                                   '$_username',
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .outline),
+                                  style: AugustFont.head2(
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
+                                  ),
                                 ), // Text Style if needed
                                 Text(
                                   "$_email",
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
+                                  style: AugustFont.captionNormal(
                                       color: Colors.grey),
                                 ), // Text Style if needed
                               ],
@@ -527,11 +517,8 @@ class _MypageState extends State<Mypage> {
                       children: [
                         Text(
                           "About Me",
-                          style: TextStyle(
-                            fontSize: 25,
-                            color: Theme.of(context).colorScheme.outline,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: AugustFont.head1(
+                              color: Theme.of(context).colorScheme.outline),
                         ),
                         SingleChildScrollView(
                           controller: ScrollController(),
@@ -549,7 +536,7 @@ class _MypageState extends State<Mypage> {
                                   },
                                   isSchool: true,
                                   isFrirend: false,
-                                  photo: 'assets/test/umd.png',
+                                  photo: "$_schoolLogo",
                                   info: "$_schoolNickname",
                                   subInfo: "$_schoolFullname",
                                 ),
@@ -563,107 +550,111 @@ class _MypageState extends State<Mypage> {
                                   subInfo: "${friendsCount} friends",
                                 ),
                                 SizedBox(width: 20),
-                                InfoWidget(
-                                  onTap: () =>
-                                      setState(() => isJustGPA = !isJustGPA),
-                                  isSchool: true,
-                                  isFrirend: false,
-                                  photo: 'assets/memoji/Memoji1.png',
-                                  info: isJustGPA ? "GPA" : "Total GPA",
-                                  subInfo: isJustGPA ? "0.00" : "3.33",
-                                  isIcon: true,
-                                ),
-                                SizedBox(width: 20),
-                                InfoWidget(
-                                  onTap: () => setState(
-                                      () => isJustCredit = !isJustCredit),
-                                  isSchool: true,
-                                  isFrirend: false,
-                                  photo: 'assets/memoji/Memoji1.png',
-                                  info:
-                                      isJustCredit ? "Credit" : "Total Credit",
-                                  subInfo: isJustCredit
-                                      ? "0 credits"
-                                      : "135 credits",
-                                  isIcon: true,
-                                ),
+                                // InfoWidget(
+                                //     onTap: () {},
+                                //     isSchool: false,
+                                //     info: "Courses",
+                                //     subInfo: '5 courses',
+                                //     photo: 'assets/icons/courses.png',
+                                //     isFrirend: false)
+                                // InfoWidget(
+                                //   onTap: () =>
+                                //       setState(() => isJustGPA = !isJustGPA),
+                                //   isSchool: true,
+                                //   isFrirend: false,
+                                //   photo: 'assets/memoji/Memoji1.png',
+                                //   info: isJustGPA ? "GPA" : "Total GPA",
+                                //   subInfo: isJustGPA ? "0.00" : "3.33",
+                                //   isIcon: true,
+                                // ),
+                                // SizedBox(width: 20),
+                                // InfoWidget(
+                                //   onTap: () => setState(
+                                //       () => isJustCredit = !isJustCredit),
+                                //   isSchool: true,
+                                //   isFrirend: false,
+                                //   photo: 'assets/memoji/Memoji1.png',
+                                //   info:
+                                //       isJustCredit ? "Credit" : "Total Credit",
+                                //   subInfo: isJustCredit
+                                //       ? "0 credits"
+                                //       : "135 credits",
+                                //   isIcon: true,
+                                // ),
                               ],
                             ),
                           ),
                         ),
-                        SizedBox(height: 10),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          child: Row(
-                            children: [
-                              Text(
-                                "GPA",
-                                style: TextStyle(
-                                  fontSize: 25,
-                                  color: Theme.of(context).colorScheme.outline,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Spacer(),
-                              GestureDetector(
-                                onTap: () {
-                                  checkAccessToken();
-                                  HapticFeedback.lightImpact();
-                                  Navigator.push(
-                                    context,
-                                    CupertinoPageRoute(
-                                      fullscreenDialog: true,
-                                      builder: (context) =>
-                                          GPAPage(semester: _semester),
-                                    ),
-                                  );
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.only(right: 10),
-                                  child: Container(
-                                    height: 30,
-                                    width: 50,
-                                    decoration: BoxDecoration(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Center(
-                                      child: Text('More',
-                                          style: TextStyle(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .outline,
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold)),
-                                    ),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              left: 10, right: 10, bottom: 10),
-                          child: GPAGraph(
-                            chartData: totalSemester
-                                .map((data) =>
-                                    GraphData(data.semester, data.grade))
-                                .toList(),
-                          ),
-                        ),
+                        // SizedBox(height: 10),
+                        // Padding(
+                        //   padding: const EdgeInsets.symmetric(vertical: 10),
+                        //   child: Row(
+                        //     children: [
+                        //       Text(
+                        //         "GPA",
+                        //         style: TextStyle(
+                        //           fontSize: 25,
+                        //           color: Theme.of(context).colorScheme.outline,
+                        //           fontWeight: FontWeight.bold,
+                        //         ),
+                        //       ),
+                        //       Spacer(),
+                        //       GestureDetector(
+                        //         onTap: () {
+                        //           checkAccessToken();
+                        //           HapticFeedback.lightImpact();
+                        //           Navigator.push(
+                        //             context,
+                        //             CupertinoPageRoute(
+                        //               fullscreenDialog: true,
+                        //               builder: (context) =>
+                        //                   GPAPage(semester: _semester),
+                        //             ),
+                        //           );
+                        //         },
+                        //         child: Padding(
+                        //           padding: const EdgeInsets.only(right: 10),
+                        //           child: Container(
+                        //             height: 30,
+                        //             width: 50,
+                        //             decoration: BoxDecoration(
+                        //               color:
+                        //                   Theme.of(context).colorScheme.primary,
+                        //               borderRadius: BorderRadius.circular(10),
+                        //             ),
+                        //             child: Center(
+                        //               child: Text('More',
+                        //                   style: TextStyle(
+                        //                       color: Theme.of(context)
+                        //                           .colorScheme
+                        //                           .outline,
+                        //                       fontSize: 15,
+                        //                       fontWeight: FontWeight.bold)),
+                        //             ),
+                        //           ),
+                        //         ),
+                        //       )
+                        //     ],
+                        //   ),
+                        // ),
+                        // Padding(
+                        //   padding: const EdgeInsets.only(
+                        //       left: 10, right: 10, bottom: 10),
+                        //   child: GPAGraph(
+                        //     chartData: totalSemester
+                        //         .map((data) =>
+                        //             GraphData(data.semester, data.grade))
+                        //         .toList(),
+                        //   ),
+                        // ),
                         SizedBox(height: 10),
                         //  PremiumWidget(),
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           child: Text(
                             "Course Colors ",
-                            style: TextStyle(
-                              fontSize: 25,
-                              color: Theme.of(context).colorScheme.outline,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: AugustFont.head1(
+                                color: Theme.of(context).colorScheme.outline),
                           ),
                         ),
                         CustomizeCourseColor(onTap: () {
@@ -683,11 +674,8 @@ class _MypageState extends State<Mypage> {
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           child: Text(
                             "Feedback",
-                            style: TextStyle(
-                              fontSize: 25,
-                              color: Theme.of(context).colorScheme.outline,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: AugustFont.head1(
+                                color: Theme.of(context).colorScheme.outline),
                           ),
                         ),
                         Column(
@@ -715,13 +703,10 @@ class _MypageState extends State<Mypage> {
                                       children: [
                                         Text(
                                           'Please send us Feedback',
-                                          style: TextStyle(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .outline,
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                          style: AugustFont.head2(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .outline),
                                         ),
                                         Icon(
                                           Icons.keyboard_arrow_right,

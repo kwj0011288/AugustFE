@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
-import 'package:august/get_api/onboard/get_semester.dart';
+import 'package:august/const/font/font.dart';
+import 'package:august/const/icons/icons.dart';
 import 'package:august/get_api/timetable/send_timetable.dart';
 import 'package:august/pages/main/homepage.dart';
 import 'package:august/pages/manual/manual_search_page.dart';
@@ -11,7 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import "package:flutter_feather_icons/flutter_feather_icons.dart";
 import 'package:flutter/material.dart' hide ModalBottomSheetRoute;
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import '../../components/home/button.dart';
@@ -160,7 +160,7 @@ class _ManualPageState extends State<ManualPage> {
                 padding: const EdgeInsets.only(left: 5),
                 child: Center(
                   child: Icon(
-                    Icons.arrow_back_ios,
+                    AugustIcons.backButton,
                     size: 15,
                     color: Theme.of(context).colorScheme.outline,
                   ),
@@ -180,7 +180,7 @@ class _ManualPageState extends State<ManualPage> {
                   textColor: Colors.white,
                   text: 'Create',
                   width: 70,
-                  height: 30,
+                  height: 35,
                   onTap: () async {
                     List<List<ScheduleList>> copiedCoursesData =
                         List.from(provider.selectedCoursesData);
@@ -227,10 +227,8 @@ class _ManualPageState extends State<ManualPage> {
                   padding: const EdgeInsets.only(left: 20),
                   child: Text(
                     'Manual',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: AugustFont.head3(
+                        color: Theme.of(context).colorScheme.outline),
                   ),
                 ),
                 Flexible(
@@ -300,7 +298,7 @@ class _ManualPageState extends State<ManualPage> {
                 shape: BoxShape.circle,
               ),
               child: IconButton(
-                icon: Icon(FeatherIcons.plus, size: 40),
+                icon: Icon(AugustIcons.add, size: 40),
                 color: Colors.white,
                 onPressed: _navigateToPage,
               ),

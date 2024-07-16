@@ -1,14 +1,14 @@
 import 'package:animated_hint_textfield/animated_hint_textfield.dart';
 import 'package:august/components/home/loading.dart';
+import 'package:august/const/font/font.dart';
+import 'package:august/const/icons/icons.dart';
 import 'package:august/get_api/onboard/get_semester.dart';
-import 'package:august/onboard/semester.dart';
 import 'package:august/provider/semester_provider.dart';
 import 'package:flutter/material.dart';
 import '../../get_api/timetable/class.dart';
 import '../../get_api/search/get_api.dart';
 import '../../components/tile/class_tile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import "package:flutter_feather_icons/flutter_feather_icons.dart";
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
@@ -144,20 +144,15 @@ class _GroupSearchPageState extends State<GroupSearchPage>
                     padding: const EdgeInsets.only(left: 20, top: 20),
                     child: Text(
                       'Search',
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: AugustFont.head3(
+                          color: Theme.of(context).colorScheme.outline),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 23, bottom: 0),
                     child: Text(
                       formatSemester(currentSemetser),
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: AugustFont.subText(color: Colors.grey),
                     ),
                   ),
                 ],
@@ -177,7 +172,7 @@ class _GroupSearchPageState extends State<GroupSearchPage>
                 ),
                 child: IconButton(
                   icon: Icon(
-                    Icons.close,
+                    AugustIcons.close,
                     color: Theme.of(context).colorScheme.outline,
                   ),
 
@@ -202,6 +197,9 @@ class _GroupSearchPageState extends State<GroupSearchPage>
                 padding: EdgeInsets.only(
                     top: 0.0, bottom: 10.0, left: 15.0, right: 15.0),
                 child: AnimatedTextField(
+                    style: AugustFont.textField(
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
                     animationType: Animationtype.typer,
                     cursorColor: Theme.of(context).colorScheme.outline,
                     controller: _keywordController,
@@ -214,9 +212,8 @@ class _GroupSearchPageState extends State<GroupSearchPage>
                       'KORA201 ',
                     ],
                     animationDuration: Duration(milliseconds: 500),
-                    hintTextStyle: const TextStyle(
+                    hintTextStyle: AugustFont.textField(
                       color: Colors.grey,
-                      overflow: TextOverflow.ellipsis,
                     ),
                     decoration: InputDecoration(
                       fillColor: Theme.of(context).colorScheme.primary,
@@ -234,7 +231,7 @@ class _GroupSearchPageState extends State<GroupSearchPage>
                       ),
                       hintText: 'Search Courses',
                       prefixIcon: Icon(
-                        FeatherIcons.search,
+                        AugustIcons.search,
                         size: 25.0,
                         color: Theme.of(context).colorScheme.outline,
                       ),
@@ -248,7 +245,7 @@ class _GroupSearchPageState extends State<GroupSearchPage>
                                 []; // Clear the list of found courses.
                           });
                         },
-                        icon: Icon(FeatherIcons.delete,
+                        icon: Icon(AugustIcons.delete,
                             size: 20,
                             color: Theme.of(context).colorScheme.outline),
                       ),
@@ -278,12 +275,10 @@ class _GroupSearchPageState extends State<GroupSearchPage>
                                 builder: (context, semesterProvider, child) {
                                   return Text(
                                     'Recent',
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .outline,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
+                                    style: AugustFont.head2(
+                                      color:
+                                          Theme.of(context).colorScheme.outline,
+                                    ),
                                     textAlign: TextAlign.center,
                                   );
                                 },
@@ -297,9 +292,8 @@ class _GroupSearchPageState extends State<GroupSearchPage>
                             padding: const EdgeInsets.all(20.0),
                             child: Text(
                               'No recent searches',
-                              style: TextStyle(
+                              style: AugustFont.subText2(
                                 color: Theme.of(context).colorScheme.onSurface,
-                                fontSize: 16,
                               ),
                             ),
                           )
@@ -335,18 +329,18 @@ class _GroupSearchPageState extends State<GroupSearchPage>
                                       ),
                                       label: Text(
                                         _searchKeywords[index],
-                                        style: TextStyle(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .outline,
-                                            fontSize: 15),
+                                        style: AugustFont.chip(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outline,
+                                        ),
                                       ),
                                       onDeleted: () {
                                         _deleteSearchKeyword(_searchKeywords[
                                             index]); // 삭제 아이콘 클릭 시 해당 검색어를 삭제합니다.
                                       },
                                       deleteIcon: Icon(
-                                        FeatherIcons.xCircle,
+                                        AugustIcons.chipDelete,
                                         size: 20,
                                         color: Theme.of(context)
                                             .colorScheme
@@ -374,10 +368,9 @@ class _GroupSearchPageState extends State<GroupSearchPage>
                     return Center(
                       child: Text(
                         'Error... Try to restart the app',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.outline,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold),
+                        style: AugustFont.head2(
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     );
@@ -386,10 +379,9 @@ class _GroupSearchPageState extends State<GroupSearchPage>
                     return Center(
                       child: Text(
                         'No courses found.\nPlease try another keyword.',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.outline,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold),
+                        style: AugustFont.head2(
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     );
@@ -501,25 +493,19 @@ class _GroupSearchPageState extends State<GroupSearchPage>
                                   builder: (BuildContext context) {
                                     return AlertDialog(
                                       title: Text(
-                                        textAlign: TextAlign.center,
-                                        '${course.courseCode} (ONLINE)',
-                                        style: TextStyle(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .outline,
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold),
-                                      ),
+                                          textAlign: TextAlign.center,
+                                          '${course.courseCode} (ONLINE)',
+                                          style: AugustFont.head2(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .outline)),
                                       content: Text(
-                                        textAlign: TextAlign.center,
-                                        'This course will not appear on the schedule.',
-                                        style: TextStyle(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .outline,
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.normal),
-                                      ),
+                                          textAlign: TextAlign.center,
+                                          'This course will not appear on the schedule.',
+                                          style: AugustFont.subText2(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .outline)),
                                       actions: <Widget>[
                                         GestureDetector(
                                           onTap: () {
@@ -546,11 +532,8 @@ class _GroupSearchPageState extends State<GroupSearchPage>
                                               children: [
                                                 Text(
                                                   'OK',
-                                                  style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 20),
+                                                  style: AugustFont.head2(
+                                                      color: Colors.white),
                                                 ),
                                               ],
                                             ),
@@ -562,7 +545,7 @@ class _GroupSearchPageState extends State<GroupSearchPage>
                                 );
                               }
                             },
-                            icon: FeatherIcons.plusCircle,
+                            icon: AugustIcons.addCoursetoGroup,
                             backgroundColor:
                                 Theme.of(context).colorScheme.background,
                             index: actualIndex,

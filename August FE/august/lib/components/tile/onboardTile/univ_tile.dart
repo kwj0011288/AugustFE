@@ -1,10 +1,12 @@
+import 'package:august/const/font/font.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bouncing_widgets/custom_bounce_widget.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class UniversityTile extends StatefulWidget {
   final String fullname;
   final String nickname;
+  final String logo;
   final VoidCallback onTap;
   final Color tileColor;
   final bool isShadow;
@@ -16,6 +18,7 @@ class UniversityTile extends StatefulWidget {
     required this.onTap,
     required this.tileColor,
     required this.isShadow,
+    required this.logo,
   }) : super(key: key);
 
   @override
@@ -25,9 +28,11 @@ class UniversityTile extends StatefulWidget {
 class _UniversityTileState extends State<UniversityTile> {
   @override
   Widget build(BuildContext context) {
+    print(widget.logo);
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 5),
       child: CustomBounceWidget(
+        isScrollable: true,
         onPressed: widget.onTap,
         duration: Duration(milliseconds: 100),
         child: Padding(
@@ -56,13 +61,14 @@ class _UniversityTileState extends State<UniversityTile> {
             ),
             child: Row(
               children: [
-                CircleAvatar(
-                  backgroundColor: Colors.white,
-                  maxRadius: 30,
-                  child: Image.asset(
-                    'assets/test/umd.png', // 'assets/icons/university.svg
-                    width: 30,
-                    height: 30,
+                SizedBox(width: 5),
+                ClipOval(
+                  child: CachedNetworkImage(
+                    width: 45,
+                    height: 45,
+                    imageUrl: widget.logo,
+                    placeholder: (context, url) => CircularProgressIndicator(),
+                    errorWidget: (context, url, error) => Icon(Icons.error),
                   ),
                 ),
                 SizedBox(width: 10),
@@ -72,19 +78,12 @@ class _UniversityTileState extends State<UniversityTile> {
                   children: [
                     Text(
                       widget.nickname,
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Theme.of(context).colorScheme.outline,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: AugustFont.head2(
+                          color: Theme.of(context).colorScheme.outline),
                     ),
                     Text(
                       widget.fullname,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: AugustFont.captionBold(color: Colors.grey),
                     ),
                   ],
                 ),

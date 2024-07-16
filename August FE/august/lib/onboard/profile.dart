@@ -1,27 +1,20 @@
 import 'dart:convert';
 import 'package:august/components/profile/contact_option.dart';
+import 'package:august/const/font/font.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:august/components/home/button.dart';
 import 'package:august/provider/courseprovider.dart';
 import 'package:august/login/login.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:flutter_native_contact_picker/flutter_native_contact_picker.dart'
-    as contact_picker;
 import 'dart:typed_data';
 import 'package:contacts_service/contacts_service.dart';
-import 'package:pull_down_button/pull_down_button.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
 import 'package:image_cropper/image_cropper.dart';
-import "package:flutter_feather_icons/flutter_feather_icons.dart";
-import 'package:flutter_popup/flutter_popup.dart';
 
 class NamePage extends StatefulWidget {
   final bool onboard;
@@ -261,11 +254,8 @@ class _NamePageState extends State<NamePage> {
                       if (widget.onboard == true) SizedBox(height: 50),
                       Text(
                         widget.onboard ? "Who Are You?" : "Change Your Profile",
-                        style: TextStyle(
-                          fontSize: 35,
-                          color: Theme.of(context).colorScheme.outline,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: AugustFont.head3(
+                            color: Theme.of(context).colorScheme.outline),
                       ),
                       SizedBox(height: 30),
                       Text(
@@ -273,11 +263,7 @@ class _NamePageState extends State<NamePage> {
                             ? "Set name and profile\nthat will be shown to others."
                             : "Change name and profile\nthat will be shown to others.",
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: AugustFont.head4(color: Colors.grey),
                       ),
                       SizedBox(height: 40),
                       Padding(
@@ -420,17 +406,11 @@ class _NamePageState extends State<NamePage> {
                           controller: _nameController,
                           padding: EdgeInsets.all(10),
                           placeholder: "Enter Your Name",
-                          placeholderStyle: TextStyle(
-                            fontSize: 40,
-                            fontWeight: FontWeight.bold,
+                          placeholderStyle: AugustFont.profileName(
                             color: Theme.of(context).colorScheme.inversePrimary,
-                            fontFamily: "Apple",
                           ),
-                          style: TextStyle(
-                            fontSize: 40,
-                            fontWeight: FontWeight.bold,
+                          style: AugustFont.profileName(
                             color: Theme.of(context).colorScheme.outline,
-                            fontFamily: "Apple",
                           ),
                           decoration: BoxDecoration(
                             color: Colors.transparent,
@@ -477,10 +457,7 @@ class _NamePageState extends State<NamePage> {
                           children: [
                             Text(
                               'NEXT',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20),
+                              style: AugustFont.head2(color: Colors.white),
                             ),
                           ],
                         ),
@@ -504,10 +481,7 @@ class _NamePageState extends State<NamePage> {
                           children: [
                             Text(
                               'DONE',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20),
+                              style: AugustFont.head2(color: Colors.white),
                             ),
                           ],
                         ),

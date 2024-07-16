@@ -1,3 +1,4 @@
+import 'package:august/const/font/font.dart';
 import 'package:flutter/material.dart';
 
 class Button extends StatelessWidget {
@@ -39,11 +40,7 @@ class Button extends StatelessWidget {
             child: Center(
               child: Text(
                 text,
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w400,
-                ),
+                style: AugustFont.button(color: textColor),
               ),
             ),
           ),

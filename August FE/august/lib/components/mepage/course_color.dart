@@ -1,3 +1,4 @@
+import 'package:august/const/font/font.dart';
 import 'package:august/provider/course_color_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -20,16 +21,14 @@ class _CustomizeCourseColorState extends State<CustomizeCourseColor> {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
         child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: 70.0, // Set the desired size
           decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: courseColorProvider.colors,
               stops: courseColorProvider.stops,
             ),
-            borderRadius: BorderRadius.circular(10),
             boxShadow: [
               BoxShadow(
                 color: Theme.of(context).colorScheme.shadow,
@@ -43,25 +42,33 @@ class _CustomizeCourseColorState extends State<CustomizeCourseColor> {
               ),
             ],
           ),
-          child: Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  'Customize Course Colors',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: 70,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Theme.of(context).colorScheme.primaryContainer,
+              ),
+              child: Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Customize Course Colors',
+                      style: AugustFont.head2(
+                          color: Theme.of(context).colorScheme.outline),
+                    ),
+                    Icon(
+                      Icons.keyboard_arrow_right,
+                      color: Theme.of(context).colorScheme.outline,
+                      size: 20,
+                    )
+                  ],
                 ),
-                Icon(
-                  Icons.keyboard_arrow_right,
-                  color: Colors.black,
-                  size: 20,
-                )
-              ],
+              ),
             ),
           ),
         ),

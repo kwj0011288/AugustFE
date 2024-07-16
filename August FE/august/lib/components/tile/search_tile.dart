@@ -1,7 +1,8 @@
+import 'package:august/const/font/font.dart';
 import 'package:august/provider/course_color_provider.dart';
 import 'package:august/const/colors/modify_color.dart';
-import 'package:august/const/dark_theme.dart';
-import 'package:august/const/light_theme.dart';
+import 'package:august/const/theme/dark_theme.dart';
+import 'package:august/const/theme/light_theme.dart';
 import 'package:flutter/material.dart';
 import '../../get_api/timetable/class.dart';
 import 'package:provider/provider.dart';
@@ -81,10 +82,7 @@ class _SearchTileState extends State<SearchTile> {
                       SizedBox(height: 2),
                       Text(
                         widget.sectionCode,
-                        style: TextStyle(
-                            fontSize: 17,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold),
+                        style: AugustFont.searchedTitle(color: Colors.black),
                       ),
                       SizedBox(height: 2),
                       Text(
@@ -93,20 +91,22 @@ class _SearchTileState extends State<SearchTile> {
                             : (widget.classes.name ?? ''),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 14, color: Colors.black),
+                        style:
+                            AugustFont.searchedCourseTitle(color: Colors.black),
                       ),
                       SizedBox(height: 2),
                       Text(
                         widget.instructorName,
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold),
+                        style: AugustFont.searchedProf(color: Colors.black),
+                        // style: TextStyle(
+                        //     fontSize: 16,
+                        //     color: Colors.black,
+                        //     fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 2),
                       Text(
                         widget.meetingTimes,
-                        style: TextStyle(fontSize: 12, color: Colors.black),
+                        style: AugustFont.searchedTime(color: Colors.black),
                       ),
                       SizedBox(height: 2),
                     ],
@@ -130,11 +130,7 @@ class _SearchTileState extends State<SearchTile> {
                         padding: const EdgeInsets.only(left: 5),
                         child: Text(
                           'Seats: ${widget.fullSeat}\nOpen: ${widget.openSeat}\nWaitlist: ${widget.waitlist}\nHoldfile: ${widget.holdfile}',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: AugustFont.searchedSeat(color: Colors.black),
                         ),
                       ),
                     ],

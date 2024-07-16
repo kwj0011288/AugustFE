@@ -2,11 +2,10 @@ import 'dart:convert';
 
 import 'package:animated_hint_textfield/animated_hint_textfield.dart';
 import 'package:august/components/tile/simple_course_tile.dart';
-import 'package:august/const/dark_theme.dart';
-import 'package:august/const/light_theme.dart';
+import 'package:august/const/font/font.dart';
+import 'package:august/const/icons/icons.dart';
 import 'package:august/get_api/onboard/get_semester.dart';
 import 'package:august/get_api/search/simple_sections.dart';
-import 'package:august/onboard/semester.dart';
 import 'package:august/provider/semester_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +16,6 @@ import '../../get_api/timetable/class.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../get_api/timetable/schedule.dart';
 import 'package:intl/intl.dart';
-import "package:flutter_feather_icons/flutter_feather_icons.dart";
 
 class ManualSearchPage extends StatefulWidget {
   final void Function(CourseList) onCourseSelected;
@@ -183,20 +181,15 @@ class _ManualSearchPageState extends State<ManualSearchPage>
                       padding: const EdgeInsets.only(left: 20, top: 20),
                       child: Text(
                         'Search',
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: AugustFont.head3(
+                            color: Theme.of(context).colorScheme.outline),
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 23, bottom: 0),
                       child: Text(
                         formatSemester(currentSemester),
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: AugustFont.subText(color: Colors.grey),
                       ),
                     ),
                   ],
@@ -212,7 +205,7 @@ class _ManualSearchPageState extends State<ManualSearchPage>
                     ),
                     child: IconButton(
                       icon: Icon(
-                        FeatherIcons.x,
+                        AugustIcons.close,
                         color: Theme.of(context).colorScheme.outline,
                       ),
 
@@ -234,6 +227,9 @@ class _ManualSearchPageState extends State<ManualSearchPage>
                 padding: EdgeInsets.only(
                     top: 15.0, bottom: 10.0, left: 15.0, right: 15.0),
                 child: AnimatedTextField(
+                    style: AugustFont.textField(
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
                     controller: _keywordController,
                     animationType: Animationtype.typer,
                     cursorColor: Theme.of(context).colorScheme.outline,
@@ -246,9 +242,8 @@ class _ManualSearchPageState extends State<ManualSearchPage>
                       'KORA201 ',
                     ],
                     animationDuration: Duration(milliseconds: 500),
-                    hintTextStyle: const TextStyle(
+                    hintTextStyle: AugustFont.textField(
                       color: Colors.grey,
-                      overflow: TextOverflow.ellipsis,
                     ),
                     decoration: InputDecoration(
                       fillColor: Theme.of(context).colorScheme.primary,
@@ -266,7 +261,7 @@ class _ManualSearchPageState extends State<ManualSearchPage>
                       ),
                       hintText: 'Search Course',
                       prefixIcon: Icon(
-                        FeatherIcons.search,
+                        AugustIcons.search,
                         size: 25.0,
                         color: Theme.of(context).colorScheme.outline,
                       ),
@@ -281,7 +276,7 @@ class _ManualSearchPageState extends State<ManualSearchPage>
                           });
                         },
                         icon: Icon(
-                          FeatherIcons.delete,
+                          AugustIcons.delete,
                           size: 20,
                           color: Theme.of(context).colorScheme.outline,
                         ),
@@ -312,12 +307,10 @@ class _ManualSearchPageState extends State<ManualSearchPage>
                                 builder: (context, semesterProvider, child) {
                                   return Text(
                                     'Recent',
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .outline,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
+                                    style: AugustFont.head2(
+                                      color:
+                                          Theme.of(context).colorScheme.outline,
+                                    ),
                                     textAlign: TextAlign.center,
                                   );
                                 },
@@ -331,9 +324,8 @@ class _ManualSearchPageState extends State<ManualSearchPage>
                             padding: const EdgeInsets.all(20.0),
                             child: Text(
                               'No recent searches',
-                              style: TextStyle(
+                              style: AugustFont.subText2(
                                 color: Theme.of(context).colorScheme.onSurface,
-                                fontSize: 16,
                               ),
                             ),
                           )
@@ -369,18 +361,18 @@ class _ManualSearchPageState extends State<ManualSearchPage>
                                       ),
                                       label: Text(
                                         _searchKeywords[index],
-                                        style: TextStyle(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .outline,
-                                            fontSize: 15),
+                                        style: AugustFont.chip(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outline,
+                                        ),
                                       ),
                                       onDeleted: () {
                                         _deleteSearchKeyword(_searchKeywords[
                                             index]); // 삭제 아이콘 클릭 시 해당 검색어를 삭제합니다.
                                       },
                                       deleteIcon: Icon(
-                                        FeatherIcons.xCircle,
+                                        AugustIcons.chipDelete,
                                         size: 20,
                                         color: Theme.of(context)
                                             .colorScheme
@@ -411,10 +403,9 @@ class _ManualSearchPageState extends State<ManualSearchPage>
                     return Center(
                       child: Text(
                         'No courses found.\nPlease try another keyword.',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.outline,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold),
+                        style: AugustFont.head2(
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     );
@@ -466,7 +457,7 @@ class _ManualSearchPageState extends State<ManualSearchPage>
                                       '', // Pass the section code
                                   instructorName: section.instructors?.first ??
                                       '', // Pass the first instructor's name
-                                  icon: FeatherIcons.plusCircle,
+                                  icon: AugustIcons.addCoursetoGroup,
                                   backgroundColor: Colors.white,
                                   index: courseIndex,
                                   onPressed: (context) {

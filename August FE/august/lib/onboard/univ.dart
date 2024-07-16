@@ -1,5 +1,6 @@
 import 'package:august/components/home/button.dart';
 import 'package:august/components/home/loading.dart';
+import 'package:august/const/font/font.dart';
 import 'package:august/provider/courseprovider.dart';
 import 'package:august/components/tile/onboardTile/univ_tile.dart';
 import 'package:august/get_api/onboard/get_semester.dart';
@@ -37,6 +38,7 @@ class _UnivPageState extends State<UnivPage> {
   String? _selectedSchoolFullname;
   String? _selectedSchoolNickname;
   int? _selectedSchoolIndex;
+  String? _selectedSchoolLogo;
   /* --- schoool list --- */
   List<Institution> schoolsList = []; // Updated to hold Institution objects
   List<Institution> filteredSchoolList = [];
@@ -96,6 +98,7 @@ class _UnivPageState extends State<UnivPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('fullname', _selectedSchoolFullname ?? '');
     prefs.setString('nickname', _selectedSchoolNickname ?? '');
+    prefs.setString('logo', _selectedSchoolLogo ?? '');
     if (_selectedSchoolIndex != null) {
       // id가 있을 경우에만 저장합니다.
       prefs.setInt('schoolId', _selectedSchoolIndex!);
@@ -110,6 +113,7 @@ class _UnivPageState extends State<UnivPage> {
       'fullname': _selectedSchoolFullname,
       'nickname': _selectedSchoolNickname,
       'id': _selectedSchoolIndex, // 사용자 정보에 id를 추가합니다.
+      'logo': _selectedSchoolLogo,
     };
     widget.onboard ? null : Navigator.pop(context, userInfo);
     int? userPk = await fetchUserPk();
@@ -144,6 +148,7 @@ class _UnivPageState extends State<UnivPage> {
         print('Selected School Fullname: $_selectedSchoolFullname');
         print('Selected School Nickname: $_selectedSchoolNickname');
         print('id: $_selectedSchoolIndex');
+        print('logo: $_selectedSchoolLogo');
       }
     });
   }
@@ -222,11 +227,8 @@ class _UnivPageState extends State<UnivPage> {
                   widget.onboard
                       ? "Select Your University"
                       : "Change Your University",
-                  style: TextStyle(
-                    fontSize: 35,
-                    color: Theme.of(context).colorScheme.outline,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AugustFont.head3(
+                      color: Theme.of(context).colorScheme.outline),
                 ),
                 SizedBox(
                   height: 20,
@@ -236,17 +238,16 @@ class _UnivPageState extends State<UnivPage> {
                   child: Text(
                     "Your university choice determines\ncourse availability.",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: AugustFont.head4(color: Colors.grey),
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.only(
                       top: 15.0, bottom: 15.0, left: 10.0, right: 10.0),
                   child: AnimatedTextField(
+                      style: AugustFont.textField(
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
                       animationType: Animationtype.typer,
                       cursorColor: Theme.of(context).colorScheme.outline,
                       controller: searchController,
@@ -258,9 +259,8 @@ class _UnivPageState extends State<UnivPage> {
                         'UCB',
                       ],
                       animationDuration: Duration(milliseconds: 500),
-                      hintTextStyle: const TextStyle(
+                      hintTextStyle: AugustFont.textField(
                         color: Colors.grey,
-                        overflow: TextOverflow.ellipsis,
                       ),
                       decoration: InputDecoration(
                         fillColor: Theme.of(context).colorScheme.primary,
@@ -298,6 +298,7 @@ class _UnivPageState extends State<UnivPage> {
                             itemCount: filteredSchoolList.length,
                             itemBuilder: (BuildContext context, int index) {
                               return UniversityTile(
+                                logo: filteredSchoolList[index].logo,
                                 fullname: filteredSchoolList[index].fullName,
                                 nickname: filteredSchoolList[index].nickname,
                                 tileColor: _selectedSchoolFullname ==
@@ -319,6 +320,8 @@ class _UnivPageState extends State<UnivPage> {
                                           filteredSchoolList[index].nickname;
                                       _selectedSchoolIndex =
                                           filteredSchoolList[index].id;
+                                      _selectedSchoolLogo =
+                                          filteredSchoolList[index].logo;
                                     },
                                   );
                                 },
@@ -358,10 +361,7 @@ class _UnivPageState extends State<UnivPage> {
                     children: [
                       Text(
                         'NEXT',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20),
+                        style: AugustFont.head2(color: Colors.white),
                       ),
                     ],
                   ),
@@ -385,10 +385,7 @@ class _UnivPageState extends State<UnivPage> {
                     children: [
                       Text(
                         'DONE',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20),
+                        style: AugustFont.head2(color: Colors.white),
                       ),
                     ],
                   ),

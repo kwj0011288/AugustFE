@@ -1,3 +1,4 @@
+import 'package:august/const/font/font.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bouncing_widgets/custom_bounce_widget.dart';
@@ -28,6 +29,7 @@ class _MajorTileState extends State<MajorTile> {
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 5),
       child: CustomBounceWidget(
+        isScrollable: true,
         onPressed: widget.onTap,
         duration: Duration(milliseconds: 100),
         child: Padding(
@@ -60,19 +62,12 @@ class _MajorTileState extends State<MajorTile> {
               children: [
                 Text(
                   widget.nickname,
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Theme.of(context).colorScheme.outline,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AugustFont.head2(
+                      color: Theme.of(context).colorScheme.outline),
                 ),
                 Text(
                   widget.fullname,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AugustFont.captionBold(color: Colors.grey),
                 ),
               ],
             ),

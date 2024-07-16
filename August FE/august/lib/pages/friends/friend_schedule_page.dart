@@ -4,7 +4,8 @@ import 'dart:math';
 import 'package:august/components/friends/friend_button.dart';
 import 'package:august/components/home/loading.dart';
 import 'package:august/components/timetable/timetable.dart';
-import 'package:august/const/tile_color.dart';
+import 'package:august/const/colors/tile_color.dart';
+import 'package:august/const/font/font.dart';
 import 'package:august/get_api/friends/friend_table.dart';
 import 'package:august/get_api/friends/friends_sem.dart';
 import 'package:august/get_api/friends/hangout.dart';
@@ -78,12 +79,6 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
     await checkAccessToken();
     print('token refreshed');
 
-    // Assuming `selectedSemester` and `loadTimetable` logic is correctly handled elsewhere and available here
-    // if (selectedSemester != null) {
-    //   loadTimetable(widget.friendId!, selectedSemester!);
-    //   _loadHangout(selectedSemester!);
-    // }
-
     _loadSemesters();
   }
 
@@ -150,14 +145,39 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: Text("Error"),
-          content: Text(e.toString()),
+          title: Text(
+            "Can't load Friends Schedules",
+            style:
+                AugustFont.head2(color: Theme.of(context).colorScheme.outline),
+          ),
+          content: Text(
+            'Please restart the app',
+            style: AugustFont.subText2(
+                color: Theme.of(context).colorScheme.outline),
+          ),
           actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(ctx).pop();
+            GestureDetector(
+              onTap: () {
+                Navigator.of(context).pop(); // 팝업 닫기
               },
-              child: Text("OK"),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 30),
+                height: 55,
+                width: MediaQuery.of(context).size.width - 80,
+                decoration: BoxDecoration(
+                    color: Colors.redAccent,
+                    borderRadius: BorderRadius.circular(60)),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'OK',
+                      style: AugustFont.head2(color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -206,11 +226,8 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                         padding: const EdgeInsets.only(left: 0),
                         child: Text(
                           "Select Semester",
-                          style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.outline,
-                          ),
+                          style: AugustFont.head1(
+                              color: Theme.of(context).colorScheme.outline),
                         ),
                       ),
                       GestureDetector(
@@ -251,16 +268,13 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                             children: [
                               Text(
                                 formattedSemester,
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: isSelected
-                                        ? Theme.of(context).colorScheme.outline
-                                        : makeDarker(
-                                            Theme.of(context)
-                                                .colorScheme
-                                                .outline,
-                                            0.3)),
+                                style: AugustFont.head6(
+                                  color: isSelected
+                                      ? Theme.of(context).colorScheme.outline
+                                      : makeDarker(
+                                          Theme.of(context).colorScheme.outline,
+                                          0.3),
+                                ),
                               ),
                             ],
                           ),
@@ -353,9 +367,13 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                                       ),
                                     ),
                                     SizedBox(height: 5),
-                                    Text(widget.name,
-                                        style:
-                                            TextStyle(fontSize: 15)), // 이름 표시
+                                    Text(
+                                      widget.name,
+                                      style: AugustFont.subText(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outline),
+                                    ), // 이름 표시
                                   ],
                                 ),
                               ),
@@ -428,12 +446,10 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                                               ? formatSemester(
                                                   selectedSemester.toString())
                                               : '',
-                                          style: TextStyle(
-                                            fontSize: 18,
+                                          style: AugustFont.head2(
                                             color: Theme.of(context)
                                                 .colorScheme
                                                 .outline,
-                                            fontWeight: FontWeight.bold,
                                           ),
                                         ),
                                         Icon(
@@ -460,7 +476,7 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                                 schedule1 = true;
                                 schedule2 = false;
                               });
-                            }, Colors.white, FontWeight.bold, context),
+                            }, Colors.white, FontWeight.w800, context),
                             SizedBox(width: 10),
                             buildButton(
                                 'Hang out',
@@ -472,7 +488,7 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                                 schedule1 = false;
                                 schedule2 = true;
                               });
-                            }, Colors.white, FontWeight.bold, context),
+                            }, Colors.white, FontWeight.w800, context),
                           ],
                         ),
                       ),
@@ -491,9 +507,7 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                                     children: [
                                       Text(
                                         'This is ${widget.name}\'s schedule.',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold,
+                                        style: AugustFont.captionSmallBold(
                                           color: Colors.grey,
                                         ),
                                       ),
@@ -509,11 +523,10 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                                 : (chillLists.first.meetings == null)
                                     ? Column(
                                         children: [
+                                          SizedBox(height: 20),
                                           Text(
                                             'No chill time available',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
+                                            style: AugustFont.head4(
                                               color: Colors.grey,
                                             ),
                                           ),
@@ -524,9 +537,7 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                                                   const EdgeInsets.all(2.0),
                                               child: Text(
                                                 '.',
-                                                style: TextStyle(
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.bold,
+                                                style: AugustFont.subText(
                                                   color: Colors.grey,
                                                 ),
                                               ),
@@ -534,17 +545,13 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                                           ),
                                           Text(
                                             'Maybe',
-                                            style: TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold,
+                                            style: AugustFont.captionSmallBold(
                                               color: Colors.grey,
                                             ),
                                           ),
                                           Text(
                                             'you or ${widget.name} did not setup schedule yet?',
-                                            style: TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold,
+                                            style: AugustFont.captionSmallBold(
                                               color: Colors.grey,
                                             ),
                                           )
@@ -554,9 +561,7 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                                         children: [
                                           Text(
                                             '${widget.name} and you can hang out at these times!',
-                                            style: TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold,
+                                            style: AugustFont.captionSmallBold(
                                               color: Colors.grey,
                                             ),
                                           ),

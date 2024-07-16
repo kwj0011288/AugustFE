@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 import 'package:august/components/home/button.dart';
+import 'package:august/const/font/font.dart';
 import 'package:august/provider/courseprovider.dart';
 import 'package:august/components/timetable/timetable.dart';
 import 'package:august/get_api/timetable/edit_timetable.dart';
@@ -161,7 +162,7 @@ class _EditPageState extends State<EditPage> {
                   textColor: Colors.white,
                   text: 'Done',
                   width: 70,
-                  height: 30,
+                  height: 35,
                   onTap: () async {
                     sendAddedOrRemovedCourse();
                     Navigator.push(
@@ -187,10 +188,9 @@ class _EditPageState extends State<EditPage> {
                 Padding(
                   padding: const EdgeInsets.only(left: 20),
                   child: Text(
-                    "Edit ${widget.name}",
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
+                    "Edit \"${widget.name}\"",
+                    style: AugustFont.head3(
+                      color: Theme.of(context).colorScheme.outline,
                     ),
                   ),
                 ),

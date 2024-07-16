@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:august/components/home/button.dart';
 import 'package:august/components/timetable/timetable.dart';
+import 'package:august/const/font/font.dart';
+import 'package:august/const/icons/icons.dart';
 import 'package:august/get_api/onboard/get_semester.dart';
 import 'package:august/get_api/timetable/send_timetable.dart';
 import 'package:august/get_api/timetable/schedule.dart';
@@ -152,7 +154,7 @@ class _SelectPageState extends State<SelectPage> {
                 padding: const EdgeInsets.only(left: 5),
                 child: Center(
                   child: Icon(
-                    Icons.arrow_back_ios,
+                    AugustIcons.backButton,
                     size: 15,
                     color: Theme.of(context).colorScheme.outline,
                   ),
@@ -164,10 +166,7 @@ class _SelectPageState extends State<SelectPage> {
         titleSpacing: 0.0,
         title: Text(
           "Select Schedules",
-          style: TextStyle(
-              color: Theme.of(context).colorScheme.outline,
-              fontSize: 18,
-              fontWeight: FontWeight.bold),
+          style: AugustFont.head4(color: Theme.of(context).colorScheme.outline),
         ),
         actions: [
           Column(
@@ -192,18 +191,14 @@ class _SelectPageState extends State<SelectPage> {
                             title: Text(
                               textAlign: TextAlign.center,
                               '0 Schedules Selected',
-                              style: TextStyle(
-                                  color: Theme.of(context).colorScheme.outline,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold),
+                              style: AugustFont.head2(
+                                  color: Theme.of(context).colorScheme.outline),
                             ),
                             content: Text(
                               textAlign: TextAlign.center,
                               'Please select at least one schedule to create a timetable.',
-                              style: TextStyle(
-                                  color: Theme.of(context).colorScheme.outline,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.normal),
+                              style: AugustFont.subText2(
+                                  color: Theme.of(context).colorScheme.outline),
                             ),
                             actions: <Widget>[
                               GestureDetector(
@@ -224,10 +219,8 @@ class _SelectPageState extends State<SelectPage> {
                                     children: [
                                       Text(
                                         'OK',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 20),
+                                        style: AugustFont.head2(
+                                            color: Colors.white),
                                       ),
                                     ],
                                   ),
@@ -283,8 +276,7 @@ class _SelectPageState extends State<SelectPage> {
 
                         // sectionIds가 비어있지 않은 경우만 처리
                         if (sectionIds.isNotEmpty) {
-                          String timetableName =
-                              "Schedule"; // 사용자가 설정할 수 있는 타임테이블 이름
+                          String timetableName = "Schedule";
 
                           try {
                             // 현재 타임테이블을 서버에 전송
@@ -345,22 +337,18 @@ class _SelectPageState extends State<SelectPage> {
                                 child: Consumer<CoursesProvider>(
                                   builder: (context, provider, child) => Text(
                                     '${coursesData.length} ',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.normal,
-                                      fontSize: 80,
-                                      color:
-                                          Theme.of(context).colorScheme.outline,
-                                    ),
+                                    style: AugustFont.scheduleTotalCount(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .outline),
                                   ),
                                 ),
                               ),
                               Text(
                                 'NEW\nSCHEDULES',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 25,
-                                  color: Theme.of(context).colorScheme.outline,
-                                ),
+                                style: AugustFont.head1(
+                                    color:
+                                        Theme.of(context).colorScheme.outline),
                               ),
                               Spacer(),
                             ],
@@ -373,11 +361,8 @@ class _SelectPageState extends State<SelectPage> {
                       padding: const EdgeInsets.only(left: 40, bottom: 5),
                       child: Text(
                         "${currentPageIndex + 1} of ${coursesData.length} Schedules", // Display current timetable index
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.onBackground,
-                        ),
+                        style: AugustFont.head4(
+                            color: Theme.of(context).colorScheme.outline),
                       ),
                     ),
                     Expanded(
@@ -444,25 +429,17 @@ class _SelectPageState extends State<SelectPage> {
                                           TextSpan(
                                             text:
                                                 '${provider.addedCoursesCount}\n',
-                                            style: TextStyle(
-                                              fontFamily: 'Apple',
-                                              fontSize: 18,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .outline,
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                                            style: AugustFont.head2(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .outline),
                                           ),
                                           TextSpan(
                                             text: 'selected',
-                                            style: TextStyle(
-                                              fontFamily: 'Apple',
-                                              fontSize: 12,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .outline,
-                                              fontWeight: FontWeight.normal,
-                                            ),
+                                            style: AugustFont.subText2(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .outline),
                                           ),
                                         ],
                                       ),
@@ -550,18 +527,15 @@ class _SelectPageState extends State<SelectPage> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.center,
                                           children: [
-                                            Icon(Icons.check,
+                                            Icon(AugustIcons.check,
                                                 size: 100), // 아이콘 크기 조정
                                             Text(
                                               'Deselected',
                                               textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .outline,
-                                                fontSize: 25,
-                                                fontWeight: FontWeight.normal,
-                                              ),
+                                              style: AugustFont.head1(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .outline),
                                             ),
                                           ],
                                         ),
@@ -604,18 +578,15 @@ class _SelectPageState extends State<SelectPage> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.center,
                                           children: [
-                                            Icon(Icons.check,
+                                            Icon(AugustIcons.check,
                                                 size: 100), // 아이콘 크기 조정
                                             Text(
                                               'Selected',
                                               textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .outline,
-                                                fontSize: 25,
-                                                fontWeight: FontWeight.normal,
-                                              ),
+                                              style: AugustFont.head1(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .outline),
                                             ),
                                           ],
                                         ),
@@ -645,11 +616,7 @@ class _SelectPageState extends State<SelectPage> {
                                 isButtonClicked[currentPageIndex].value
                                     ? 'DESELECT'
                                     : 'SELECT',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: AugustFont.head2(color: Colors.white),
                               ),
                             ),
                             style: ButtonStyle(

@@ -1,3 +1,4 @@
+import 'package:august/const/font/font.dart';
 import 'package:august/get_api/onboard/get_semester.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -76,11 +77,8 @@ class _SemesterTileState extends State<SemesterTile> {
                   children: [
                     Text(
                       formatSemester(widget.semester),
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Theme.of(context).colorScheme.outline,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: AugustFont.head2(
+                          color: Theme.of(context).colorScheme.outline),
                     ),
                   ],
                 ),

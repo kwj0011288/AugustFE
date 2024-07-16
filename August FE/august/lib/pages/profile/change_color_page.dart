@@ -1,8 +1,9 @@
 import 'package:august/components/mepage/color_box.dart';
 import 'package:august/components/mepage/color_picker.dart';
+import 'package:august/const/font/font.dart';
 import 'package:august/provider/course_color_provider.dart';
 import 'package:august/components/timetable/timetable.dart';
-import 'package:august/const/course_color.dart';
+import 'package:august/const/colors/course_color.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -35,11 +36,8 @@ class _ChangeCourseColorPageState extends State<ChangeCourseColorPage> {
                 children: [
                   Text(
                     'Customize Course Color',
-                    style: TextStyle(
-                      fontSize: 25,
-                      color: Theme.of(context).colorScheme.outline,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: AugustFont.head1(
+                        color: Theme.of(context).colorScheme.outline),
                   ),
                   Spacer(),
                   Padding(
@@ -90,10 +88,7 @@ class _ChangeCourseColorPageState extends State<ChangeCourseColorPage> {
                     child: Center(
                       child: Text(
                         'Reset',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold),
+                        style: AugustFont.subText(color: Colors.white),
                       ),
                     ),
                   ),

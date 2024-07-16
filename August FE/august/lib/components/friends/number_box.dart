@@ -1,3 +1,4 @@
+import 'package:august/const/font/font.dart';
 import 'package:flutter/material.dart';
 
 class DigitBoxes extends StatelessWidget {
@@ -31,9 +32,8 @@ class DigitBoxes extends StatelessWidget {
           fit: BoxFit.scaleDown,
           child: Text(
             digit,
-            style: TextStyle(
-              fontSize: 30,
-              fontWeight: FontWeight.bold,
+            style: AugustFont.head3(
+              color: Theme.of(context).colorScheme.outline,
             ),
             textAlign: TextAlign.center,
           ),

@@ -73,14 +73,23 @@ dev_dependencies:
   sign_in_with_apple:
   lottie:
   custom_sliding_segmented_control:
+  cached_network_image:
 
 flutter:
   fonts:
-    - family: Apple
+    - family: Nanum
       fonts:
-        - asset: assets/fonts/SF-Pro-Rounded-Light.ttf
-        - asset: assets/fonts/SF-Pro-Rounded-Medium.ttf
-          weight: 200
+        - asset: assets/fonts/NanumSquareRoundEB.ttf
+          weight: 800  # Extra Bold
+        - asset: assets/fonts/NanumSquareRoundB.ttf
+          weight: 700  # Bold
+        - asset: assets/fonts/NanumSquareRoundL.ttf
+          weight: 300  # Light
+        - asset: assets/fonts/NanumSquareRoundR.ttf
+          weight: 400  # Regular
+
+        
+
   assets:
   - assets/icons/horizontal-bar.svg
   - assets/icons/memoji.png
@@ -90,10 +99,14 @@ flutter:
   - assets/icons/major.svg
   - assets/icons/univ.svg
   - assets/icons/profile.svg
+  - assets/icons/courses.png
   - assets/memoji/Memoji1.png
   - assets/memoji/Memoji2.png
   - assets/memoji/Memoji3.png
   - assets/memoji/Memoji4.png
+
+
+  # schools
   - assets/test/umd.png
 
   # season

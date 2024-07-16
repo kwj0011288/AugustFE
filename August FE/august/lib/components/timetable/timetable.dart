@@ -2,7 +2,8 @@
 import 'dart:math';
 
 import 'package:animations/animations.dart';
-import 'package:august/const/device_util.dart';
+import 'package:august/const/device/device_util.dart';
+import 'package:august/const/font/font.dart';
 import 'package:august/provider/course_color_provider.dart';
 import 'package:august/get_api/timetable/schedule.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
@@ -10,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-import '../../const/course_color.dart';
+import '../../const/colors/course_color.dart';
 
 import '../home/button.dart';
 import '../../provider/courseprovider.dart';
@@ -265,8 +266,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
           child: Text(
             schedule.sectionCode!,
             textAlign: TextAlign.center, // Center text horizontally
-            style: TextStyle(
-                fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black),
+            style: AugustFont.head6(color: Colors.black),
           ),
         ),
       );
@@ -280,10 +280,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
               children: <TextSpan>[
                 TextSpan(
                   text: formatMinutes(durationMinutes),
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 9.5,
-                      color: Colors.black),
+                  style: AugustFont.captionSmallBold3(color: Colors.black),
                 ),
               ],
             ),
@@ -297,10 +294,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
               children: <TextSpan>[
                 TextSpan(
                   text: formatMinutes(durationMinutes),
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 7,
-                      color: Colors.black),
+                  style: AugustFont.captionSmallBold2(color: Colors.black),
                 ),
               ],
             ),
@@ -316,10 +310,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
               children: <TextSpan>[
                 TextSpan(
                   text: schedule.sectionCode!,
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 9.5,
-                      color: Colors.black),
+                  style: AugustFont.captionSmallNormal1(color: Colors.black),
                 ),
               ],
             ),
@@ -327,15 +318,16 @@ class _SingleTimetableState extends State<SingleTimetable> {
         );
       } else if (height > 50 && !widget.isCustomizeColor) {
         children.addAll([
-          Text(schedule.sectionCode!,
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 9.5,
-                  color: Colors.black)),
-          Text('${schedule.instructors!.first}',
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-              style: TextStyle(fontSize: 10, color: Colors.black)),
+          Text(
+            schedule.sectionCode!,
+            style: AugustFont.captionSmallNormal1(color: Colors.black),
+          ),
+          Text(
+            '${schedule.instructors!.first}',
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+            style: AugustFont.captionSmallNormal2(color: Colors.black),
+          ),
           // Add other widgets specific to height > 20 condition
         ]);
       }
@@ -343,23 +335,27 @@ class _SingleTimetableState extends State<SingleTimetable> {
       if (height > 50 && dayIndex != null && !widget.isCustomizeColor) {
         children.add(
           Text(
-              '${schedule.meetings!.firstWhere((meeting) => meeting.days?.contains(week[dayIndex]) ?? false).building} ${schedule.meetings!.firstWhere((meeting) => meeting.days?.contains(week[dayIndex]) ?? false).room}',
-              style: TextStyle(fontSize: 10, color: Colors.black)),
+            '${schedule.meetings!.firstWhere((meeting) => meeting.days?.contains(week[dayIndex]) ?? false).building} ${schedule.meetings!.firstWhere((meeting) => meeting.days?.contains(week[dayIndex]) ?? false).room}',
+            style: AugustFont.captionSmallNormal1(color: Colors.black),
+          ),
         );
       } else if (dayIndex != null) {
         if (widget.isSelectpage) {
           children.addAll([
-            Text('${schedule.instructors!.first}',
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                style: TextStyle(fontSize: 10, color: Colors.black)),
+            Text(
+              '${schedule.instructors!.first}',
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              style: AugustFont.captionSmallNormal2(color: Colors.black),
+            ),
             // Add other widgets specific to height > 20 condition
           ]);
         } else {
           children.add(
             Text(
-                '${schedule.meetings!.firstWhere((meeting) => meeting.days?.contains(week[dayIndex]) ?? false).building} ${schedule.meetings!.firstWhere((meeting) => meeting.days?.contains(week[dayIndex]) ?? false).room}',
-                style: TextStyle(fontSize: 10, color: Colors.black)),
+              '${schedule.meetings!.firstWhere((meeting) => meeting.days?.contains(week[dayIndex]) ?? false).building} ${schedule.meetings!.firstWhere((meeting) => meeting.days?.contains(week[dayIndex]) ?? false).room}',
+              style: AugustFont.captionSmallNormal1(color: Colors.black),
+            ),
           );
         }
       }
@@ -455,9 +451,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                             Alignment.centerLeft, // 왼쪽 정렬
                                         child: Text(
                                           'Course',
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
+                                          style: AugustFont.subText5(
                                               color: Colors.black),
                                         ),
                                       ),
@@ -470,9 +464,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                             Alignment.centerLeft, // 왼쪽 정렬
                                         child: Text(
                                           '${schedule.sectionCode}',
-                                          style: TextStyle(
-                                              fontSize: 25,
-                                              fontWeight: FontWeight.bold,
+                                          style: AugustFont.head1(
                                               color: Colors.black),
                                         ),
                                       ),
@@ -485,9 +477,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                             Alignment.centerLeft, // 왼쪽 정렬
                                         child: Text(
                                           'Name',
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
+                                          style: AugustFont.subText5(
                                               color: Colors.black),
                                         ),
                                       ),
@@ -500,9 +490,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                             Alignment.centerLeft, // 왼쪽 정렬
                                         child: Text(
                                           '${schedule.name}',
-                                          style: TextStyle(
-                                              fontSize: 25,
-                                              fontWeight: FontWeight.bold,
+                                          style: AugustFont.head1(
                                               color: Colors.black),
                                         ),
                                       ),
@@ -515,9 +503,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                             Alignment.centerLeft, // 왼쪽 정렬
                                         child: Text(
                                           'Instructor',
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
+                                          style: AugustFont.subText5(
                                               color: Colors.black),
                                         ),
                                       ),
@@ -530,9 +516,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                             Alignment.centerLeft, // 왼쪽 정렬
                                         child: Text(
                                           '${schedule.instructors?.join(', ')}',
-                                          style: TextStyle(
-                                              fontSize: 25,
-                                              fontWeight: FontWeight.bold,
+                                          style: AugustFont.head1(
                                               color: Colors.black),
                                         ),
                                       ),
@@ -545,9 +529,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                             Alignment.centerLeft, // 왼쪽 정렬
                                         child: Text(
                                           'Time',
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
+                                          style: AugustFont.subText5(
                                               color: Colors.black),
                                         ),
                                       ),
@@ -560,9 +542,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                             Alignment.centerLeft, // 왼쪽 정렬
                                         child: Text(
                                           '${_formatTime(_parseTime(meeting.startTime ?? ''))} ~ ${_formatTime(_parseTime(meeting.endTime ?? ''))}',
-                                          style: TextStyle(
-                                              fontSize: 25,
-                                              fontWeight: FontWeight.bold,
+                                          style: AugustFont.head1(
                                               color: Colors.black),
                                         ),
                                       ),
@@ -575,9 +555,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                             Alignment.centerLeft, // 왼쪽 정렬
                                         child: Text(
                                           'Location',
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
+                                          style: AugustFont.subText5(
                                               color: Colors.black),
                                         ),
                                       ),
@@ -590,9 +568,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                             Alignment.centerLeft, // 왼쪽 정렬
                                         child: Text(
                                           '${meeting.building} ${meeting.room}',
-                                          style: TextStyle(
-                                              fontSize: 25,
-                                              fontWeight: FontWeight.bold,
+                                          style: AugustFont.head1(
                                               color: Colors.black),
                                         ),
                                       ),
@@ -605,9 +581,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                             Alignment.centerLeft, // 왼쪽 정렬
                                         child: Text(
                                           'Credit',
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
+                                          style: AugustFont.subText5(
                                               color: Colors.black),
                                         ),
                                       ),
@@ -620,11 +594,8 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                             Alignment.centerLeft, // 왼쪽 정렬
                                         child: Text(
                                           '${schedule.credits} credits',
-                                          style: TextStyle(
-                                            fontSize: 25,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black,
-                                          ),
+                                          style: AugustFont.head1(
+                                              color: Colors.black),
                                         ),
                                       ),
                                     ),
@@ -640,10 +611,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                                     .centerLeft, // 왼쪽 정렬
                                                 child: Text(
                                                   'Seats',
-                                                  style: TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                                  style: AugustFont.subText5(
                                                       color: Colors.black),
                                                 ),
                                               ),
@@ -656,10 +624,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                                     .centerLeft, // 왼쪽 정렬
                                                 child: Text(
                                                   '${schedule.seats}',
-                                                  style: TextStyle(
-                                                      fontSize: 25,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                                  style: AugustFont.head1(
                                                       color: Colors.black),
                                                 ),
                                               ),
@@ -677,10 +642,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                                     .centerLeft, // 왼쪽 정렬
                                                 child: Text(
                                                   'Open Seats',
-                                                  style: TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                                  style: AugustFont.subText5(
                                                       color: Colors.black),
                                                 ),
                                               ),
@@ -693,10 +655,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                                     .centerLeft, // 왼쪽 정렬
                                                 child: Text(
                                                   '${schedule.openSeats}',
-                                                  style: TextStyle(
-                                                      fontSize: 25,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                                  style: AugustFont.head1(
                                                       color: Colors.black),
                                                 ),
                                               ),
@@ -718,10 +677,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                                     .centerLeft, // 왼쪽 정렬
                                                 child: Text(
                                                   'Waitlist',
-                                                  style: TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                                  style: AugustFont.subText5(
                                                       color: Colors.black),
                                                 ),
                                               ),
@@ -734,10 +690,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                                     .centerLeft, // 왼쪽 정렬
                                                 child: Text(
                                                   '${schedule.waitlist}',
-                                                  style: TextStyle(
-                                                      fontSize: 25,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                                  style: AugustFont.head1(
                                                       color: Colors.black),
                                                 ),
                                               ),
@@ -759,10 +712,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                                     .centerLeft, // 왼쪽 정렬
                                                 child: Text(
                                                   'Holdfile',
-                                                  style: TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                                  style: AugustFont.subText5(
                                                       color: Colors.black),
                                                 ),
                                               ),
@@ -775,10 +725,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                                     .centerLeft, // 왼쪽 정렬
                                                 child: Text(
                                                   '${schedule.holdfile}',
-                                                  style: TextStyle(
-                                                      fontSize: 25,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                                  style: AugustFont.head1(
                                                       color: Colors.black),
                                                 ),
                                               ),
@@ -814,9 +761,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                               Alignment.centerLeft, // 왼쪽 정렬
                                           child: Text(
                                             'Date',
-                                            style: TextStyle(
-                                                fontSize: 25,
-                                                fontWeight: FontWeight.bold,
+                                            style: AugustFont.head7(
                                                 color: Colors.black),
                                           ),
                                         ),
@@ -829,9 +774,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                               Alignment.centerLeft, // 왼쪽 정렬
                                           child: Text(
                                             '$day',
-                                            style: TextStyle(
-                                                fontSize: 40,
-                                                fontWeight: FontWeight.bold,
+                                            style: AugustFont.friendTime(
                                                 color: Colors.black),
                                           ),
                                         ),
@@ -844,9 +787,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                               Alignment.centerLeft, // 왼쪽 정렬
                                           child: Text(
                                             'Total Time',
-                                            style: TextStyle(
-                                                fontSize: 25,
-                                                fontWeight: FontWeight.bold,
+                                            style: AugustFont.head7(
                                                 color: Colors.black),
                                           ),
                                         ),
@@ -859,9 +800,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                               Alignment.centerLeft, // 왼쪽 정렬
                                           child: Text(
                                             formatMinutes(durationMinutes),
-                                            style: TextStyle(
-                                                fontSize: 40,
-                                                fontWeight: FontWeight.bold,
+                                            style: AugustFont.friendTime(
                                                 color: Colors.black),
                                           ),
                                         ),
@@ -874,9 +813,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                               Alignment.centerLeft, // 왼쪽 정렬
                                           child: Text(
                                             'Duration',
-                                            style: TextStyle(
-                                                fontSize: 25,
-                                                fontWeight: FontWeight.bold,
+                                            style: AugustFont.head7(
                                                 color: Colors.black),
                                           ),
                                         ),
@@ -889,9 +826,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                               Alignment.centerLeft, // 왼쪽 정렬
                                           child: Text(
                                             '${_formatTime(_parseTime(meeting.startTime ?? ''))} ~\n${_formatTime(_parseTime(meeting.endTime ?? ''))}',
-                                            style: TextStyle(
-                                                fontSize: 40,
-                                                fontWeight: FontWeight.bold,
+                                            style: AugustFont.friendTime(
                                                 color: Colors.black),
                                             textAlign: TextAlign.center,
                                           ),

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:august/const/course_color.dart';
+import 'package:august/const/colors/course_color.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../get_api/timetable/schedule.dart';

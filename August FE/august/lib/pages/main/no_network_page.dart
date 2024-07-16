@@ -1,6 +1,7 @@
 import 'dart:convert';
-import 'package:august/const/dark_theme.dart';
-import 'package:august/const/light_theme.dart';
+import 'package:august/const/font/font.dart';
+import 'package:august/const/theme/dark_theme.dart';
+import 'package:august/const/theme/light_theme.dart';
 import 'package:august/get_api/timetable/schedule.dart';
 import 'package:august/login/initialpage.dart';
 import 'package:august/main.dart';
@@ -110,18 +111,13 @@ class _NoNetworkPageState extends State<NoNetworkPage> {
                         children: [
                           Text(
                             'Offline',
-                            style: TextStyle(
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.outline,
-                            ),
+                            style: AugustFont.head3(
+                                color: Theme.of(context).colorScheme.outline),
                           ),
                           Text(
                             'Please check your internet connection',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: AugustFont.subText(
+                                color: Theme.of(context).colorScheme.outline),
                           ),
                         ],
                       ),

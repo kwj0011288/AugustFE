@@ -1,5 +1,7 @@
 import 'package:august/components/mepage/stacked_photo.dart';
+import 'package:august/const/font/font.dart';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class InfoWidget extends StatefulWidget {
   final String info;
@@ -67,11 +69,28 @@ class _InfoWidgetState extends State<InfoWidget> {
                         child: Icon(Icons.grade),
                         backgroundColor: Colors.white,
                       )
-                    : CircleAvatar(
-                        maxRadius: 25,
-                        child: Image.asset(widget.photo),
-                        backgroundColor: Colors.white,
-                      ),
+                    : widget.isSchool
+                        ? ClipOval(
+                            child: CachedNetworkImage(
+                              width: 50,
+                              height: 50,
+                              imageUrl: widget.photo,
+                              progressIndicatorBuilder:
+                                  (context, url, downloadProgress) =>
+                                      CircularProgressIndicator(
+                                          value: downloadProgress.progress),
+                              errorWidget: (context, url, error) =>
+                                  CircleAvatar(
+                                maxRadius: 25,
+                                backgroundColor: Colors.white,
+                              ),
+                            ),
+                          )
+                        : CircleAvatar(
+                            maxRadius: 25,
+                            child: Image.asset(widget.photo),
+                            backgroundColor: Colors.white,
+                          ),
             SizedBox(
               height: 25,
             ),
@@ -79,10 +98,8 @@ class _InfoWidgetState extends State<InfoWidget> {
               children: [
                 Text(
                   widget.info,
-                  style: TextStyle(
-                    fontSize: 20,
+                  style: AugustFont.head2(
                     color: Theme.of(context).colorScheme.outline,
-                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 widget.isSchool
@@ -92,10 +109,8 @@ class _InfoWidgetState extends State<InfoWidget> {
             ),
             Text(
               widget.subInfo,
-              style: TextStyle(
-                fontSize: 12,
+              style: AugustFont.captionBold(
                 color: Colors.grey,
-                fontWeight: FontWeight.bold,
               ),
             ),
           ],

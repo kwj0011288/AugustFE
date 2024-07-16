@@ -1,3 +1,4 @@
+import 'package:august/const/font/font.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -240,12 +241,11 @@ class _PopupMenuContentState extends State<PopupMenuContent>
                                         ),
                                         Text(
                                           "Set as Main",
-                                          style: TextStyle(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .outline,
-                                              fontSize: 17,
-                                              fontWeight: FontWeight.normal),
+                                          style: AugustFont.subText3(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .outline,
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -270,10 +270,11 @@ class _PopupMenuContentState extends State<PopupMenuContent>
                                       ),
                                       Text(
                                         "This is Main",
-                                        style: TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 17,
-                                            fontWeight: FontWeight.normal),
+                                        style: AugustFont.subText3(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outline,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -305,12 +306,10 @@ class _PopupMenuContentState extends State<PopupMenuContent>
                                   ),
                                   Text(
                                     "Edit Schedule",
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .outline,
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.normal),
+                                    style: AugustFont.subText3(
+                                      color:
+                                          Theme.of(context).colorScheme.outline,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -343,12 +342,10 @@ class _PopupMenuContentState extends State<PopupMenuContent>
                                   ),
                                   Text(
                                     "Edit Name",
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .outline,
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.normal),
+                                    style: AugustFont.subText3(
+                                      color:
+                                          Theme.of(context).colorScheme.outline,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -384,12 +381,10 @@ class _PopupMenuContentState extends State<PopupMenuContent>
                                   ),
                                   Text(
                                     "Remove",
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .outline,
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.w600),
+                                    style: AugustFont.subText3(
+                                      color:
+                                          Theme.of(context).colorScheme.outline,
+                                    ),
                                   ),
                                 ],
                               ),
