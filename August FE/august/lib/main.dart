@@ -6,11 +6,8 @@ import 'package:august/get_api/onboard/get_department.dart';
 import 'package:august/login/initialpage.dart';
 import 'package:august/login/login.dart';
 import 'package:august/onboard/profile.dart';
-import 'package:august/onboard/semester.dart';
-import 'package:august/pages/profile/me_page.dart';
 import 'package:august/pages/main/no_network_page.dart';
 import 'package:august/pages/main/schedule_page.dart';
-import 'package:august/pages/main/wizard_page.dart';
 import 'package:august/provider/Institution_provider.dart';
 import 'package:august/provider/department_provider.dart';
 import 'package:august/provider/semester_provider.dart';
@@ -19,14 +16,14 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'provider/courseprovider.dart';
-import 'components/timetable/timetable.dart';
 import 'get_api/timetable/class_grouping.dart';
 import 'get_api/onboard/get_semester.dart';
-import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Add this line
+  MobileAds.instance.initialize();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool isOnline = await InternetConnectionChecker().hasConnection;
   List<String> preloadedSemesters;
@@ -47,7 +44,7 @@ void main() async {
     await prefs.remove('contactPhoto');
     await prefs.remove('codeExpires');
     await prefs.remove('invitationCode');
-    // await prefs.clear();
+    //await prefs.clear();
   } else {
     preloadedSemesters = ["Error"];
     departments = ["Error"];

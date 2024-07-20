@@ -4,7 +4,6 @@ import 'package:august/login/login.dart';
 import 'package:august/provider/department_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pull_down_button/pull_down_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:august/get_api/onboard/get_department.dart'; // Make sure this import is correct
 import "package:flutter_feather_icons/flutter_feather_icons.dart";
@@ -133,7 +132,7 @@ class _MajorPageState extends State<MajorPage> {
       return;
     }
 
-    if (_selectedMajorIndex != null && _selectedMajorIndex! >= 0) {
+    if (_selectedMajorIndex != null) {
       // 백그라운드에서 updateDepartment 호출
       Future<void> updateFuture =
           updateDepartment(userPk, _selectedMajorIndex!);

@@ -9,7 +9,6 @@ import 'package:august/get_api/timetable/send_timetable.dart';
 import 'package:august/get_api/timetable/schedule.dart';
 import 'package:august/pages/main/homepage.dart';
 import 'package:august/provider/semester_provider.dart';
-import 'package:card_swiper/card_swiper.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +32,6 @@ class _SelectPageState extends State<SelectPage> {
   int currentPageIndex = 0;
   late List<ValueNotifier<bool>> isButtonClicked;
   List<List<ScheduleList>> selectedCoursesData = [];
-  final SwiperController swiperController = SwiperController();
   final PageController pageController = PageController(viewportFraction: 0.90);
 
   List<List<ScheduleList>> coursesData = [];

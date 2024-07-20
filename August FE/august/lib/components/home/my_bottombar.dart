@@ -1,7 +1,6 @@
 import 'package:august/components/profile/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:google_nav_bar/google_nav_bar.dart';
 import "package:flutter_feather_icons/flutter_feather_icons.dart";
 import 'package:flutter_snake_navigationbar/flutter_snake_navigationbar.dart';
 

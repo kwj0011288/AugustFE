@@ -14,7 +14,8 @@ class DepartmentProvider with ChangeNotifier {
     try {
       List<String> loadedDepartments = await fetchDepartments();
       if (loadedDepartments.isNotEmpty) {
-        _departmentList = loadedDepartments;
+        _departmentList =
+            ["ID: -1, Undecided (UNDECIDED) "] + loadedDepartments;
         notifyListeners();
       } else {
         // Optionally handle the case where loaded data is empty but successful

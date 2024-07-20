@@ -1,6 +1,4 @@
 // ignore_for_file: prefer_const_constructors
-import 'dart:math';
-
 import 'package:animations/animations.dart';
 import 'package:august/const/device/device_util.dart';
 import 'package:august/const/font/font.dart';
@@ -15,11 +13,9 @@ import '../../const/colors/course_color.dart';
 
 import '../home/button.dart';
 import '../../provider/courseprovider.dart';
-import 'package:card_swiper/card_swiper.dart';
 
 class TimeTables extends StatelessWidget {
   final List<List<ScheduleList>> coursesData;
-  final SwiperController? swiperController;
   final PageController? pageController;
   final bool isSelectpage;
   String? name;
@@ -29,7 +25,6 @@ class TimeTables extends StatelessWidget {
   TimeTables({
     Key? key,
     required this.coursesData,
-    this.swiperController,
     this.pageController,
     this.isSelectpage = false,
     this.name,

@@ -1,22 +1,14 @@
-import 'package:august/components/home/button.dart';
 import 'package:august/const/font/font.dart';
-import 'package:august/provider/courseprovider.dart';
 import 'package:august/components/tile/onboardTile/sem_tile.dart';
-import 'package:august/components/tile/onboardTile/univ_tile.dart';
 import 'package:august/get_api/onboard/get_semester.dart';
 import 'package:august/login/login.dart';
 import 'package:august/pages/main/homepage.dart';
 import 'package:august/provider/semester_provider.dart';
-import 'package:cool_dropdown/models/cool_dropdown_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:pull_down_button/pull_down_button.dart';
 import "package:flutter_feather_icons/flutter_feather_icons.dart";
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
 
 class SemesterPage extends StatefulWidget {

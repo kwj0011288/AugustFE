@@ -12,7 +12,7 @@ ThemeData dartTheme = ThemeData(
     primaryContainer: Color(0xFF333333), // 타임테이블  색(2번째 어두움)
     primary: Color(0xFF4d4d4d), // 버튼 색 (3번째 어두움)
     secondary: Color(0xFF666666), // ??? 색 (4번째 어두움)
-    secondaryContainer: Color(0xFF808080), // ??? 색 (5번째 어두움)
+    secondaryContainer: Color.fromARGB(255, 117, 78, 78), // ??? 색 (5번째 어두움)
 
     ///////////
     inversePrimary: Color(0xFF666666),

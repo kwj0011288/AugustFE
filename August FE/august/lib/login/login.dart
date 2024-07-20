@@ -474,7 +474,7 @@ Future<void> updateDepartment(int userPk, int department) async {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $accessToken',
     },
-    body: jsonEncode({'department_id': department}),
+    body: jsonEncode({'department_id': (department != -1) ? department : null}),
   );
 
   if (response.statusCode == 200) {

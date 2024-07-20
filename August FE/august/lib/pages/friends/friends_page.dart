@@ -237,7 +237,6 @@ class _FriendsPageState extends State<FriendsPage>
         color: Theme.of(context).colorScheme.background,
         padding: EdgeInsets.all(20),
         child: Column(
-          mainAxisSize: MainAxisSize.max,
           children: <Widget>[
             Text(
               "Invitation Code?",
@@ -245,7 +244,7 @@ class _FriendsPageState extends State<FriendsPage>
                 color: Theme.of(context).colorScheme.outline,
               ),
             ),
-            SizedBox(height: 15),
+            SizedBox(height: 10),
             Row(
               children: [
                 Expanded(
@@ -257,12 +256,10 @@ class _FriendsPageState extends State<FriendsPage>
                     autofocus: true,
                     controller: inviteController,
                     placeholder: 'Type Invitation Code',
-                    placeholderStyle: TextStyle(
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
-                    style: AugustFont.head2(
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
+                    placeholderStyle: AugustFont.textField2(
+                        color: Theme.of(context).colorScheme.outline),
+                    style: AugustFont.textField2(
+                        color: Theme.of(context).colorScheme.outline),
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.inversePrimary,
                       borderRadius: BorderRadius.circular(15),

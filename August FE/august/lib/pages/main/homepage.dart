@@ -86,13 +86,12 @@ class _HomePageState extends State<HomePage> {
     if (!isFirst) {
       fetchAndSetUserInfo(isFirst);
     }
-    /*
-       if (!isFirst && widget.preloadedSemesters.isNotEmpty) {
-      Provider.of<SemesterProvider>(context, listen: false)
-          .setSelectedSemester(formatSemester(widget.preloadedSemesters.last));
-      fetchAndSetUserInfo(isFirst);
-    }
-     */
+
+    //    if (!isFirst && widget.preloadedSemesters.isNotEmpty) {
+    //   Provider.of<SemesterProvider>(context, listen: false)
+    //       .setSelectedSemester(formatSemester(widget.preloadedSemesters.last));
+    //   fetchAndSetUserInfo(isFirst);
+    // }
 
     await Future.wait([
       if (isFirst) fetchAndSetUserInfo(isFirst),
@@ -181,8 +180,10 @@ class _HomePageState extends State<HomePage> {
           'institution_nickname':
               userDetails.institution?.nickname ?? 'Unknown',
           'logo': userDetails.institution?.logo ?? 'Unknown',
-          'department_fullname': userDetails.department?.fullName ?? 'Unknown',
-          'department_nickname': userDetails.department?.nickname ?? 'Unknown',
+          'department_fullname':
+              userDetails.department?.fullName ?? 'UNDECIDED',
+          'department_nickname':
+              userDetails.department?.nickname ?? 'UNDECIDED',
           'contactPhoto': userDetails.profileImage,
           'yearInSchool': displayGrade,
           'dateJoined': userDetails.dateJoined,
@@ -216,6 +217,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: Column(
         children: <Widget>[
           DeviceUtils.isTablet(context) ? tabBar() : Container(),

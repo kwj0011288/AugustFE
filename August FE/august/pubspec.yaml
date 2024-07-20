@@ -8,13 +8,9 @@ environment:
 
 dependencies:
   avatar_glow: ^3.0.1
-  cool_dropdown: ^2.1.0
-  dropdown_button2: ^2.3.9
   flutter:
     sdk: flutter
   hsv_color_pickers: ^0.3.0
-  mirai_dropdown_menu: ^0.0.8+2
-  flutter_popup:
 
 dev_dependencies:
   flutter_test:
@@ -28,20 +24,9 @@ dev_dependencies:
   sizer: ^2.0.15
   flutter_svg:
   colorful_safe_area:
-  dynamic_timeline: ^0.1.2 
-  dots_indicator:
-  flutter_keyboard_visibility: 
-  custom_navigation_bar:
   animations:
   skeleton_text: 
-  card_swiper:
   shared_preferences:
-  animated_digit:
-  persistent_bottom_nav_bar:
-  dropdown_search:
-  google_nav_bar:
-  qr_flutter:
-  pull_down_button:
   image_picker:
   path_provider:
   flutter_feather_icons: ^2.0.0
@@ -57,12 +42,10 @@ dev_dependencies:
   flutter_animated_icons: ^1.0.1
   flutter_bouncing_widgets: ^1.0.3
   flutter_slidable: ^3.1.0
-  gaimon: ^1.2.2+2
   image_cropper: ^7.0.5
   internet_connection_checker: ^1.0.0+1
   animated_hint_textfield: ^1.0.1
   intl: ^0.19.0
-  page_view_dot_indicator: ^2.3.0
   sliding_number: ^0.0.4
   url_launcher: ^6.2.5
   toasty_box: 
@@ -74,6 +57,7 @@ dev_dependencies:
   lottie:
   custom_sliding_segmented_control:
   cached_network_image:
+  google_mobile_ads: 
 
 flutter:
   fonts:

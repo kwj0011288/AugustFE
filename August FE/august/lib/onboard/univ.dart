@@ -13,7 +13,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:pull_down_button/pull_down_button.dart';
 import "package:flutter_feather_icons/flutter_feather_icons.dart";
 import 'package:colorful_safe_area/colorful_safe_area.dart';
 import 'package:animated_hint_textfield/animated_hint_textfield.dart';

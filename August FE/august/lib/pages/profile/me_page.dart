@@ -22,8 +22,6 @@ import 'package:august/onboard/profile.dart';
 import 'package:august/onboard/semester.dart';
 import 'package:august/onboard/grade.dart';
 import 'package:august/onboard/univ.dart';
-import 'package:august/pages/gpa/gpa_page.dart';
-import 'package:august/pages/main/homepage.dart';
 import 'package:august/pages/profile/change_color_page.dart';
 import 'package:august/provider/semester_provider.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
@@ -33,7 +31,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:pull_down_button/pull_down_button.dart';
 import "package:flutter_feather_icons/flutter_feather_icons.dart";
 import 'package:url_launcher/url_launcher.dart';
 
@@ -51,7 +48,7 @@ class _MypageState extends State<Mypage> {
   //info
   String _username = 'User';
   String _grade = 'Freshman';
-  String _major = 'LTSC';
+  String _major = 'Undecided';
   String _schoolFullname = 'Unknown';
   String _schoolNickname = 'Unknown';
   String _schoolLogo = 'Unknown';
@@ -235,11 +232,10 @@ class _MypageState extends State<Mypage> {
 
   void _launchURL() async {
     const url = 'https://forms.gle/2ytdRmXgFps7pK567';
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
+    await launchUrl(
+      Uri.parse(url),
+      mode: LaunchMode.externalApplication,
+    );
   }
 
   Future<void> saveUserInfo() async {
@@ -279,7 +275,7 @@ class _MypageState extends State<Mypage> {
     // Once all fields are loaded, assign them.
     _username = prefs.getString('name') ?? 'User';
     _grade = prefs.getString('grade') ?? 'Freshman';
-    _major = prefs.getString('major') ?? 'LTSC';
+    _major = prefs.getString('major') ?? 'Undecided';
     _schoolFullname = prefs.getString('fullname') ?? 'Unknown';
     _schoolNickname = prefs.getString('nickname') ?? 'Unknown';
     _schoolLogo = prefs.getString('logo') ?? 'Unknown';
@@ -303,7 +299,7 @@ class _MypageState extends State<Mypage> {
   Widget buildButton(String text, Color buttonColor, final VoidCallback onTap) {
     TextStyle buttonTextStyle = TextStyle(
       // Define your text style here
-      fontSize: 15,
+      fontSize: 18,
     );
 
     double textWidth = calculateTextWidth(text, buttonTextStyle, context);

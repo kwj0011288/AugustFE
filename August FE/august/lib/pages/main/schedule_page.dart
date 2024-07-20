@@ -261,9 +261,12 @@ class _SchedulePageState extends State<SchedulePage>
                 ),
                 const SizedBox(height: 10),
                 CupertinoTextField(
+                  inputFormatters: [
+                    LengthLimitingTextInputFormatter(15),
+                  ],
                   autofocus: true,
                   controller: nameController,
-                  placeholder: "",
+                  placeholder: "Change Timetable Name",
                   placeholderStyle: AugustFont.textField2(
                       color: Theme.of(context).colorScheme.outline),
                   style: AugustFont.textField2(
