@@ -24,6 +24,7 @@ import 'package:august/onboard/grade.dart';
 import 'package:august/onboard/univ.dart';
 import 'package:august/pages/profile/change_color_page.dart';
 import 'package:august/provider/semester_provider.dart';
+import 'package:august/provider/user_info_provider.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -45,17 +46,7 @@ class Mypage extends StatefulWidget {
 class _MypageState extends State<Mypage> {
   int bottomIndex = 0;
 
-  //info
-  String _username = 'User';
-  String _grade = 'Freshman';
-  String _major = 'Undecided';
-  String _schoolFullname = 'Unknown';
-  String _schoolNickname = 'Unknown';
-  String _schoolLogo = 'Unknown';
-  String _semester = 'Unknown';
-  Uint8List? profilePhoto;
   String _email = 'Welcome to August';
-  late Future<void> _loadUserFuture;
   Map<int, String> selectedGrades = {};
   bool isJustGPA = true;
   bool isJustCredit = true;
@@ -63,12 +54,6 @@ class _MypageState extends State<Mypage> {
 
   void initState() {
     super.initState();
-    //info and image
-    _loadUserFuture = loadUserInfo();
-    _loadUserFuture = loadUserInfo().then((_) {
-      // Load the profile photo after the user info is loaded
-      loadProfilePhoto();
-    });
 
     //gpa
     loadTotalGPA().then((loadedGPAList) {
@@ -97,45 +82,23 @@ class _MypageState extends State<Mypage> {
     return gradeToPoint[grade] ?? 0.0; // Returns 0.0 if grade is not found
   }
 
-  Future<void> loadProfilePhoto() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? base64Image = prefs.getString('contactPhoto');
-    if (base64Image != null) {
-      setState(() {
-        profilePhoto = base64Decode(base64Image);
-      });
-    }
-  }
-
   void _navigateToPageProfile() async {
-    var result = await Navigator.push<Map<String, dynamic>>(
+    await Navigator.push<Map<String, dynamic>>(
       context,
       CupertinoPageRoute(
-          fullscreenDialog: true,
-          builder: (context) {
-            return NamePage(
-              onboard: false,
-              onTap: () {},
-              onPhotoUpdated: (photo) {
-                if (photo != null) {
-                  setState(() {
-                    profilePhoto = photo;
-                  });
-                }
-              },
-            );
-          }),
+        fullscreenDialog: true,
+        builder: (context) {
+          return NamePage(
+            onboard: false,
+            onTap: () {},
+          );
+        },
+      ),
     );
-    if (result != null) {
-      setState(() {
-        _username = result['name'] ?? _username;
-      });
-      saveUserInfo(); // Save updated user info after state updates
-    }
   }
 
   void _navigateToPageSemester() async {
-    var result = await Navigator.push<Map<String, dynamic>>(
+    await Navigator.push<Map<String, dynamic>>(
       context,
       CupertinoPageRoute(
         fullscreenDialog: true,
@@ -148,12 +111,10 @@ class _MypageState extends State<Mypage> {
         },
       ),
     );
-
-    saveUserInfo(); // 상태를 업데이트한 후에 사용자 정보를 저장합니다.
   }
 
   void _navigateToPageMajor() async {
-    var result = await Navigator.push<Map<String, dynamic>>(
+    await Navigator.push<Map<String, dynamic>>(
       context,
       CupertinoPageRoute(
           fullscreenDialog: true,
@@ -165,14 +126,6 @@ class _MypageState extends State<Mypage> {
             );
           }),
     );
-
-    if (result != null) {
-      setState(() {
-        _major = result['major'] ?? _major;
-      });
-
-      saveUserInfo(); // 상태를 업데이트한 후에 사용자 정보를 저장합니다.
-    }
   }
 
   void _navigateToPageUniv() async {
@@ -188,23 +141,10 @@ class _MypageState extends State<Mypage> {
             );
           }),
     );
-    if (result != null) {
-      setState(() {
-        // 반환된 데이터를 사용하여 상태를 업데이트
-
-        _grade = result['grade'] ?? _grade;
-
-        _schoolFullname = result['fullname'] ?? _schoolFullname;
-        _schoolNickname = result['nickname'] ?? _schoolNickname;
-        _schoolLogo = result['logo'] ?? _schoolLogo;
-      });
-
-      saveUserInfo(); // 상태를 업데이트한 후에 사용자 정보를 저장합니다.
-    }
   }
 
   void _navigateToPageGrade() async {
-    var result = await Navigator.push<Map<String, dynamic>>(
+    await Navigator.push<Map<String, dynamic>>(
       context,
       CupertinoPageRoute(
           fullscreenDialog: true,
@@ -216,18 +156,18 @@ class _MypageState extends State<Mypage> {
             );
           }),
     );
-    if (result != null) {
-      setState(() {
-        // 반환된 데이터를 사용하여 상태를 업데이트
+    // if (result != null) {
+    //   setState(() {
+    //     // 반환된 데이터를 사용하여 상태를 업데이트
 
-        _grade = result['grade'] ?? _grade;
+    //     _grade = result['grade'] ?? _grade;
 
-        _schoolFullname = result['fullname'] ?? _schoolFullname;
-        _schoolNickname = result['nickname'] ?? _schoolNickname;
-      });
+    //     _schoolFullname = result['fullname'] ?? _schoolFullname;
+    //     _schoolNickname = result['nickname'] ?? _schoolNickname;
+    //   });
 
-      saveUserInfo(); // 상태를 업데이트한 후에 사용자 정보를 저장합니다.
-    }
+    //   saveUserInfo(); // 상태를 업데이트한 후에 사용자 정보를 저장합니다.
+    // }
   }
 
   void _launchURL() async {
@@ -238,51 +178,27 @@ class _MypageState extends State<Mypage> {
     );
   }
 
-  Future<void> saveUserInfo() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('name', _username);
-    await prefs.setString('grade', _grade);
-    await prefs.setString('major', _major);
-    await prefs.setString('fullname', _schoolFullname);
-    await prefs.setString('nickname', _schoolNickname);
-    await prefs.setString('semester', _semester);
-    await prefs.setString('userEmail', _email); // Save the email
-
-    // Check if the data is saved correctly
-    print(prefs.getString('name')); // It should print the username
-    await loadUserInfo();
-  }
-
-  Future<void> loadUserInfo() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    // Define a helper function to check if all required fields are not null.
-    bool allFieldsLoaded() {
-      return prefs.getString('name') != null &&
-          prefs.getString('grade') != null &&
-          prefs.getString('major') != null &&
-          prefs.getString('fullname') != null &&
-          prefs.getString('nickname') != null &&
-          prefs.getString('userEmail') != null;
+  String convertDepartment(String department) {
+    switch (department) {
+      case 'FR':
+        department = 'Freshman';
+        break;
+      case 'SO':
+        department = 'Sophomore';
+        break;
+      case 'JR':
+        department = 'Junior';
+        break;
+      case 'SR':
+        department = 'Senior';
+        break;
+      case 'Graduated':
+        department = 'GR';
+        break;
+      default:
+        department = 'New?'; // 기본값 또는 오류 처리
     }
-
-    // Wait for all fields to be loaded.
-    while (!allFieldsLoaded()) {
-      await Future.delayed(Duration(seconds: 1));
-      prefs.reload();
-    }
-
-    // Once all fields are loaded, assign them.
-    _username = prefs.getString('name') ?? 'User';
-    _grade = prefs.getString('grade') ?? 'Freshman';
-    _major = prefs.getString('major') ?? 'Undecided';
-    _schoolFullname = prefs.getString('fullname') ?? 'Unknown';
-    _schoolNickname = prefs.getString('nickname') ?? 'Unknown';
-    _schoolLogo = prefs.getString('logo') ?? 'Unknown';
-    _email = prefs.getString('userEmail') ?? _email;
-
-    // Update the UI if necessary.
-    setState(() {});
+    return department;
   }
 
   double calculateTextWidth(
@@ -383,365 +299,361 @@ class _MypageState extends State<Mypage> {
 
   @override
   Widget build(BuildContext context) {
-    print('this is school logo $_schoolLogo');
     int friendsCount = Provider.of<FriendsProvider>(context).friendsCount;
     var colorProvider = Provider.of<CourseColorProvider>(context);
-    return FutureBuilder(
-      future: _loadUserFuture,
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator()); // 로딩 인디케이터 표시
-        } else if (snapshot.hasError) {
-          return Center(child: Text('An error occurred.')); // 에러 메시지 표시
-        } else {
-          return ClipRRect(
-            child: Scaffold(
+    return Consumer<UserInfoProvider>(
+      builder: (context, userProvider, child) {
+        var userDetails = userProvider.userInfo;
+        if (userDetails == null) {
+          return CircularProgressIndicator();
+        }
+        print(userDetails.yearInSchool);
+        return ClipRRect(
+          child: Scaffold(
+            backgroundColor: Theme.of(context).colorScheme.background,
+            appBar: AppBar(
               backgroundColor: Theme.of(context).colorScheme.background,
-              appBar: AppBar(
-                backgroundColor: Theme.of(context).colorScheme.background,
-                forceMaterialTransparency: true,
-                leading: Padding(
-                  padding: const EdgeInsets.only(left: 15),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 15),
-                      Row(
-                        children: [
-                          GestureDetector(
-                              onTap: () {
-                                checkAccessToken();
-                                HapticFeedback.lightImpact();
-                                _navigateToPageProfile();
-                              },
-                              child: ProfileWidget(
-                                isBottomBar: false,
-                              )),
-                          SizedBox(width: 10),
-                          GestureDetector(
+              forceMaterialTransparency: true,
+              leading: Padding(
+                padding: const EdgeInsets.only(left: 15),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 15),
+                    Row(
+                      children: [
+                        GestureDetector(
                             onTap: () {
                               checkAccessToken();
                               HapticFeedback.lightImpact();
                               _navigateToPageProfile();
                             },
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment
-                                  .center, // Center texts vertically
-                              crossAxisAlignment: CrossAxisAlignment
-                                  .start, // Align texts to the start
-                              children: [
-                                Text(
-                                  '$_username',
-                                  style: AugustFont.head2(
-                                    color:
-                                        Theme.of(context).colorScheme.outline,
-                                  ),
-                                ), // Text Style if needed
-                                Text(
-                                  "$_email",
-                                  style: AugustFont.captionNormal(
-                                      color: Colors.grey),
-                                ), // Text Style if needed
-                              ],
-                            ),
-                          ),
-                          Spacer(),
-                        ],
-                      ),
-                      SizedBox(height: 10),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 0),
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
+                            child: ProfileWidget(
+                              isBottomBar: false,
+                            )),
+                        SizedBox(width: 10),
+                        GestureDetector(
+                          onTap: () {
+                            checkAccessToken();
+                            HapticFeedback.lightImpact();
+                            _navigateToPageProfile();
+                          },
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment
+                                .center, // Center texts vertically
+                            crossAxisAlignment: CrossAxisAlignment
+                                .start, // Align texts to the start
                             children: [
-                              Consumer<SemesterProvider>(
-                                builder: (context, semesterProvider, child) {
-                                  return buildButton(
-                                    formatSemester(semesterProvider.semester),
-                                    Color(0xFFe5fff9),
-                                    () {
-                                      checkAccessToken();
-                                      HapticFeedback.lightImpact();
-                                      _navigateToPageSemester();
-                                    },
-                                  );
-                                },
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              buildButton((('$_grade')), Color(0xFFffe6ea), () {
-                                checkAccessToken();
-                                HapticFeedback.lightImpact();
-                                _navigateToPageGrade();
-                              }),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              buildButton(
-                                '$_major',
-                                Color(0xFFe3ecff),
-                                () {
-                                  checkAccessToken();
-                                  HapticFeedback.lightImpact();
-                                  _navigateToPageMajor();
-                                },
-                              ),
+                              Text(
+                                '${userDetails.name}',
+                                style: AugustFont.head2(
+                                  color: Theme.of(context).colorScheme.outline,
+                                ),
+                              ), // Text Style if needed
+                              Text(
+                                '${userDetails.email}',
+                                style: AugustFont.captionNormal(
+                                    color: Colors.grey),
+                              ), // Text Style if needed
                             ],
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                leadingWidth: 500,
-                toolbarHeight: 110,
-              ),
-              body: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                child: ColorfulSafeArea(
-                  bottomColor: Colors.white.withOpacity(0),
-                  overflowRules: OverflowRules.only(bottom: true),
-                  child: SingleChildScrollView(
-                    controller: ScrollController(),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "About Me",
-                          style: AugustFont.head1(
-                              color: Theme.of(context).colorScheme.outline),
-                        ),
-                        SingleChildScrollView(
-                          controller: ScrollController(),
-                          scrollDirection: Axis.horizontal,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 10),
-                            child: Row(
-                              children: [
-                                InfoWidget(
-                                  onTap: () {
+                        Spacer(),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 0),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            Consumer<SemesterProvider>(
+                              builder: (context, semesterProvider, child) {
+                                return buildButton(
+                                  formatSemester(semesterProvider.semester),
+                                  Color(0xFFe5fff9),
+                                  () {
                                     checkAccessToken();
                                     HapticFeedback.lightImpact();
-                                    _navigateToPageUniv();
+                                    _navigateToPageSemester();
                                   },
-                                  isSchool: true,
-                                  isFrirend: false,
-                                  photo: "$_schoolLogo",
-                                  info: "$_schoolNickname",
-                                  subInfo: "$_schoolFullname",
-                                ),
-                                SizedBox(width: 20),
-                                InfoWidget(
-                                  onTap: () {},
-                                  isSchool: false,
-                                  isFrirend: true,
-                                  photo: 'assets/memoji/Memoji1.png',
-                                  info: "Friends",
-                                  subInfo: "${friendsCount} friends",
-                                ),
-                                SizedBox(width: 20),
-                                // InfoWidget(
-                                //     onTap: () {},
-                                //     isSchool: false,
-                                //     info: "Courses",
-                                //     subInfo: '5 courses',
-                                //     photo: 'assets/icons/courses.png',
-                                //     isFrirend: false)
-                                // InfoWidget(
-                                //   onTap: () =>
-                                //       setState(() => isJustGPA = !isJustGPA),
-                                //   isSchool: true,
-                                //   isFrirend: false,
-                                //   photo: 'assets/memoji/Memoji1.png',
-                                //   info: isJustGPA ? "GPA" : "Total GPA",
-                                //   subInfo: isJustGPA ? "0.00" : "3.33",
-                                //   isIcon: true,
-                                // ),
-                                // SizedBox(width: 20),
-                                // InfoWidget(
-                                //   onTap: () => setState(
-                                //       () => isJustCredit = !isJustCredit),
-                                //   isSchool: true,
-                                //   isFrirend: false,
-                                //   photo: 'assets/memoji/Memoji1.png',
-                                //   info:
-                                //       isJustCredit ? "Credit" : "Total Credit",
-                                //   subInfo: isJustCredit
-                                //       ? "0 credits"
-                                //       : "135 credits",
-                                //   isIcon: true,
-                                // ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        // SizedBox(height: 10),
-                        // Padding(
-                        //   padding: const EdgeInsets.symmetric(vertical: 10),
-                        //   child: Row(
-                        //     children: [
-                        //       Text(
-                        //         "GPA",
-                        //         style: TextStyle(
-                        //           fontSize: 25,
-                        //           color: Theme.of(context).colorScheme.outline,
-                        //           fontWeight: FontWeight.bold,
-                        //         ),
-                        //       ),
-                        //       Spacer(),
-                        //       GestureDetector(
-                        //         onTap: () {
-                        //           checkAccessToken();
-                        //           HapticFeedback.lightImpact();
-                        //           Navigator.push(
-                        //             context,
-                        //             CupertinoPageRoute(
-                        //               fullscreenDialog: true,
-                        //               builder: (context) =>
-                        //                   GPAPage(semester: _semester),
-                        //             ),
-                        //           );
-                        //         },
-                        //         child: Padding(
-                        //           padding: const EdgeInsets.only(right: 10),
-                        //           child: Container(
-                        //             height: 30,
-                        //             width: 50,
-                        //             decoration: BoxDecoration(
-                        //               color:
-                        //                   Theme.of(context).colorScheme.primary,
-                        //               borderRadius: BorderRadius.circular(10),
-                        //             ),
-                        //             child: Center(
-                        //               child: Text('More',
-                        //                   style: TextStyle(
-                        //                       color: Theme.of(context)
-                        //                           .colorScheme
-                        //                           .outline,
-                        //                       fontSize: 15,
-                        //                       fontWeight: FontWeight.bold)),
-                        //             ),
-                        //           ),
-                        //         ),
-                        //       )
-                        //     ],
-                        //   ),
-                        // ),
-                        // Padding(
-                        //   padding: const EdgeInsets.only(
-                        //       left: 10, right: 10, bottom: 10),
-                        //   child: GPAGraph(
-                        //     chartData: totalSemester
-                        //         .map((data) =>
-                        //             GraphData(data.semester, data.grade))
-                        //         .toList(),
-                        //   ),
-                        // ),
-                        SizedBox(height: 10),
-                        //  PremiumWidget(),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          child: Text(
-                            "Course Colors ",
-                            style: AugustFont.head1(
-                                color: Theme.of(context).colorScheme.outline),
-                          ),
-                        ),
-                        CustomizeCourseColor(onTap: () {
-                          checkAccessToken();
-                          Navigator.push(
-                            context,
-                            CupertinoPageRoute(
-                              fullscreenDialog: true,
-                              builder: (context) => ChangeCourseColorPage(),
-                            ),
-                          );
-                        }),
-
-                        SizedBox(height: 10),
-                        //  PremiumWidget(),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          child: Text(
-                            "Feedback",
-                            style: AugustFont.head1(
-                                color: Theme.of(context).colorScheme.outline),
-                          ),
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              child: GestureDetector(
-                                onTap: _launchURL,
-                                child: Container(
-                                  width: MediaQuery.sizeOf(context).width,
-                                  height: 70.0,
-                                  decoration: BoxDecoration(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: Center(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          'Please send us Feedback',
-                                          style: AugustFont.head2(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .outline),
-                                        ),
-                                        Icon(
-                                          Icons.keyboard_arrow_right,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .outline,
-                                          size: 20,
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 20),
-                            SignoutButton(
-                              'Sign out',
-                              Color.fromARGB(255, 243, 154, 168),
-                              () async {
-                                HapticFeedback.lightImpact();
-                                await logoutUser();
-                                Navigator.pushReplacement(
-                                  context,
-                                  CupertinoPageRoute(
-                                    builder: (context) => InitialPage(),
-                                  ),
                                 );
+                              },
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            buildButton(
+                                (convertDepartment(
+                                    '${userDetails.yearInSchool}')),
+                                Color(0xFFffe6ea), () {
+                              checkAccessToken();
+                              HapticFeedback.lightImpact();
+                              _navigateToPageGrade();
+                            }),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            buildButton(
+                              '${userDetails.department!.nickname}',
+                              Color(0xFFe3ecff),
+                              () {
+                                checkAccessToken();
+                                HapticFeedback.lightImpact();
+                                _navigateToPageMajor();
                               },
                             ),
                           ],
                         ),
-                      ],
+                      ),
                     ),
+                  ],
+                ),
+              ),
+              leadingWidth: 500,
+              toolbarHeight: 110,
+            ),
+            body: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              child: ColorfulSafeArea(
+                bottomColor: Colors.white.withOpacity(0),
+                overflowRules: OverflowRules.only(bottom: true),
+                child: SingleChildScrollView(
+                  controller: ScrollController(),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "About Me",
+                        style: AugustFont.head1(
+                            color: Theme.of(context).colorScheme.outline),
+                      ),
+                      SingleChildScrollView(
+                        controller: ScrollController(),
+                        scrollDirection: Axis.horizontal,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 10),
+                          child: Row(
+                            children: [
+                              InfoWidget(
+                                onTap: () {
+                                  checkAccessToken();
+                                  HapticFeedback.lightImpact();
+                                  _navigateToPageUniv();
+                                },
+                                isSchool: true,
+                                isFrirend: false,
+                                photo: '${userDetails.institution!.logo}',
+                                info: '${userDetails.institution!.nickname}',
+                                subInfo: '${userDetails.institution!.fullName}',
+                              ),
+                              SizedBox(width: 20),
+                              InfoWidget(
+                                onTap: () {},
+                                isSchool: false,
+                                isFrirend: true,
+                                photo: 'assets/memoji/Memoji1.png',
+                                info: "Friends",
+                                subInfo: "${friendsCount} friends",
+                              ),
+                              SizedBox(width: 20),
+                              // InfoWidget(
+                              //     onTap: () {},
+                              //     isSchool: false,
+                              //     info: "Courses",
+                              //     subInfo: '5 courses',
+                              //     photo: 'assets/icons/courses.png',
+                              //     isFrirend: false)
+                              // InfoWidget(
+                              //   onTap: () =>
+                              //       setState(() => isJustGPA = !isJustGPA),
+                              //   isSchool: true,
+                              //   isFrirend: false,
+                              //   photo: 'assets/memoji/Memoji1.png',
+                              //   info: isJustGPA ? "GPA" : "Total GPA",
+                              //   subInfo: isJustGPA ? "0.00" : "3.33",
+                              //   isIcon: true,
+                              // ),
+                              // SizedBox(width: 20),
+                              // InfoWidget(
+                              //   onTap: () => setState(
+                              //       () => isJustCredit = !isJustCredit),
+                              //   isSchool: true,
+                              //   isFrirend: false,
+                              //   photo: 'assets/memoji/Memoji1.png',
+                              //   info:
+                              //       isJustCredit ? "Credit" : "Total Credit",
+                              //   subInfo: isJustCredit
+                              //       ? "0 credits"
+                              //       : "135 credits",
+                              //   isIcon: true,
+                              // ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      // SizedBox(height: 10),
+                      // Padding(
+                      //   padding: const EdgeInsets.symmetric(vertical: 10),
+                      //   child: Row(
+                      //     children: [
+                      //       Text(
+                      //         "GPA",
+                      //         style: TextStyle(
+                      //           fontSize: 25,
+                      //           color: Theme.of(context).colorScheme.outline,
+                      //           fontWeight: FontWeight.bold,
+                      //         ),
+                      //       ),
+                      //       Spacer(),
+                      //       GestureDetector(
+                      //         onTap: () {
+                      //           checkAccessToken();
+                      //           HapticFeedback.lightImpact();
+                      //           Navigator.push(
+                      //             context,
+                      //             CupertinoPageRoute(
+                      //               fullscreenDialog: true,
+                      //               builder: (context) =>
+                      //                   GPAPage(semester: _semester),
+                      //             ),
+                      //           );
+                      //         },
+                      //         child: Padding(
+                      //           padding: const EdgeInsets.only(right: 10),
+                      //           child: Container(
+                      //             height: 30,
+                      //             width: 50,
+                      //             decoration: BoxDecoration(
+                      //               color:
+                      //                   Theme.of(context).colorScheme.primary,
+                      //               borderRadius: BorderRadius.circular(10),
+                      //             ),
+                      //             child: Center(
+                      //               child: Text('More',
+                      //                   style: TextStyle(
+                      //                       color: Theme.of(context)
+                      //                           .colorScheme
+                      //                           .outline,
+                      //                       fontSize: 15,
+                      //                       fontWeight: FontWeight.bold)),
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       )
+                      //     ],
+                      //   ),
+                      // ),
+                      // Padding(
+                      //   padding: const EdgeInsets.only(
+                      //       left: 10, right: 10, bottom: 10),
+                      //   child: GPAGraph(
+                      //     chartData: totalSemester
+                      //         .map((data) =>
+                      //             GraphData(data.semester, data.grade))
+                      //         .toList(),
+                      //   ),
+                      // ),
+                      SizedBox(height: 10),
+                      //  PremiumWidget(),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: Text(
+                          "Course Colors ",
+                          style: AugustFont.head1(
+                              color: Theme.of(context).colorScheme.outline),
+                        ),
+                      ),
+                      CustomizeCourseColor(onTap: () {
+                        checkAccessToken();
+                        Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                            fullscreenDialog: true,
+                            builder: (context) => ChangeCourseColorPage(),
+                          ),
+                        );
+                      }),
+
+                      SizedBox(height: 10),
+                      //  PremiumWidget(),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: Text(
+                          "Feedback",
+                          style: AugustFont.head1(
+                              color: Theme.of(context).colorScheme.outline),
+                        ),
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: GestureDetector(
+                              onTap: _launchURL,
+                              child: Container(
+                                width: MediaQuery.sizeOf(context).width,
+                                height: 70.0,
+                                decoration: BoxDecoration(
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                    borderRadius: BorderRadius.circular(10)),
+                                child: Center(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'Please send us Feedback',
+                                        style: AugustFont.head2(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .outline),
+                                      ),
+                                      Icon(
+                                        Icons.keyboard_arrow_right,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .outline,
+                                        size: 20,
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          SignoutButton(
+                            'Sign out',
+                            Color.fromARGB(255, 243, 154, 168),
+                            () async {
+                              HapticFeedback.lightImpact();
+                              await logoutUser();
+                              Navigator.pushReplacement(
+                                context,
+                                CupertinoPageRoute(
+                                  builder: (context) => InitialPage(),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
-          );
-        }
+          ),
+        );
       },
     );
   }

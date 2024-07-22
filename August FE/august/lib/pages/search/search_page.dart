@@ -455,7 +455,7 @@ class _SearchPageState extends State<SearchPage>
                             // 3개보다 많은 섹션이 있을 경우, 5번째 섹션마다 광고 삽입
                             if (sectionsCount > 3 && (i + 1) % 5 == 0) {
                               widgets.add(
-                                googleAdMobContainer(),
+                                googleAdMobContainer(isGroup: false),
                               );
                             }
                           }
@@ -463,7 +463,7 @@ class _SearchPageState extends State<SearchPage>
                           // 3개 이하의 섹션이 있고, 섹션이 하나 이상 있는 경우, 리스트의 마지막에 광고 삽입
                           if (sectionsCount > 1 && sectionsCount <= 4) {
                             widgets.add(
-                              googleAdMobContainer(),
+                              googleAdMobContainer(isGroup: false),
                             );
                           }
 

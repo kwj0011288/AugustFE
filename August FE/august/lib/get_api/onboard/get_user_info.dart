@@ -1,12 +1,12 @@
 class UserDetails {
-  final int id;
-  final String email;
-  final String name;
-  final Institution? institution; // Make nullable
-  final Department? department; // Make nullable
-  final String profileImage;
-  final String yearInSchool;
-  final String dateJoined;
+  int id;
+  String email;
+  String name;
+  Institution? institution; // Make nullable
+  Department? department; // Make nullable
+  String? profileImage;
+  String yearInSchool;
+  String dateJoined;
 
   UserDetails({
     required this.id,
@@ -30,7 +30,9 @@ class UserDetails {
       department: json['department'] != null
           ? Department.fromJson(json['department'])
           : null,
-      profileImage: json['profile_image'],
+      profileImage: json['profile_image'] != null
+          ? json['profile_image']
+          : 'https://augustapp.one/media/institution_logos/umd.png',
       yearInSchool: json['year_in_school'],
       dateJoined: json['date_joined'],
     );

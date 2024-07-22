@@ -1,4 +1,5 @@
 import 'package:animated_hint_textfield/animated_hint_textfield.dart';
+import 'package:august/components/ad/ad_list.dart';
 import 'package:august/components/home/loading.dart';
 import 'package:august/const/font/font.dart';
 import 'package:august/const/icons/icons.dart';
@@ -426,33 +427,7 @@ class _GroupSearchPageState extends State<GroupSearchPage>
                         if ((instructorCourses.length < 4 &&
                                 index == instructorCourses.length) ||
                             (index % 6 == 5)) {
-                          return Padding(
-                            padding: const EdgeInsets.only(
-                              bottom: 15,
-                              left: 15,
-                              right: 15,
-                            ),
-                            child: Container(
-                              height: 100,
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.primary,
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Theme.of(context).colorScheme.shadow,
-                                    blurRadius: 10,
-                                    offset: Offset(6, 4),
-                                  ),
-                                  BoxShadow(
-                                    color: Theme.of(context).colorScheme.shadow,
-                                    blurRadius: 10,
-                                    offset: Offset(-2, 0),
-                                  ),
-                                ],
-                              ),
-                              child: Center(child: Text('Ad space')),
-                            ),
-                          );
+                          return googleAdMobContainer(isGroup: true);
                         } else if (actualIndex < instructorCourses.length) {
                           var course = instructorCourses[actualIndex].course;
                           var instructor =

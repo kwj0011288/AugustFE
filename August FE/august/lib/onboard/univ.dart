@@ -7,6 +7,7 @@ import 'package:august/get_api/onboard/get_semester.dart';
 import 'package:august/get_api/onboard/get_univ.dart';
 import 'package:august/login/login.dart';
 import 'package:august/provider/Institution_provider.dart';
+import 'package:august/provider/user_info_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -34,10 +35,10 @@ class UnivPage extends StatefulWidget {
 
 class _UnivPageState extends State<UnivPage> {
   /* --- check selected school info ---  */
-  String? _selectedSchoolFullname;
-  String? _selectedSchoolNickname;
-  int? _selectedSchoolIndex;
-  String? _selectedSchoolLogo;
+  String? selectedSchoolFullname;
+  String? selectedSchoolNickname;
+  int? selectedSchoolIndex;
+  String? selectedSchoolLogo;
   /* --- schoool list --- */
   List<Institution> schoolsList = []; // Updated to hold Institution objects
   List<Institution> filteredSchoolList = [];
@@ -55,9 +56,18 @@ class _UnivPageState extends State<UnivPage> {
   void initState() {
     super.initState();
     var provider = Provider.of<InstitutionProvider>(context, listen: false);
+    var infoProvider =
+        Provider.of<UserInfoProvider>(context, listen: false).userInfo;
 
+    /* --- school list --- */
     schoolsList = provider.institutionList;
     filteredSchoolList = schoolsList;
+
+    /* --- school info from the user info provider --- */
+    selectedSchoolFullname = infoProvider?.institution?.fullName;
+    selectedSchoolNickname = infoProvider?.institution?.nickname;
+    selectedSchoolIndex = infoProvider?.institution?.id;
+    selectedSchoolLogo = infoProvider?.institution?.logo;
 
     Future.delayed(Duration(seconds: 1), () {
       print('check filter list ${filteredSchoolList.length}');
@@ -94,27 +104,19 @@ class _UnivPageState extends State<UnivPage> {
   }
 
   Future<void> _saveInfo() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('fullname', _selectedSchoolFullname ?? '');
-    prefs.setString('nickname', _selectedSchoolNickname ?? '');
-    prefs.setString('logo', _selectedSchoolLogo ?? '');
-    if (_selectedSchoolIndex != null) {
-      // id가 있을 경우에만 저장합니다.
-      prefs.setInt('schoolId', _selectedSchoolIndex!);
-    }
+    Provider.of<UserInfoProvider>(context, listen: false).updateUserInstitution(
+        selectedSchoolIndex!,
+        selectedSchoolFullname!,
+        selectedSchoolNickname!,
+        selectedSchoolLogo!);
   }
 
 // 'Done' 버튼이 클릭될 때 _saveInfo 호출
   Future<void> _saveAndClose() async {
     checkAccessToken();
     await _saveInfo();
-    Map<String, dynamic> userInfo = {
-      'fullname': _selectedSchoolFullname,
-      'nickname': _selectedSchoolNickname,
-      'id': _selectedSchoolIndex, // 사용자 정보에 id를 추가합니다.
-      'logo': _selectedSchoolLogo,
-    };
-    widget.onboard ? null : Navigator.pop(context, userInfo);
+
+    widget.onboard ? null : Navigator.pop(context);
     int? userPk = await fetchUserPk();
 
     if (userPk == null) {
@@ -122,9 +124,9 @@ class _UnivPageState extends State<UnivPage> {
       return;
     }
 
-    if (_selectedSchoolFullname!.isNotEmpty && _selectedSchoolIndex != null) {
+    if (selectedSchoolFullname!.isNotEmpty && selectedSchoolIndex != null) {
       // updateInstitution을 백그라운드에서 호출
-      updateInstitution(userPk, _selectedSchoolIndex!).then((_) {
+      updateInstitution(userPk, selectedSchoolIndex!).then((_) {
         print('Institution updated successfully');
       }).catchError((error) {
         print('Failed to update institution: $error');
@@ -139,15 +141,15 @@ class _UnivPageState extends State<UnivPage> {
       (institution) => institution.fullName == value,
     );
     setState(() {
-      _selectedSchoolFullname = value;
+      selectedSchoolFullname = value;
       if (selectedInstitution != null) {
-        _selectedSchoolNickname = selectedInstitution.nickname;
-        _selectedSchoolIndex = selectedInstitution.id; // 선택한 기관의 id를 저장합니다.
+        selectedSchoolNickname = selectedInstitution.nickname;
+        selectedSchoolIndex = selectedInstitution.id; // 선택한 기관의 id를 저장합니다.
 
-        print('Selected School Fullname: $_selectedSchoolFullname');
-        print('Selected School Nickname: $_selectedSchoolNickname');
-        print('id: $_selectedSchoolIndex');
-        print('logo: $_selectedSchoolLogo');
+        // print('Selected School Fullname: $_selectedSchoolFullname');
+        // print('Selected School Nickname: $_selectedSchoolNickname');
+        // print('id: $_selectedSchoolIndex');
+        // print('logo: $_selectedSchoolLogo');
       }
     });
   }
@@ -291,42 +293,39 @@ class _UnivPageState extends State<UnivPage> {
                 isLoading
                     ? CircularProgressIndicator()
                     : Expanded(
-                        child: Scrollbar(
-                          thumbVisibility: true,
-                          child: ListView.builder(
-                            itemCount: filteredSchoolList.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return UniversityTile(
-                                logo: filteredSchoolList[index].logo,
-                                fullname: filteredSchoolList[index].fullName,
-                                nickname: filteredSchoolList[index].nickname,
-                                tileColor: _selectedSchoolFullname ==
-                                        filteredSchoolList[index].fullName
-                                    ? Theme.of(context).colorScheme.primary
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .primaryContainer,
-                                isShadow: _selectedSchoolFullname ==
-                                    filteredSchoolList[index].fullName,
-                                onTap: () {
-                                  _onSchoolChanged(
-                                      filteredSchoolList[index].fullName);
-                                  setState(
-                                    () {
-                                      _selectedSchoolFullname =
-                                          filteredSchoolList[index].fullName;
-                                      _selectedSchoolNickname =
-                                          filteredSchoolList[index].nickname;
-                                      _selectedSchoolIndex =
-                                          filteredSchoolList[index].id;
-                                      _selectedSchoolLogo =
-                                          filteredSchoolList[index].logo;
-                                    },
-                                  );
-                                },
-                              );
-                            },
-                          ),
+                        child: ListView.builder(
+                          itemCount: filteredSchoolList.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return UniversityTile(
+                              logo: filteredSchoolList[index].logo,
+                              fullname: filteredSchoolList[index].fullName,
+                              nickname: filteredSchoolList[index].nickname,
+                              tileColor: selectedSchoolFullname ==
+                                      filteredSchoolList[index].fullName
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(context)
+                                      .colorScheme
+                                      .primaryContainer,
+                              isShadow: selectedSchoolFullname ==
+                                  filteredSchoolList[index].fullName,
+                              onTap: () {
+                                _onSchoolChanged(
+                                    filteredSchoolList[index].fullName);
+                                setState(
+                                  () {
+                                    selectedSchoolFullname =
+                                        filteredSchoolList[index].fullName;
+                                    selectedSchoolNickname =
+                                        filteredSchoolList[index].nickname;
+                                    selectedSchoolIndex =
+                                        filteredSchoolList[index].id;
+                                    selectedSchoolLogo =
+                                        filteredSchoolList[index].logo;
+                                  },
+                                );
+                              },
+                            );
+                          },
                         ),
                       ),
               ],

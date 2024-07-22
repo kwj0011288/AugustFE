@@ -75,7 +75,6 @@ class _OnBoardPageState extends State<OnBoardPage> {
         NamePage(
           onboard: true,
           onTap: _navigateToNextOrHome,
-          onPhotoUpdated: (Uint8List? updatedPhoto) {},
         ),
         UnivPage(
           onboard: true,

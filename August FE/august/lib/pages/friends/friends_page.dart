@@ -171,6 +171,9 @@ class _FriendsPageState extends State<FriendsPage>
       case 'SR':
         department = 'Senior';
         break;
+      case 'Graduated':
+        department = 'GR';
+        break;
       default:
         department = 'New?'; // 기본값 또는 오류 처리
     }

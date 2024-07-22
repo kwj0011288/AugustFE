@@ -143,7 +143,6 @@ Future<bool> fetchAndPrintUserInfo(BuildContext context) async {
 
   if (response.statusCode == 200) {
     print("User info fetched successfully.");
-    saveTokensToSpecificPath(accessToken, 'd');
     fetchUserDetails();
     // 여기서 사용자 정보를 처리하거나 표시할 수 있습니다.
     return true;
@@ -247,6 +246,9 @@ Future<void> logoutUser() async {
   final prefs = await SharedPreferences.getInstance();
 
   await prefs.clear();
+
+  print('check hasSeenOnboard ${prefs.getBool('hasSeenOnboard')}');
+  print('check isFirst ${prefs.getBool('isFirst')}');
 
   print('User logged out. All user data deleted.');
 
@@ -422,7 +424,7 @@ Future<void> updateInstitution(int userPk, int institution) async {
       print('Failed to refresh token. User needs to login again.');
     }
   } else {
-    print('Failed to update user details. Status code: ${response.statusCode}');
+    print('Failed to update user details. Status code: ${response.body}');
   }
 }
 

@@ -2,6 +2,7 @@ import 'package:august/components/tile/onboardTile/major_tile.dart';
 import 'package:august/const/font/font.dart';
 import 'package:august/login/login.dart';
 import 'package:august/provider/department_provider.dart';
+import 'package:august/provider/user_info_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,9 +30,9 @@ class MajorPage extends StatefulWidget {
 
 class _MajorPageState extends State<MajorPage> {
   /* --- check selected major name --- */
-  String? _selectedMajorFullname;
-  String? _selectedMajorNickname;
-  int? _selectedMajorIndex;
+  String? selectedMajorFullname;
+  String? selectedMajorNickname;
+  int? selectedMajorIndex;
 
   /* --- department list --- */
   List<String>? departmentList = [];
@@ -46,9 +47,18 @@ class _MajorPageState extends State<MajorPage> {
   void initState() {
     super.initState();
 
+    /* --- department list --- */
     var provider = Provider.of<DepartmentProvider>(context, listen: false);
     departmentList = provider.departmentList;
     filteredDepartments = departmentList!;
+
+    var infoProvider =
+        Provider.of<UserInfoProvider>(context, listen: false).userInfo;
+
+    /* --- deaprtment info from the user info provider --- */
+    selectedMajorFullname = infoProvider?.department?.fullName;
+    selectedMajorNickname = infoProvider?.department?.nickname;
+    selectedMajorIndex = infoProvider?.department?.id;
 
     provider.addListener(_updateDepartmentList);
 
@@ -98,33 +108,30 @@ class _MajorPageState extends State<MajorPage> {
         : '';
 
     // ID 추출
-    final id = int.tryParse(idPart.split(': ')[1]) ?? -1;
+    final id = int.tryParse(idPart.split(': ')[1]) ?? null;
 
     setState(() {
-      _selectedMajorIndex = id;
-      _selectedMajorFullname = fullName;
-      _selectedMajorNickname = nickname;
+      selectedMajorIndex = id;
+      selectedMajorFullname = fullName;
+      selectedMajorNickname = nickname;
     });
-
-    // 선택된 전공의 fullname 출력 (디버깅 목적)
-    if (_selectedMajorFullname != null) {
-      print('Selected Major Fullname: $_selectedMajorFullname');
-      print('$_selectedMajorIndex');
-    }
   }
 
   Future<void> _saveInfo() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    prefs.setString('major', _selectedMajorNickname ?? '');
+    var provider = Provider.of<UserInfoProvider>(context, listen: false);
+    provider.updateUserDepartment(
+      selectedMajorIndex!,
+      selectedMajorFullname!,
+      selectedMajorNickname!,
+      provider.userInfo!.institution!.id,
+    );
   }
 
   Future<void> _saveAndClose() async {
     checkAccessToken();
     _saveInfo();
-    Map<String, dynamic> userInfo = {'major': _selectedMajorNickname};
 
-    widget.onboard ? null : Navigator.pop(context, userInfo);
+    widget.onboard ? null : Navigator.pop(context);
     int? userPk = await fetchUserPk();
 
     if (userPk == null) {
@@ -132,10 +139,9 @@ class _MajorPageState extends State<MajorPage> {
       return;
     }
 
-    if (_selectedMajorIndex != null) {
+    if (selectedMajorIndex != null) {
       // 백그라운드에서 updateDepartment 호출
-      Future<void> updateFuture =
-          updateDepartment(userPk, _selectedMajorIndex!);
+      Future<void> updateFuture = updateDepartment(userPk, selectedMajorIndex!);
       updateFuture.then((_) {
         print('Department updated successfully');
       }).catchError((error) {
@@ -302,17 +308,17 @@ class _MajorPageState extends State<MajorPage> {
                               return MajorTile(
                                 fullname: fullname,
                                 nickname: nickname,
-                                tileColor: _selectedMajorNickname == nickname
+                                tileColor: selectedMajorNickname == nickname
                                     ? Theme.of(context).colorScheme.primary
                                     : Theme.of(context)
                                         .colorScheme
                                         .primaryContainer,
-                                isShadow: _selectedMajorNickname == nickname,
+                                isShadow: selectedMajorNickname == nickname,
                                 onTap: () {
                                   setState(() {
                                     _selectMajor(filteredDepartments[index]);
-                                    _selectedMajorNickname = nickname;
-                                    _selectedMajorFullname = fullname;
+                                    selectedMajorNickname = nickname;
+                                    selectedMajorFullname = fullname;
                                   });
                                 },
                               );

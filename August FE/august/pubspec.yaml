@@ -8,14 +8,16 @@ environment:
 
 dependencies:
   avatar_glow: ^3.0.1
+  change_app_package_name: ^1.3.0
   flutter:
     sdk: flutter
   hsv_color_pickers: ^0.3.0
+  sign_in_with_apple: ^6.1.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
+  flutter_lints: ^4.0.0
 
   http: ^1.1.0
   image:
@@ -53,7 +55,6 @@ dev_dependencies:
   flutter_native_splash:
   flutter_snake_navigationbar:
   syncfusion_flutter_charts: 
-  sign_in_with_apple:
   lottie:
   custom_sliding_segmented_control:
   cached_network_image:

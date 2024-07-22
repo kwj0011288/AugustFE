@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:august/components/ad/ad_helper.dart';
 import 'package:august/const/font/font.dart';
 import 'package:flutter/material.dart';
@@ -5,7 +7,8 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shimmer/shimmer.dart';
 
 class googleAdMobContainer extends StatefulWidget {
-  const googleAdMobContainer({super.key});
+  final bool isGroup;
+  const googleAdMobContainer({super.key, required this.isGroup});
 
   @override
   State<googleAdMobContainer> createState() => _googleAdMobContainerState();
@@ -35,6 +38,8 @@ class _googleAdMobContainerState extends State<googleAdMobContainer> {
           ad.dispose();
         },
       ),
+      // nativeAdOptions: NativeAdOptions(),
+      // nativeTemplateStyle: NativeTemplateStyle(templateType: templateType),
     );
     _nativeAd!.load();
     super.initState();
@@ -52,9 +57,11 @@ class _googleAdMobContainerState extends State<googleAdMobContainer> {
         ? Padding(
             padding: const EdgeInsets.only(bottom: 15, left: 15, right: 15),
             child: Container(
-              padding: const EdgeInsets.all(10),
+              padding: widget.isGroup
+                  ? const EdgeInsets.all(0)
+                  : const EdgeInsets.all(0),
               width: double.infinity,
-              height: 120,
+              height: widget.isGroup ? 100 : 120,
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.primary,
                 borderRadius: BorderRadius.circular(12),

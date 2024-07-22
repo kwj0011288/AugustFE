@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:animated_hint_textfield/animated_hint_textfield.dart';
+import 'package:august/components/ad/ad_list.dart';
 import 'package:august/const/font/font.dart';
+import 'package:august/const/icons/icons.dart';
 import 'package:august/provider/courseprovider.dart';
 import 'package:august/components/tile/simple_course_tile.dart';
 import 'package:august/const/theme/dark_theme.dart';
@@ -530,51 +532,63 @@ class _EditSearchPageState extends State<EditSearchPage>
                       itemCount: _foundCourses.length,
                       itemBuilder: (context, courseIndex) {
                         var course = _foundCourses[courseIndex];
-                        return Column(
-                          children: course.sections?.map((section) {
-                                // Collect formatted meeting times into a list
-                                List<String> formattedMeetingTimes =
-                                    section.meetings?.map((meeting) {
-                                          DateTime startTime = DateFormat.Hm()
-                                              .parse(meeting.startTime!);
-                                          DateTime endTime = DateFormat.Hm()
-                                              .parse(meeting.endTime!);
-                                          String formattedStartTime =
-                                              DateFormat('h:mm a')
-                                                  .format(startTime);
-                                          String formattedEndTime =
-                                              DateFormat('h:mm a')
-                                                  .format(endTime);
+                        List<Widget> widgets = [];
+                        int sectionsCount = course.sections?.length ?? 0;
 
-                                          return '${meeting.days} $formattedStartTime - $formattedEndTime';
-                                        }).toList() ??
-                                        [];
+                        // 각 코스의 섹션을 순회하면서 위젯 리스트에 추가
+                        for (int i = 0; i < sectionsCount; i++) {
+                          var section = course.sections![i];
+                          List<String> formattedMeetingTimes =
+                              section.meetings?.map((meeting) {
+                                    DateTime startTime = DateFormat.Hm()
+                                        .parse(meeting.startTime!);
+                                    DateTime endTime =
+                                        DateFormat.Hm().parse(meeting.endTime!);
+                                    String formattedStartTime =
+                                        DateFormat('h:mm a').format(startTime);
+                                    String formattedEndTime =
+                                        DateFormat('h:mm a').format(endTime);
+                                    return '${meeting.days} $formattedStartTime - $formattedEndTime';
+                                  }).toList() ??
+                                  [];
+                          String meetingTimes =
+                              formattedMeetingTimes.join('\n');
 
-                                String meetingTimes =
-                                    formattedMeetingTimes.join('\n');
-                                return SimepleCourseTile(
-                                  classes: course,
-                                  sectionCode: section.code ??
-                                      '', // Pass the section code
-                                  instructorName: section.instructors?.first ??
-                                      '', // Pass the first instructor's name
-                                  icon: FeatherIcons.plusCircle,
-                                  backgroundColor: Colors.white,
-                                  index: courseIndex,
-                                  onPressed: (context) {
-                                    _handleCourseSelection(course, section);
-                                    //    addToGroup(context, section, course);
-                                    // Navigator.pop(context);
-                                  },
-                                  meetingTimes: meetingTimes,
-                                  fullSeat: section.seats ?? 0,
-                                  openSeat: section.openSeats ?? 0,
-                                  waitlist: section.waitlist ?? 0,
-                                  holdfile: section.holdfile ?? 0,
-                                );
-                              }).toList() ??
-                              [],
-                        );
+                          widgets.add(SimepleCourseTile(
+                            classes: course,
+                            sectionCode:
+                                section.code ?? '', // Pass the section code
+                            instructorName: section.instructors?.first ??
+                                '', // Pass the first instructor's name
+                            icon: AugustIcons.addCoursetoGroup,
+                            backgroundColor: Colors.white,
+                            index: courseIndex,
+                            onPressed: (context) {
+                              _handleCourseSelection(course, section);
+                            },
+                            meetingTimes: meetingTimes,
+                            fullSeat: section.seats ?? 0,
+                            openSeat: section.openSeats ?? 0,
+                            waitlist: section.waitlist ?? 0,
+                            holdfile: section.holdfile ?? 0,
+                          ));
+
+                          // 3개보다 많은 섹션이 있을 경우, 5번째 섹션마다 광고 삽입
+                          if (sectionsCount > 3 && (i + 1) % 5 == 0) {
+                            widgets.add(
+                              googleAdMobContainer(isGroup: false),
+                            );
+                          }
+                        }
+
+                        // 3개 이하의 섹션이 있고, 섹션이 하나 이상 있는 경우, 리스트의 마지막에 광고 삽입
+                        if (sectionsCount > 1 && sectionsCount <= 4) {
+                          widgets.add(
+                            googleAdMobContainer(isGroup: false),
+                          );
+                        }
+
+                        return Column(children: widgets);
                       },
                     );
                   }

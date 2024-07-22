@@ -11,6 +11,7 @@ import 'package:colorful_safe_area/colorful_safe_area.dart';
 import 'package:auth_buttons/auth_buttons.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -97,38 +98,29 @@ class _InitialPageState extends State<InitialPage> {
     }
   }
 
-/* --- test test test  ---  */
-  final GoogleSignIn testSignin = GoogleSignIn(
-    clientId: Platform.isIOS
-        ? '469588470984-or2haks4c471937fblbnc1j26061n6d1.apps.googleusercontent.com'
-        : '469588470984-87et979ds37bt4svf5mv6tfe64i9ue21.apps.googleusercontent.com',
-    scopes: <String>[
-      'email',
-      'https://www.googleapis.com/auth/userinfo.profile',
-    ],
-  );
-  Future<void> testGoogleLogin() async {
+  Future<void> _loginWithApple() async {
     try {
-      final GoogleSignInAccount? googleUser = await testSignin.signIn();
-      final GoogleSignInAuthentication? googleAuth =
-          await googleUser?.authentication;
+      final AuthorizationCredentialAppleID appleCredential =
+          await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
 
-      final String? accessToken = googleAuth?.accessToken;
-      final String? idToken = googleAuth?.idToken;
+      final String? accessToken = appleCredential.authorizationCode;
+      final String? idToken = appleCredential.identityToken;
 
-      // print('Check accessToken $accessToken');
-      // print('Check idtoken $idToken');
-
-      if (googleUser == null || accessToken == null || idToken == null) {
+      if (accessToken == null || idToken == null) {
         print(
-            'Google login was cancelled by the user or failed to receive ID token.');
+            'Apple login was cancelled by the user or failed to receive ID token.');
         return;
       }
 
       String requestBody =
           jsonEncode({'access_token': accessToken, 'id_token': idToken});
       final response = await http.post(
-        Uri.parse('https://augustapp.one/users/google/login/callback/ios/'),
+        Uri.parse('https://augustapp.one/users/apple/login/callback/'),
         headers: {'Content-Type': 'application/json'},
         body: requestBody,
       );
@@ -152,14 +144,14 @@ class _InitialPageState extends State<InitialPage> {
         );
       } else {
         print('Server error: ${response.body}');
+        logoutUser();
         showLoginPrompt(context);
       }
     } catch (error) {
-      print('Error logging in with Google: $error');
+      print('Error logging in with Apple: $error');
     }
   }
 
-/* --- test test test  ---  */
   @override
   void initState() {
     super.initState();
@@ -216,6 +208,7 @@ class _InitialPageState extends State<InitialPage> {
           // If fetching user info fails, show login prompt
           Navigator.pop(context); // Close loading indicator
           print('1');
+          logoutUser();
           showLoginPrompt(context);
         }
       } else {
@@ -233,6 +226,7 @@ class _InitialPageState extends State<InitialPage> {
       } else {
         // If fetching user info fails, show login prompt
         Navigator.pop(context); // Close loading indicator
+        logoutUser();
         print('4');
         //showLoginPrompt(context);
       }
@@ -265,8 +259,6 @@ class _InitialPageState extends State<InitialPage> {
           SizedBox(height: 20),
           googleButton(),
           SizedBox(height: 20),
-          testWidget(),
-          SizedBox(height: 40),
           policyTerms(),
         ],
       ),
@@ -456,6 +448,7 @@ class _InitialPageState extends State<InitialPage> {
   Widget appleButton() {
     return AppleAuthButton(
       onPressed: () {
+        _loginWithApple();
         print('apple login clicked');
       },
       style: AuthButtonStyle(
@@ -480,34 +473,6 @@ class _InitialPageState extends State<InitialPage> {
   Widget googleButton() {
     return GoogleAuthButton(
       onPressed: _loginWithGoogle,
-      style: AuthButtonStyle(
-        buttonColor: Colors.white,
-        iconSize: 28,
-        borderRadius: 18,
-        separator: 10,
-        borderColor: Colors.black,
-        borderWidth: 1,
-        splashColor: Theme.of(context).colorScheme.background.withOpacity(0.1),
-        textStyle: TextStyle(
-          fontSize: 18,
-          color: Colors.black,
-          fontWeight: FontWeight.w600,
-          fontFamily: 'Nanum',
-        ),
-        width: MediaQuery.of(context).size.width,
-        height: 60,
-      ),
-    );
-  }
-
-  Widget testWidget() {
-    return CustomAuthButton(
-      text: 'Has IOS, No Server',
-      authIcon: AuthIcon(
-        iconPath: 'assets/icons/memoji.png',
-        iconSize: 35,
-      ),
-      onPressed: testGoogleLogin,
       style: AuthButtonStyle(
         buttonColor: Colors.white,
         iconSize: 28,

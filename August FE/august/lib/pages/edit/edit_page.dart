@@ -280,33 +280,26 @@ class _EditPageState extends State<EditPage> {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
-        return GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () {
-            Navigator.pop(
-                context); // Close the bottom sheet when the area outside the sheet is tapped
+        return NotificationListener<ScrollNotification>(
+          onNotification: (ScrollNotification notification) {
+            if (notification.metrics.pixels ==
+                notification.metrics.maxScrollExtent) {
+              HapticFeedback.lightImpact();
+            }
+            return true;
           },
-          child: NotificationListener<ScrollNotification>(
-            onNotification: (ScrollNotification notification) {
-              if (notification.metrics.pixels ==
-                  notification.metrics.maxScrollExtent) {
-                HapticFeedback.lightImpact();
-              }
-              return true;
+          child: DraggableScrollableSheet(
+            expand: false,
+            initialChildSize: 1,
+            maxChildSize: 1,
+            minChildSize: 1,
+            builder:
+                (BuildContext context, ScrollController sheetScrollController) {
+              return EditSearchPage(
+                addedCoursesNotifier: widget.addedCoursesNotifier!,
+                semester: widget.semester,
+              );
             },
-            child: DraggableScrollableSheet(
-              expand: false,
-              initialChildSize: 1,
-              maxChildSize: 1,
-              minChildSize: 1,
-              builder: (BuildContext context,
-                  ScrollController sheetScrollController) {
-                return EditSearchPage(
-                  addedCoursesNotifier: widget.addedCoursesNotifier!,
-                  semester: widget.semester,
-                );
-              },
-            ),
           ),
         );
       },

@@ -11,6 +11,7 @@ import 'package:august/pages/main/schedule_page.dart';
 import 'package:august/provider/Institution_provider.dart';
 import 'package:august/provider/department_provider.dart';
 import 'package:august/provider/semester_provider.dart';
+import 'package:august/provider/user_info_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:provider/provider.dart';
@@ -30,6 +31,7 @@ void main() async {
   List<String> departments;
   String? email;
   prefs.remove('semester');
+  //prefs.clear();
 
   if (isOnline) {
     await checkAccessToken();
@@ -103,6 +105,7 @@ class MyApp extends StatelessWidget {
             ChangeNotifierProvider(create: (context) => CourseColorProvider()),
             ChangeNotifierProvider(create: (context) => DepartmentProvider()),
             ChangeNotifierProvider(create: (context) => InstitutionProvider()),
+            ChangeNotifierProvider(create: (context) => UserInfoProvider()),
           ],
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
