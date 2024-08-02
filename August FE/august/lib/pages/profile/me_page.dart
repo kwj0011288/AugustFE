@@ -1,20 +1,16 @@
 import 'dart:convert';
-import 'dart:math';
-import 'dart:typed_data';
-import 'package:august/components/mepage/color_box.dart';
-import 'package:august/components/mepage/color_picker.dart';
+import 'dart:io';
 import 'package:august/components/mepage/course_color.dart';
-import 'package:august/components/mepage/gpa_graph.dart';
+import 'package:august/components/mepage/customize_icon.dart';
 import 'package:august/components/mepage/info_box.dart';
-import 'package:august/components/mepage/premium.dart';
 import 'package:august/components/profile/profile.dart';
 import 'package:august/const/font/font.dart';
+import 'package:august/pages/profile/change_icon_page.dart';
 import 'package:august/provider/course_color_provider.dart';
+import 'package:august/provider/courseprovider.dart';
 import 'package:august/provider/friends_provider.dart';
 import 'package:august/get_api/gpa/gpa_courses.dart';
 import 'package:august/get_api/onboard/get_semester.dart';
-import 'package:august/get_api/onboard/get_univ.dart';
-import 'package:august/get_api/wizard/schedule_get.dart';
 import 'package:august/login/initialpage.dart';
 import 'package:august/login/login.dart';
 import 'package:august/onboard/major.dart';
@@ -32,7 +28,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import "package:flutter_feather_icons/flutter_feather_icons.dart";
 import 'package:url_launcher/url_launcher.dart';
 
 class Mypage extends StatefulWidget {
@@ -51,6 +46,7 @@ class _MypageState extends State<Mypage> {
   bool isJustGPA = true;
   bool isJustCredit = true;
   List<TotalGPA> totalSemester = [];
+  int numCourses = 0;
 
   void initState() {
     super.initState();
@@ -61,6 +57,10 @@ class _MypageState extends State<Mypage> {
         totalSemester = loadedGPAList;
       });
     });
+
+    // course count
+    numCourses =
+        Provider.of<CoursesProvider>(context, listen: false).numCourses;
   }
 
   double getNumericGrade(String grade) {
@@ -192,8 +192,8 @@ class _MypageState extends State<Mypage> {
       case 'SR':
         department = 'Senior';
         break;
-      case 'Graduated':
-        department = 'GR';
+      case 'GR':
+        department = 'Graduated';
         break;
       default:
         department = 'New?'; // 기본값 또는 오류 처리
@@ -308,6 +308,8 @@ class _MypageState extends State<Mypage> {
           return CircularProgressIndicator();
         }
         print(userDetails.yearInSchool);
+        String departmentNickname =
+            userDetails.department?.nickname ?? 'Undecided';
         return ClipRRect(
           child: Scaffold(
             backgroundColor: Theme.of(context).colorScheme.background,
@@ -331,6 +333,7 @@ class _MypageState extends State<Mypage> {
                             },
                             child: ProfileWidget(
                               isBottomBar: false,
+                              isMePage: true,
                             )),
                         SizedBox(width: 10),
                         GestureDetector(
@@ -397,7 +400,7 @@ class _MypageState extends State<Mypage> {
                               width: 10,
                             ),
                             buildButton(
-                              '${userDetails.department!.nickname}',
+                              '$departmentNickname',
                               Color(0xFFe3ecff),
                               () {
                                 checkAccessToken();
@@ -447,9 +450,9 @@ class _MypageState extends State<Mypage> {
                                 },
                                 isSchool: true,
                                 isFrirend: false,
-                                photo: '${userDetails.institution!.logo}',
-                                info: '${userDetails.institution!.nickname}',
-                                subInfo: '${userDetails.institution!.fullName}',
+                                photo: '${userDetails.institution?.logo}',
+                                info: '${userDetails.institution?.nickname}',
+                                subInfo: '${userDetails.institution?.fullName}',
                               ),
                               SizedBox(width: 20),
                               InfoWidget(
@@ -459,6 +462,15 @@ class _MypageState extends State<Mypage> {
                                 photo: 'assets/memoji/Memoji1.png',
                                 info: "Friends",
                                 subInfo: "${friendsCount} friends",
+                              ),
+                              SizedBox(width: 20),
+                              InfoWidget(
+                                onTap: () {},
+                                isSchool: false,
+                                isFrirend: false,
+                                photo: 'assets/icons/splash.png',
+                                info: "Course",
+                                subInfo: "${numCourses} Courses",
                               ),
                               SizedBox(width: 20),
                               // InfoWidget(
@@ -496,68 +508,7 @@ class _MypageState extends State<Mypage> {
                           ),
                         ),
                       ),
-                      // SizedBox(height: 10),
-                      // Padding(
-                      //   padding: const EdgeInsets.symmetric(vertical: 10),
-                      //   child: Row(
-                      //     children: [
-                      //       Text(
-                      //         "GPA",
-                      //         style: TextStyle(
-                      //           fontSize: 25,
-                      //           color: Theme.of(context).colorScheme.outline,
-                      //           fontWeight: FontWeight.bold,
-                      //         ),
-                      //       ),
-                      //       Spacer(),
-                      //       GestureDetector(
-                      //         onTap: () {
-                      //           checkAccessToken();
-                      //           HapticFeedback.lightImpact();
-                      //           Navigator.push(
-                      //             context,
-                      //             CupertinoPageRoute(
-                      //               fullscreenDialog: true,
-                      //               builder: (context) =>
-                      //                   GPAPage(semester: _semester),
-                      //             ),
-                      //           );
-                      //         },
-                      //         child: Padding(
-                      //           padding: const EdgeInsets.only(right: 10),
-                      //           child: Container(
-                      //             height: 30,
-                      //             width: 50,
-                      //             decoration: BoxDecoration(
-                      //               color:
-                      //                   Theme.of(context).colorScheme.primary,
-                      //               borderRadius: BorderRadius.circular(10),
-                      //             ),
-                      //             child: Center(
-                      //               child: Text('More',
-                      //                   style: TextStyle(
-                      //                       color: Theme.of(context)
-                      //                           .colorScheme
-                      //                           .outline,
-                      //                       fontSize: 15,
-                      //                       fontWeight: FontWeight.bold)),
-                      //             ),
-                      //           ),
-                      //         ),
-                      //       )
-                      //     ],
-                      //   ),
-                      // ),
-                      // Padding(
-                      //   padding: const EdgeInsets.only(
-                      //       left: 10, right: 10, bottom: 10),
-                      //   child: GPAGraph(
-                      //     chartData: totalSemester
-                      //         .map((data) =>
-                      //             GraphData(data.semester, data.grade))
-                      //         .toList(),
-                      //   ),
-                      // ),
+
                       SizedBox(height: 10),
                       //  PremiumWidget(),
                       Padding(
@@ -569,6 +520,7 @@ class _MypageState extends State<Mypage> {
                         ),
                       ),
                       CustomizeCourseColor(onTap: () {
+                        HapticFeedback.mediumImpact();
                         checkAccessToken();
                         Navigator.push(
                           context,
@@ -578,8 +530,32 @@ class _MypageState extends State<Mypage> {
                           ),
                         );
                       }),
+                      SizedBox(height: 20),
+                      //  PremiumWidget(),
 
-                      SizedBox(height: 10),
+                      if (Platform.isIOS)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: Text(
+                            "App Icon",
+                            style: AugustFont.head1(
+                                color: Theme.of(context).colorScheme.outline),
+                          ),
+                        ),
+                      if (Platform.isIOS)
+                        CustomizeIcon(onTap: () {
+                          HapticFeedback.mediumImpact();
+                          checkAccessToken();
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              fullscreenDialog: true,
+                              builder: (context) => ChangeIconPage(),
+                            ),
+                          );
+                        }),
+
+                      SizedBox(height: 20),
                       //  PremiumWidget(),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 10),

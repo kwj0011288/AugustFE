@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:august/get_api/onboard/get_univ.dart';
+import 'package:august/onboard/done.dart';
 import 'package:august/onboard/grade.dart';
 import 'package:august/onboard/major.dart';
 import 'package:august/onboard/profile.dart';
@@ -95,7 +96,11 @@ class _OnBoardPageState extends State<OnBoardPage> {
           onboard: true,
           gonext: _navigateToNextOrHome,
           goBack: _navigateToPrevious,
-        )
+        ),
+        OnBoardDonePage(
+          goBack: _navigateToPrevious,
+          gonext: _navigateToNextOrHome,
+        ),
       ];
 
   @override

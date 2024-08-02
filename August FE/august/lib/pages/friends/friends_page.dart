@@ -1,7 +1,11 @@
 import 'dart:convert';
+import 'package:august/components/ad/ad_grid.dart';
+import 'package:august/components/ad/ad_list.dart';
 import 'package:august/components/friends/add_friend.dart';
 import 'package:august/components/friends/number_box.dart';
+import 'package:august/components/profile/profile.dart';
 import 'package:august/const/font/font.dart';
+import 'package:august/provider/courseprovider.dart';
 import 'package:august/provider/friends_provider.dart';
 import 'package:august/get_api/friends/delete_friend.dart';
 import 'package:august/get_api/friends/friends_sem.dart';
@@ -49,13 +53,12 @@ class _FriendsPageState extends State<FriendsPage>
   AnimationController? _refreshFriendsController;
   String? _ownInvitationCode;
 
+  int timetableLength = 0;
+
   @override
   void initState() {
     super.initState();
     loadFriends();
-
-    _loadProfilePhoto();
-    _listenForPhotoChanges(); // Listen for photo changes if using a Provider
     //refresh button
     _refreshFriendsController = AnimationController(
       duration: const Duration(seconds: 1),
@@ -75,6 +78,9 @@ class _FriendsPageState extends State<FriendsPage>
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     )..repeat(reverse: true);
+
+    timetableLength =
+        Provider.of<CoursesProvider>(context, listen: false).timetableLength;
   }
 
   void toggleisEdit(int friendListLength) {
@@ -105,47 +111,44 @@ class _FriendsPageState extends State<FriendsPage>
     );
   }
 
+  // Future<void> loadFriends() async {
+  //   try {
+  //     var fetchedFriends = await FriendInfos().fetchFriends();
+
+  //     if (mounted) {
+  //       setState(() {
+  //         friends = fetchedFriends;
+  //         print('friends: $friends');
+  //         isLoading = false;
+  //       });
+  //       Provider.of<FriendsProvider>(context, listen: false)
+  //           .setFriendsCount(friends.length);
+  //     }
+  //   } catch (e) {
+  //     if (mounted) {
+  //       setState(() {
+  //         isLoading = false;
+  //       });
+  //     }
+  //     print('Failed to load friends: $e');
+  //   }
+  // }
+
   Future<void> loadFriends() async {
-    try {
-      var fetchedFriends = await FriendInfos().fetchFriends();
-      if (mounted) {
-        setState(() {
-          friends = fetchedFriends;
-          isLoading = false;
-        });
-        Provider.of<FriendsProvider>(context, listen: false)
-            .setFriendsCount(friends.length);
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-        });
-      }
-      print('Failed to load friends: $e');
-    }
-  }
+    var fetchedFriends = await FriendInfos().fetchFriends();
 
-  void _listenForPhotoChanges() {
-    final photoNotifier =
-        Provider.of<ProfilePhotoNotifier>(context, listen: false);
-    photoNotifier.addListener(() {
-      if (mounted) {
-        setState(() {
-          profilePhoto = photoNotifier.photo;
-        });
-      }
-    });
-  }
-
-  Future<void> _loadProfilePhoto() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? base64Image = prefs.getString('contactPhoto');
-    if (base64Image != null) {
+    if (mounted) {
       setState(() {
-        profilePhoto = base64Decode(base64Image);
+        friends = fetchedFriends;
+        print('friends: $friends');
+        isLoading = false;
       });
+      Provider.of<FriendsProvider>(context, listen: false)
+          .setFriendsCount(friends.length);
     }
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -171,8 +174,8 @@ class _FriendsPageState extends State<FriendsPage>
       case 'SR':
         department = 'Senior';
         break;
-      case 'Graduated':
-        department = 'GR';
+      case 'GR':
+        department = 'Graduated';
         break;
       default:
         department = 'New?'; // 기본값 또는 오류 처리
@@ -275,7 +278,7 @@ class _FriendsPageState extends State<FriendsPage>
                       addFriend(inviteController.text);
                       inviteController.clear();
 
-                      Future.delayed(Duration(microseconds: 1500), () {
+                      Future.delayed(Duration(seconds: 3), () {
                         loadFriends();
                       });
                     },
@@ -314,6 +317,57 @@ class _FriendsPageState extends State<FriendsPage>
     );
   }
 
+  Future showNoTimetableDialog(BuildContext context) {
+    return showDialog(
+      context: context, // Add context parameter
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Want to see friend schedule?',
+            textAlign: TextAlign.center,
+            style: AugustFont.head5(
+              color: Theme.of(context).colorScheme.outline,
+            ),
+          ),
+          content: Text(
+            "Create your timetable first!",
+            textAlign: TextAlign.center,
+            style: AugustFont.subText2(
+              color: Theme.of(context).colorScheme.outline,
+            ),
+          ),
+          actions: <Widget>[
+            Center(
+              // Use Center widget to center the button horizontally
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 30),
+                  height: 55,
+                  decoration: BoxDecoration(
+                    color: Colors.redAccent,
+                    borderRadius: BorderRadius.circular(60),
+                  ),
+                  child: Center(
+                    // Center the content inside the button
+                    child: Text(
+                      'Okay',
+                      style: AugustFont.head4(
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> deleteFriends(int friendId) async {
     // Show a confirmation dialog to confirm deletion
     final bool? deleted = await showDialog<bool>(
@@ -325,18 +379,16 @@ class _FriendsPageState extends State<FriendsPage>
             title: Text(
               textAlign: TextAlign.center,
               'Are you sure?',
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.outline,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold),
+              style: AugustFont.head5(
+                color: Theme.of(context).colorScheme.outline,
+              ),
             ),
             content: Text(
               textAlign: TextAlign.center,
-              "He/She will be removed from friends list.",
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.outline,
-                  fontSize: 15,
-                  fontWeight: FontWeight.normal),
+              "He/She will be removed from friends list",
+              style: AugustFont.subText2(
+                color: Theme.of(context).colorScheme.outline,
+              ),
             ),
             actions: <Widget>[
               Row(
@@ -359,10 +411,9 @@ class _FriendsPageState extends State<FriendsPage>
                         children: [
                           Text(
                             'Delete',
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20),
+                            style: AugustFont.head4(
+                              color: Colors.black,
+                            ),
                           ),
                         ],
                       ),
@@ -386,10 +437,9 @@ class _FriendsPageState extends State<FriendsPage>
                         children: [
                           Text(
                             'Keep',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20),
+                            style: AugustFont.head4(
+                              color: Colors.white,
+                            ),
                           ),
                         ],
                       ),
@@ -576,7 +626,7 @@ class _FriendsPageState extends State<FriendsPage>
                                   width: 30,
                                   height: 30,
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(30),
+                                    borderRadius: BorderRadius.circular(10),
                                     color:
                                         Theme.of(context).colorScheme.primary,
                                   ),
@@ -608,8 +658,8 @@ class _FriendsPageState extends State<FriendsPage>
                             child: GridView.extent(
                               maxCrossAxisExtent:
                                   200, // Max width of each item, adjust as needed
-                              padding:
-                                  EdgeInsets.only(top: 10, left: 20, right: 20),
+                              padding: EdgeInsets.only(
+                                  top: 10, left: 20, right: 20, bottom: 20),
                               crossAxisSpacing: 20.0,
                               mainAxisSpacing: 20.0,
                               childAspectRatio: (10 / 11),
@@ -617,32 +667,9 @@ class _FriendsPageState extends State<FriendsPage>
                               children: List.generate(
                                 friends.length + 2,
                                 (index) {
-                                  if (index == friends.length) {
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primaryContainer,
-                                        borderRadius: BorderRadius.circular(10),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .shadow,
-                                            blurRadius: 10,
-                                            offset: Offset(6, 4),
-                                          ),
-                                          BoxShadow(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .shadow,
-                                            blurRadius: 10,
-                                            offset: Offset(-2, 0),
-                                          ),
-                                        ],
-                                      ),
-                                      child: Center(child: Text('Ad space')),
-                                    );
+                                  if (index == friends.length &&
+                                      friends.isNotEmpty) {
+                                    return googleAdMobGridList();
                                   } else if (index == friends.length + 1) {
                                     return GestureDetector(
                                       onTap: () {
@@ -727,7 +754,8 @@ class _FriendsPageState extends State<FriendsPage>
                                                     friends[index].profileImage,
                                                 name: friends[index].name,
                                                 department:
-                                                    friends[index].department,
+                                                    friends[index].department ??
+                                                        'Undecided',
                                                 yearInSchool: convertDepartment(
                                                     friends[index]
                                                         .yearInSchool),
@@ -781,23 +809,12 @@ class _FriendsPageState extends State<FriendsPage>
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.center,
                                                 children: [
-                                                  CircleAvatar(
-                                                    maxRadius: 50,
-                                                    backgroundImage: friends[
-                                                                    index]
-                                                                .profileImage !=
-                                                            null
-                                                        ? NetworkImage(
-                                                            friends[index]
-                                                                .profileImage!)
-                                                        : null,
-                                                    child: friends[index]
-                                                                .profileImage ==
-                                                            null
-                                                        ? Icon(Icons.person,
-                                                            size: 45)
-                                                        : null,
-                                                  ),
+                                                  ProfileWidget(
+                                                      isBottomBar: false,
+                                                      isFriendsPage: true,
+                                                      friendPhoto:
+                                                          friends[index]
+                                                              .profileImage!),
                                                   SizedBox(height: 5),
                                                   Text(
                                                     friends[index].name,
@@ -820,7 +837,8 @@ class _FriendsPageState extends State<FriendsPage>
                                                     children: [
                                                       Text(
                                                         friends[index]
-                                                            .department,
+                                                                .department ??
+                                                            'Undecided',
                                                         style: AugustFont
                                                             .captionBold(
                                                           color: Colors.grey,
@@ -837,7 +855,8 @@ class _FriendsPageState extends State<FriendsPage>
                                                       SizedBox(width: 5),
                                                       Text(
                                                         friends[index]
-                                                            .yearInSchool,
+                                                            .institution!
+                                                            .nickname,
                                                         style: AugustFont
                                                             .captionBold(
                                                           color: Colors.grey,
@@ -922,7 +941,9 @@ class _FriendsPageState extends State<FriendsPage>
                                   padding: const EdgeInsets.all(10.0),
                                   child: GestureDetector(
                                     onTap: () async {
-                                      InvitationInput();
+                                      (timetableLength == 0)
+                                          ? showNoTimetableDialog(context)
+                                          : InvitationInput();
                                       await checkAccessToken();
                                     },
                                     child: Container(

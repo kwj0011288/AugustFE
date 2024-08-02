@@ -48,14 +48,37 @@ class _NamePageState extends State<NamePage> {
     _loadUserFuture = loadInfo();
   }
 
-  void updateProfileImage(String imagePath) {
+  Future<void> updateProfileImage(String imagePath) async {
+    int? userPk = await fetchUserPk();
+    if (userPk == null) {
+      print("Failed to fetch userPk");
+      return;
+    }
     Provider.of<UserInfoProvider>(context, listen: false)
         .updateUserProfileImage(imagePath);
-    _saveInfo();
+
+    File imageFile = File(imagePath);
+    updatePhoto(userPk, imageFile).then((_) {
+      print('Name updated successfully with $imagePath');
+      _saveInfo();
+    }).catchError((error) {
+      print('Failed to update name: $error');
+    });
   }
 
-  void updateName(String name) {
+  Future<void> updateUserName(String name) async {
+    int? userPk = await fetchUserPk();
+    if (userPk == null) {
+      print("Failed to fetch userPk");
+      return;
+    }
     Provider.of<UserInfoProvider>(context, listen: false).updateUserName(name);
+    updateName(userPk, name).then((_) {
+      print('Name updated successfully with $name');
+      _saveInfo();
+    }).catchError((error) {
+      print('Failed to update name: $error');
+    });
   }
 
   Future<void> getImage() async {
@@ -86,46 +109,6 @@ class _NamePageState extends State<NamePage> {
     }
   }
 
-/*
-Future<void> _pickContact() async {
-    try {
-      Contact? contact = await ContactsService.openDeviceContactPicker();
-      if (contact != null) {
-        // Concatenate givenName and familyName to get the full name
-        String fullName = '';
-        if (contact.givenName != null) {
-          fullName += contact.givenName!;
-        }
-        if (contact.familyName != null) {
-          // Add a space before the family name if the given name is not null
-          if (fullName.isNotEmpty) {
-            fullName += ' ';
-          }
-          fullName += contact.familyName!;
-        }
-
-        setState(() {
-          setState(() {
-            contactPhoto = contact.avatar;
-            widget.onPhotoUpdated(contactPhoto); // Add this
-          });
-
-          _nameController.text = fullName; // Set the contact's full name
-        });
-
-        // Debugging: Check if the photo was fetched
-        if (contactPhoto != null) {
-          print("Contact photo fetched successfully.");
-        } else {
-          print("No photo available for this contact.");
-        }
-      }
-    } catch (e) {
-      // Handle any errors here and print them for debugging
-      print("Error picking contact: $e");
-    }
-  }
-*/
   Future<void> pickFromContact() async {
     try {
       Contact? contact = await ContactsService.openDeviceContactPicker();
@@ -145,6 +128,7 @@ Future<void> _pickContact() async {
         }
         Provider.of<UserInfoProvider>(context, listen: false)
             .updateUserName(fullName);
+        _nameController.text = fullName;
       }
 
       if (contact != null &&
@@ -164,16 +148,14 @@ Future<void> _pickContact() async {
   }
 
   Future<void> useDefaultImage() async {
-    setState(() {
-      imagePath = 'assets/icons/memoji.png';
-    });
-    updateProfileImage(imagePath!); // Update shared state
+    imagePath = await getUserDefaultPhoto();
+    updateProfileImage(imagePath!);
   }
 
   Future<void> loadInfo() async {
     var infoProvider =
         Provider.of<UserInfoProvider>(context, listen: false).userInfo;
-    _nameController.text = infoProvider!.name;
+    _nameController.text = infoProvider!.name!;
     imagePath = infoProvider.profileImage;
 
     // setState(() {
@@ -187,16 +169,6 @@ Future<void> _pickContact() async {
         Provider.of<UserInfoProvider>(context, listen: false).userInfo;
     infoProvider!.name = _nameController.text;
     infoProvider.profileImage = imagePath;
-  }
-
-  Widget buildImage() {
-    if (imagePath == null) {
-      return Image.asset('assets/icons/memoji.png'); // Default placeholder
-    } else if (imagePath!.startsWith('http')) {
-      return Image.network(imagePath!);
-    } else {
-      return Image.asset(imagePath!);
-    }
   }
 
   @override
@@ -272,91 +244,6 @@ Future<void> _pickContact() async {
                                   HapticFeedback.mediumImpact();
                                 },
                               ),
-                              // child: CustomPopup(
-                              //   showArrow: false,
-                              //   contentPadding: EdgeInsets.symmetric(
-                              //       horizontal: 30, vertical: 10),
-                              //   arrowColor: Theme.of(context)
-                              //       .colorScheme
-                              //       .primaryContainer,
-                              //   backgroundColor: Theme.of(context)
-                              //       .colorScheme
-                              //       .primaryContainer,
-                              //   content: Column(
-                              //     mainAxisSize: MainAxisSize.min,
-                              //     crossAxisAlignment: CrossAxisAlignment.start,
-                              //     children: <Widget>[
-                              //       GestureDetector(
-                              //         onTap: _pickContact,
-                              //         child: Text(
-                              //           'Get Memoji from Contacts',
-                              //           style: TextStyle(
-                              //             fontWeight: FontWeight.bold,
-                              //             color: Theme.of(context)
-                              //                 .colorScheme
-                              //                 .outline,
-                              //           ),
-                              //         ),
-                              //       ),
-                              //       SizedBox(height: 5),
-                              //       GestureDetector(
-                              //         child: Text(
-                              //           'Open Photo App',
-                              //           style: TextStyle(
-                              //             fontWeight: FontWeight.bold,
-                              //             color: Theme.of(context)
-                              //                 .colorScheme
-                              //                 .outline,
-                              //           ),
-                              //         ),
-                              //         onTap: getImage,
-                              //       ),
-                              //       SizedBox(height: 5),
-                              //       GestureDetector(
-                              //         child: Text(
-                              //           'Use Default Image',
-                              //           style: TextStyle(
-                              //             fontWeight: FontWeight.bold,
-                              //             color: Theme.of(context)
-                              //                 .colorScheme
-                              //                 .outline,
-                              //           ),
-                              //         ),
-                              //         onTap: () async {
-                              //           ByteData data = await rootBundle
-                              //               .load('assets/icons/memoji.png');
-                              //           Uint8List bytes =
-                              //               data.buffer.asUint8List();
-                              //           setState(() {
-                              //             contactPhoto = bytes;
-                              //           });
-                              //           _saveInfo();
-                              //         },
-                              //       ),
-                              //     ],
-                              //   ),
-                              //   child: Container(
-                              //     height: 50,
-                              //     width: 50,
-                              //     decoration: BoxDecoration(
-                              //       color: Theme.of(context)
-                              //           .colorScheme
-                              //           .background,
-                              //       shape: BoxShape.circle,
-                              //       border: Border.all(
-                              //         color:
-                              //             Theme.of(context).colorScheme.outline,
-                              //         width: 2.0,
-                              //       ),
-                              //     ),
-                              //     child: Icon(
-                              //       Icons.add,
-                              //       color:
-                              //           Theme.of(context).colorScheme.outline,
-                              //       size: 40,
-                              //     ),
-                              //   ),
-                              // ),
                             ),
                           ],
                         ),
@@ -384,6 +271,9 @@ Future<void> _pickContact() async {
                           onChanged: (text) {
                             setState(() {}); // 텍스트 필드의 내용이 변경될 때마다 UI 업데이트
                           },
+                          onSubmitted: (text) {
+                            updateUserName(text);
+                          },
                           maxLength: 12,
                         ),
                       ),
@@ -402,6 +292,7 @@ Future<void> _pickContact() async {
                   ? GestureDetector(
                       onTap: () {
                         FocusScope.of(context).unfocus();
+                        updateUserName(_nameController.text);
                         Future.delayed(Duration(milliseconds: 200), () {
                           widget.onTap();
                           // _saveAndClose();
@@ -428,7 +319,8 @@ Future<void> _pickContact() async {
                     )
                   : GestureDetector(
                       onTap: () {
-                        //_saveAndClose();
+                        Navigator.pop(context);
+                        updateUserName(_nameController.text);
                         HapticFeedback.mediumImpact();
                       },
                       child: Container(
@@ -455,16 +347,5 @@ Future<void> _pickContact() async {
         }
       },
     );
-  }
-}
-
-class ProfilePhotoNotifier extends ChangeNotifier {
-  Uint8List? _photo;
-
-  Uint8List? get photo => _photo;
-
-  void updatePhoto(Uint8List? newPhoto) {
-    _photo = newPhoto;
-    notifyListeners();
   }
 }

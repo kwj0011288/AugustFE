@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:august/const/colors/tile_color.dart';
+import 'package:august/const/font/font.dart';
 import 'package:flutter/material.dart';
 
 Widget animationFriend(Color color, String imagePath) {
@@ -26,9 +27,11 @@ Widget animationFriend(Color color, String imagePath) {
                   ),
                 ),
                 const SizedBox(height: 5),
-                const Text(
+                Text(
                   "August",
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  style: AugustFont.head4(
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
                 ),
               ],
             ),

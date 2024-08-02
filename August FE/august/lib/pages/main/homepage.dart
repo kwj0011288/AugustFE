@@ -2,6 +2,7 @@ import 'package:august/components/home/my_bottombar.dart';
 import 'package:august/components/profile/profile.dart';
 import 'package:august/const/device/device_util.dart';
 import 'package:august/const/customs/save_image.dart';
+import 'package:august/get_api/onboard/get_user_info.dart';
 import 'package:august/login/login.dart';
 import 'package:august/onboard/onboard.dart';
 import 'package:august/provider/user_info_provider.dart';
@@ -69,21 +70,21 @@ class _HomePageState extends State<HomePage> {
 
     // isFirst 값이 로컬ㄹ에 저장되었는지 확인
     bool? hasCheckedFirst = prefs.getBool('hasCheckedFirst');
-    if (hasCheckedFirst == null) {
-      final userDetails =
-          Provider.of<UserInfoProvider>(context, listen: false).userInfo;
+    isFirst = prefs.getBool('isFirst') ?? false;
 
-      if (userDetails == null) {
-        CircularProgressIndicator();
-      } else {
-        // 앱이 처음 실행되는 경우, isFirst 값을 계산하여 저장
-        String dateJoined = userDetails!.dateJoined;
-        print(dateJoined);
-        print('dateJoined: $dateJoined');
-        isFirst = isTodayOrWithin5min(dateJoined);
-        await prefs.setBool('hasCheckedFirst', true);
-        await prefs.setBool('isFirst', isFirst);
-      }
+    /* --- load user info --- */
+    UserInfoProvider userInfoProvider =
+        Provider.of<UserInfoProvider>(context, listen: false);
+    await userInfoProvider.loadUserInfo();
+
+    UserDetails? userDetails = userInfoProvider.userInfo;
+    if (hasCheckedFirst == null) {
+      String dateJoined = userDetails?.dateJoined ?? '2021-01-01T00:00:00.000Z';
+      print(dateJoined);
+      print('dateJoined: $dateJoined');
+      isFirst = isTodayOrWithin5min(dateJoined);
+      await prefs.setBool('hasCheckedFirst', true);
+      await prefs.setBool('isFirst', isFirst);
     } else {
       // 이미 저장된 isFirst 값을 사용
       isFirst = prefs.getBool('isFirst') ?? false;
@@ -100,7 +101,7 @@ class _HomePageState extends State<HomePage> {
 
     if (isFirst == true) {
       // isFirst가 true인 경우에만 onBoarding 체크
-      Future.delayed(Duration(milliseconds: 500), () async {
+      Future.delayed(Duration(milliseconds: 0), () async {
         checkAndShowOnBoarding();
       });
     } else {

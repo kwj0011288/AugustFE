@@ -8,7 +8,12 @@ import 'package:shimmer/shimmer.dart';
 
 class googleAdMobContainer extends StatefulWidget {
   final bool isGroup;
-  const googleAdMobContainer({super.key, required this.isGroup});
+  final bool isMedium;
+  const googleAdMobContainer({
+    super.key,
+    required this.isGroup,
+    this.isMedium = false,
+  });
 
   @override
   State<googleAdMobContainer> createState() => _googleAdMobContainerState();
@@ -21,7 +26,7 @@ class _googleAdMobContainerState extends State<googleAdMobContainer> {
   @override
   void initState() {
     _nativeAd = NativeAd(
-      factoryId: 'listTile',
+      factoryId: widget.isMedium ? 'listTileMedium' : 'listTile',
       adUnitId: AdHelper.nativeAdUnitId,
       request: const AdRequest(),
       listener: NativeAdListener(
@@ -76,7 +81,7 @@ class _googleAdMobContainerState extends State<googleAdMobContainer> {
               right: 15,
             ),
             child: Container(
-              height: 120,
+              height: widget.isGroup ? 100 : 120,
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.primary,
                 borderRadius: BorderRadius.circular(12),

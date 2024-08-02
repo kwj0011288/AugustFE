@@ -1,22 +1,22 @@
 class UserDetails {
-  int id;
-  String email;
-  String name;
-  Institution? institution; // Make nullable
-  Department? department; // Make nullable
+  int? id;
+  String? email;
+  String? name;
+  Institution? institution;
+  Department? department;
   String? profileImage;
-  String yearInSchool;
-  String dateJoined;
+  String? yearInSchool;
+  String? dateJoined;
 
   UserDetails({
-    required this.id,
-    required this.email,
-    required this.name,
-    this.institution, // Updated to be nullable
-    this.department, // Updated to be nullable
-    required this.profileImage,
-    required this.yearInSchool,
-    required this.dateJoined,
+    this.id,
+    this.email,
+    this.name,
+    this.institution,
+    this.department,
+    this.profileImage,
+    this.yearInSchool,
+    this.dateJoined,
   });
 
   factory UserDetails.fromJson(Map<String, dynamic> json) {
@@ -30,9 +30,7 @@ class UserDetails {
       department: json['department'] != null
           ? Department.fromJson(json['department'])
           : null,
-      profileImage: json['profile_image'] != null
-          ? json['profile_image']
-          : 'https://augustapp.one/media/institution_logos/umd.png',
+      profileImage: json['profile_image'],
       yearInSchool: json['year_in_school'],
       dateJoined: json['date_joined'],
     );
@@ -40,38 +38,40 @@ class UserDetails {
 }
 
 class Institution {
-  final int id;
-  final String fullName;
-  final String nickname;
-  final String logo;
+  int? id;
+  String? fullName;
+  String? nickname;
+  String? logo;
 
-  Institution(
-      {required this.id,
-      required this.fullName,
-      required this.nickname,
-      required this.logo});
+  Institution({
+    this.id,
+    this.fullName,
+    this.nickname,
+    this.logo,
+  });
 
   factory Institution.fromJson(Map<String, dynamic> json) {
     return Institution(
       id: json['id'],
       fullName: json['full_name'],
       nickname: json['nickname'],
-      logo: json['inst_logo'] != null ? json['inst_logo'] : '',
+      logo: json['inst_logo'],
     );
   }
 }
 
 class Department {
-  final int id;
-  final String fullName;
-  final String nickname;
-  final int institutionId;
+  int? id;
+  String? fullName;
+  String? nickname;
+  int? institutionId;
 
-  Department(
-      {required this.id,
-      required this.fullName,
-      required this.nickname,
-      required this.institutionId});
+  Department({
+    this.id,
+    this.fullName,
+    this.nickname,
+    this.institutionId,
+  });
 
   factory Department.fromJson(Map<String, dynamic> json) {
     return Department(

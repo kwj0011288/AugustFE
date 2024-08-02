@@ -115,21 +115,42 @@ class _SearchTileState extends State<SearchTile> {
               ),
               Container(
                 width: 100, // 너비 조절
-                height: 90, // 높이 조절
+                height: 113, // 높이 조절
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.5),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(5),
+                  padding: const EdgeInsets.all(10),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center, // 수직 방향 중앙 정렬
                     crossAxisAlignment: CrossAxisAlignment.start, // 수평 방향 중앙 정렬
                     children: [
                       Padding(
+                        padding: const EdgeInsets.only(left: 5, bottom: 5),
+                        child: Text(
+                          'Seats: ${widget.fullSeat}',
+                          style: AugustFont.searchedSeat(color: Colors.black),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 5, bottom: 5),
+                        child: Text(
+                          'Open: ${widget.openSeat}',
+                          style: AugustFont.searchedSeat(color: Colors.black),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 5, bottom: 5),
+                        child: Text(
+                          'Waitlist: ${widget.waitlist}',
+                          style: AugustFont.searchedSeat(color: Colors.black),
+                        ),
+                      ),
+                      Padding(
                         padding: const EdgeInsets.only(left: 5),
                         child: Text(
-                          'Seats: ${widget.fullSeat}\nOpen: ${widget.openSeat}\nWaitlist: ${widget.waitlist}\nHoldfile: ${widget.holdfile}',
+                          'Holdfile: ${widget.holdfile}',
                           style: AugustFont.searchedSeat(color: Colors.black),
                         ),
                       ),

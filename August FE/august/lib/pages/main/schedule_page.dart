@@ -18,6 +18,7 @@ import 'package:august/get_api/timetable/set_timetable_name.dart';
 import 'package:august/login/login.dart';
 import 'package:august/onboard/semester.dart';
 import 'package:august/pages/search/search_page.dart';
+import 'package:august/provider/courseprovider.dart';
 import 'package:august/provider/semester_provider.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
@@ -214,6 +215,11 @@ class _SchedulePageState extends State<SchedulePage>
 
         return newTimetable;
       }).toList();
+      Provider.of<CoursesProvider>(context, listen: false).timetableLength =
+          timetableOrder.length;
+
+      Provider.of<CoursesProvider>(context, listen: false).numCourses =
+          _timetableCollection[0].coursesData[0].length;
 
       await saveTimetableToLocalStorage();
     } catch (e) {

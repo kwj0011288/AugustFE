@@ -5,7 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 class InfoWidget extends StatefulWidget {
   final String info;
-  final String photo;
+  final String? photo;
   final String subInfo;
   final VoidCallback onTap;
   final bool isSchool;
@@ -69,28 +69,33 @@ class _InfoWidgetState extends State<InfoWidget> {
                         child: Icon(Icons.grade),
                         backgroundColor: Colors.white,
                       )
-                    : widget.isSchool
-                        ? ClipOval(
-                            child: CachedNetworkImage(
-                              width: 50,
-                              height: 50,
-                              imageUrl: widget.photo,
-                              progressIndicatorBuilder:
-                                  (context, url, downloadProgress) =>
-                                      CircularProgressIndicator(
-                                          value: downloadProgress.progress),
-                              errorWidget: (context, url, error) =>
-                                  CircleAvatar(
-                                maxRadius: 25,
-                                backgroundColor: Colors.white,
+                    : widget.photo == null
+                        ? Container()
+                        : widget.isSchool
+                            ? ClipOval(
+                                child: CachedNetworkImage(
+                                  width: 50,
+                                  height: 50,
+                                  imageUrl: widget.photo!,
+                                  progressIndicatorBuilder:
+                                      (context, url, downloadProgress) =>
+                                          CircularProgressIndicator(
+                                              value: downloadProgress.progress),
+                                  errorWidget: (context, url, error) =>
+                                      CircleAvatar(
+                                    maxRadius: 25,
+                                    backgroundColor: Colors.white,
+                                  ),
+                                ),
+                              )
+                            : ClipOval(
+                                child: CircleAvatar(
+                                  maxRadius: 25,
+                                  child: Image.asset(widget.photo!,
+                                      fit: BoxFit.cover, width: 50, height: 50),
+                                  backgroundColor: Colors.red,
+                                ),
                               ),
-                            ),
-                          )
-                        : CircleAvatar(
-                            maxRadius: 25,
-                            child: Image.asset(widget.photo),
-                            backgroundColor: Colors.white,
-                          ),
             SizedBox(
               height: 25,
             ),

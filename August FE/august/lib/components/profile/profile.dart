@@ -1,15 +1,34 @@
+import 'dart:typed_data';
+import 'dart:convert';
+import 'dart:io';
+import 'package:august/provider/user_info_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:contacts_service/contacts_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:august/provider/user_info_provider.dart';
+import 'package:http/http.dart' as http;
+
+// UserInfoProvider remains the same, but ensure it is capable of handling new image data.
 
 class ProfileWidget extends StatefulWidget {
   final bool isBottomBar;
   final bool isProfilePage;
+  final bool isMePage;
+  final bool isMyCode;
+  final bool isFriendsPage;
+  final String friendPhoto;
   const ProfileWidget({
     Key? key,
     required this.isBottomBar,
     this.isProfilePage = false,
+    this.isMePage = false,
+    this.isMyCode = false,
+    this.isFriendsPage = false,
+    this.friendPhoto = '',
   }) : super(key: key);
 
   @override
@@ -17,51 +36,45 @@ class ProfileWidget extends StatefulWidget {
 }
 
 class _ProfileWidgetState extends State<ProfileWidget> {
+  Future<MemoryImage?> getMemoryImage(String url) async {
+    try {
+      final response = await http.get(Uri.parse(url));
+      return MemoryImage(response.bodyBytes);
+    } catch (e) {
+      print("Failed to load image: $e");
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Consumer<UserInfoProvider>(
-      builder: (context, userProvider, child) {
-        var userDetails = userProvider.userInfo;
+    var userProvider = Provider.of<UserInfoProvider>(context);
+    var userDetails = userProvider.userInfo;
 
-        // Check if userDetails is null and handle the UI accordingly
-        if (userDetails == null) {
-          return CircularProgressIndicator();
-        }
+    if (userDetails == null || userDetails.profileImage == null) {
+      return CircularProgressIndicator();
+    }
 
-        // Ensure the profile image URL is not null using null-aware operators
-        var profileImageUrl = userDetails.profileImage ??
-            'https://augustapp.one/media/institution_logos/umd.png';
-
-        return Padding(
-          padding:
-              widget.isBottomBar ? const EdgeInsets.all(5.0) : EdgeInsets.zero,
-          child: ClipOval(
-            child: widget.isProfilePage
-                ? SizedBox(
-                    width: 200,
-                    height: 200,
-                    child: CircleAvatar(
-                      backgroundColor: Colors.grey,
-                      foregroundColor: Theme.of(context).colorScheme.background,
-                      backgroundImage: profileImageUrl == null
-                          ? null
-                          : CachedNetworkImageProvider(profileImageUrl),
-                    ),
-                  )
-                : CachedNetworkImage(
-                    width: 50,
-                    height: 50,
-                    imageUrl: profileImageUrl,
-                    placeholder: (context, url) => CircularProgressIndicator(),
-                    errorWidget: (context, url, error) => CircleAvatar(
-                      maxRadius: 25,
-                      backgroundColor: Colors.white,
-                      child: Icon(Icons.error, color: Colors.red),
-                    ),
-                  ),
-          ),
-        );
-      },
+    String profileImageUrl = userDetails.profileImage!;
+    return Padding(
+      padding: widget.isBottomBar ? const EdgeInsets.all(5.0) : EdgeInsets.zero,
+      child: CircleAvatar(
+        radius: widget.isFriendsPage
+            ? 50
+            : widget.isMePage
+                ? 20
+                : widget.isProfilePage
+                    ? 100
+                    : widget.isMyCode
+                        ? 50
+                        : 30,
+        backgroundColor: Colors.grey,
+        backgroundImage: widget.isFriendsPage
+            ? CachedNetworkImageProvider(widget.friendPhoto)
+            : profileImageUrl.startsWith('http')
+                ? NetworkImage(profileImageUrl) as ImageProvider
+                : FileImage(File(profileImageUrl)),
+      ),
     );
   }
 }

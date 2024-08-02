@@ -1,29 +1,35 @@
 import 'dart:convert';
+import 'package:august/get_api/onboard/get_univ.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FriendInfo {
   final int id;
   final String name;
-  final String department;
+  String? department;
   final String? profileImage;
   final String yearInSchool;
+  final Institution? institution;
 
   FriendInfo({
     required this.id,
     required this.name,
-    required this.department,
+    this.department,
     this.profileImage,
     required this.yearInSchool,
+    this.institution,
   });
 
   factory FriendInfo.fromJson(Map<String, dynamic> json) {
     return FriendInfo(
       id: json['id'],
       name: json['name'],
-      department: json['department'],
+      department: json['department'] != null ? json['department'] : null,
       profileImage: json['profile_image'],
       yearInSchool: json['year_in_school'],
+      institution: json['institution'] != null
+          ? Institution.fromJson(json['institution'])
+          : null,
     );
   }
 }
@@ -57,7 +63,8 @@ class FriendInfos {
       throw Exception(
           'Unauthorized request: Please check your authentication token.');
     } else {
-      throw Exception('Failed to load friends: ${response.body}');
+      throw Exception(
+          'Failed to load friends on get friends.dart:  ${response.body}');
     }
   }
 }

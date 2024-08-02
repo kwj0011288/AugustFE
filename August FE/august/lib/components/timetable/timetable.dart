@@ -432,308 +432,327 @@ class _SingleTimetableState extends State<SingleTimetable> {
                         child: (widget.isFriend == false)
                             ? SingleChildScrollView(
                                 child: Container(
-                                width: MediaQuery.of(context)
-                                    .size
-                                    .width, // 화면 너비에 맞춤
-                                color: boxColor,
-                                child: Column(
-                                  children: [
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                          left: 20, top: 20, right: 20),
-                                      child: Align(
-                                        alignment:
-                                            Alignment.centerLeft, // 왼쪽 정렬
-                                        child: Text(
-                                          'Course',
-                                          style: AugustFont.subText5(
-                                              color: Colors.black),
+                                  width: MediaQuery.of(context)
+                                      .size
+                                      .width, // 화면 너비에 맞춤
+                                  color: boxColor,
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            left: 20, top: 20, right: 20),
+                                        child: Align(
+                                          alignment:
+                                              Alignment.centerLeft, // 왼쪽 정렬
+                                          child: Text(
+                                            'Course',
+                                            style: AugustFont.subText5(
+                                                color: Colors.black),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                          left: 20, top: 5, right: 20),
-                                      child: Align(
-                                        alignment:
-                                            Alignment.centerLeft, // 왼쪽 정렬
-                                        child: Text(
-                                          '${schedule.sectionCode}',
-                                          style: AugustFont.head1(
-                                              color: Colors.black),
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            left: 20, top: 5, right: 20),
+                                        child: Align(
+                                          alignment:
+                                              Alignment.centerLeft, // 왼쪽 정렬
+                                          child: Text(
+                                            '${schedule.sectionCode}',
+                                            style: AugustFont.head1(
+                                                color: Colors.black),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                          left: 20, top: 20, right: 20),
-                                      child: Align(
-                                        alignment:
-                                            Alignment.centerLeft, // 왼쪽 정렬
-                                        child: Text(
-                                          'Name',
-                                          style: AugustFont.subText5(
-                                              color: Colors.black),
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            left: 20, top: 20, right: 20),
+                                        child: Align(
+                                          alignment:
+                                              Alignment.centerLeft, // 왼쪽 정렬
+                                          child: Text(
+                                            'Name',
+                                            style: AugustFont.subText5(
+                                                color: Colors.black),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                          left: 20, top: 5, right: 20),
-                                      child: Align(
-                                        alignment:
-                                            Alignment.centerLeft, // 왼쪽 정렬
-                                        child: Text(
-                                          '${schedule.name}',
-                                          style: AugustFont.head1(
-                                              color: Colors.black),
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            left: 20, top: 5, right: 20),
+                                        child: Align(
+                                          alignment:
+                                              Alignment.centerLeft, // 왼쪽 정렬
+                                          child: Text(
+                                            '${schedule.name}',
+                                            style: AugustFont.head1(
+                                                color: Colors.black),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                          left: 20, top: 20, right: 20),
-                                      child: Align(
-                                        alignment:
-                                            Alignment.centerLeft, // 왼쪽 정렬
-                                        child: Text(
-                                          'Instructor',
-                                          style: AugustFont.subText5(
-                                              color: Colors.black),
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            left: 20, top: 20, right: 20),
+                                        child: Align(
+                                          alignment:
+                                              Alignment.centerLeft, // 왼쪽 정렬
+                                          child: Text(
+                                            'Instructor',
+                                            style: AugustFont.subText5(
+                                                color: Colors.black),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                          left: 20, top: 5, right: 20),
-                                      child: Align(
-                                        alignment:
-                                            Alignment.centerLeft, // 왼쪽 정렬
-                                        child: Text(
-                                          '${schedule.instructors?.join(', ')}',
-                                          style: AugustFont.head1(
-                                              color: Colors.black),
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            left: 20, top: 5, right: 20),
+                                        child: Align(
+                                          alignment:
+                                              Alignment.centerLeft, // 왼쪽 정렬
+                                          child: Text(
+                                            '${schedule.instructors?.join(', ')}',
+                                            style: AugustFont.head1(
+                                                color: Colors.black),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                          left: 20, top: 20, right: 20),
-                                      child: Align(
-                                        alignment:
-                                            Alignment.centerLeft, // 왼쪽 정렬
-                                        child: Text(
-                                          'Time',
-                                          style: AugustFont.subText5(
-                                              color: Colors.black),
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            left: 20, top: 20, right: 20),
+                                        child: Align(
+                                          alignment:
+                                              Alignment.centerLeft, // 왼쪽 정렬
+                                          child: Text(
+                                            'Time',
+                                            style: AugustFont.subText5(
+                                                color: Colors.black),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                          left: 20, top: 5, right: 20),
-                                      child: Align(
-                                        alignment:
-                                            Alignment.centerLeft, // 왼쪽 정렬
-                                        child: Text(
-                                          '${_formatTime(_parseTime(meeting.startTime ?? ''))} ~ ${_formatTime(_parseTime(meeting.endTime ?? ''))}',
-                                          style: AugustFont.head1(
-                                              color: Colors.black),
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            left: 20, top: 5, right: 20),
+                                        child: Align(
+                                          alignment:
+                                              Alignment.centerLeft, // 왼쪽 정렬
+                                          child: Text(
+                                            '${_formatTime(_parseTime(meeting.startTime ?? ''))} ~ ${_formatTime(_parseTime(meeting.endTime ?? ''))}',
+                                            style: AugustFont.head1(
+                                                color: Colors.black),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                          left: 20, top: 20, right: 20),
-                                      child: Align(
-                                        alignment:
-                                            Alignment.centerLeft, // 왼쪽 정렬
-                                        child: Text(
-                                          'Location',
-                                          style: AugustFont.subText5(
-                                              color: Colors.black),
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            left: 20, top: 20, right: 20),
+                                        child: Align(
+                                          alignment:
+                                              Alignment.centerLeft, // 왼쪽 정렬
+                                          child: Text(
+                                            'Location',
+                                            style: AugustFont.subText5(
+                                                color: Colors.black),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                          left: 20, top: 5, right: 20),
-                                      child: Align(
-                                        alignment:
-                                            Alignment.centerLeft, // 왼쪽 정렬
-                                        child: Text(
-                                          '${meeting.building} ${meeting.room}',
-                                          style: AugustFont.head1(
-                                              color: Colors.black),
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            left: 20, top: 5, right: 20),
+                                        child: Align(
+                                          alignment:
+                                              Alignment.centerLeft, // 왼쪽 정렬
+                                          child: Text(
+                                            '${meeting.building} ${meeting.room}',
+                                            style: AugustFont.head1(
+                                                color: Colors.black),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                          left: 20, top: 20, right: 20),
-                                      child: Align(
-                                        alignment:
-                                            Alignment.centerLeft, // 왼쪽 정렬
-                                        child: Text(
-                                          'Credit',
-                                          style: AugustFont.subText5(
-                                              color: Colors.black),
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            left: 20, top: 20, right: 20),
+                                        child: Align(
+                                          alignment:
+                                              Alignment.centerLeft, // 왼쪽 정렬
+                                          child: Text(
+                                            'Credit',
+                                            style: AugustFont.subText5(
+                                                color: Colors.black),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                          left: 20, top: 5, right: 20),
-                                      child: Align(
-                                        alignment:
-                                            Alignment.centerLeft, // 왼쪽 정렬
-                                        child: Text(
-                                          '${schedule.credits} credits',
-                                          style: AugustFont.head1(
-                                              color: Colors.black),
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            left: 20, top: 5, right: 20),
+                                        child: Align(
+                                          alignment:
+                                              Alignment.centerLeft, // 왼쪽 정렬
+                                          child: Text(
+                                            '${schedule.credits} credits',
+                                            style: AugustFont.head1(
+                                                color: Colors.black),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Row(
-                                      children: [
-                                        Column(
-                                          children: [
-                                            Padding(
-                                              padding: EdgeInsets.only(
-                                                  left: 20, top: 20, right: 10),
-                                              child: Align(
-                                                alignment: Alignment
-                                                    .centerLeft, // 왼쪽 정렬
-                                                child: Text(
-                                                  'Seats',
-                                                  style: AugustFont.subText5(
-                                                      color: Colors.black),
+                                      Row(
+                                        children: [
+                                          Column(
+                                            children: [
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                    left: 20,
+                                                    top: 20,
+                                                    right: 10),
+                                                child: Align(
+                                                  alignment: Alignment
+                                                      .centerLeft, // 왼쪽 정렬
+                                                  child: Text(
+                                                    'Seats',
+                                                    style: AugustFont.subText5(
+                                                        color: Colors.black),
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                            Padding(
-                                              padding: EdgeInsets.only(
-                                                  left: 20, top: 5, right: 10),
-                                              child: Align(
-                                                alignment: Alignment
-                                                    .centerLeft, // 왼쪽 정렬
-                                                child: Text(
-                                                  '${schedule.seats}',
-                                                  style: AugustFont.head1(
-                                                      color: Colors.black),
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                    left: 20,
+                                                    top: 5,
+                                                    right: 10),
+                                                child: Align(
+                                                  alignment: Alignment
+                                                      .centerLeft, // 왼쪽 정렬
+                                                  child: Text(
+                                                    '${schedule.seats}',
+                                                    style: AugustFont.head1(
+                                                        color: Colors.black),
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                        Spacer(),
-                                        Column(
-                                          children: [
-                                            Padding(
-                                              padding: EdgeInsets.only(
-                                                  left: 10, top: 20, right: 10),
-                                              child: Align(
-                                                alignment: Alignment
-                                                    .centerLeft, // 왼쪽 정렬
-                                                child: Text(
-                                                  'Open Seats',
-                                                  style: AugustFont.subText5(
-                                                      color: Colors.black),
+                                            ],
+                                          ),
+                                          Spacer(),
+                                          Column(
+                                            children: [
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                    left: 10,
+                                                    top: 20,
+                                                    right: 10),
+                                                child: Align(
+                                                  alignment: Alignment
+                                                      .centerLeft, // 왼쪽 정렬
+                                                  child: Text(
+                                                    'Open Seats',
+                                                    style: AugustFont.subText5(
+                                                        color: Colors.black),
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                            Padding(
-                                              padding: EdgeInsets.only(
-                                                  left: 10, top: 5, right: 10),
-                                              child: Align(
-                                                alignment: Alignment
-                                                    .centerLeft, // 왼쪽 정렬
-                                                child: Text(
-                                                  '${schedule.openSeats}',
-                                                  style: AugustFont.head1(
-                                                      color: Colors.black),
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                    left: 10,
+                                                    top: 5,
+                                                    right: 10),
+                                                child: Align(
+                                                  alignment: Alignment
+                                                      .centerLeft, // 왼쪽 정렬
+                                                  child: Text(
+                                                    '${schedule.openSeats}',
+                                                    style: AugustFont.head1(
+                                                        color: Colors.black),
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                        Spacer(),
-                                        Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Padding(
-                                              padding: EdgeInsets.only(
-                                                  left: 10, top: 20, right: 10),
-                                              child: Align(
-                                                alignment: Alignment
-                                                    .centerLeft, // 왼쪽 정렬
-                                                child: Text(
-                                                  'Waitlist',
-                                                  style: AugustFont.subText5(
-                                                      color: Colors.black),
+                                            ],
+                                          ),
+                                          Spacer(),
+                                          Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                    left: 10,
+                                                    top: 20,
+                                                    right: 10),
+                                                child: Align(
+                                                  alignment: Alignment
+                                                      .centerLeft, // 왼쪽 정렬
+                                                  child: Text(
+                                                    'Waitlist',
+                                                    style: AugustFont.subText5(
+                                                        color: Colors.black),
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                            Padding(
-                                              padding: EdgeInsets.only(
-                                                  left: 10, top: 5, right: 10),
-                                              child: Align(
-                                                alignment: Alignment
-                                                    .centerLeft, // 왼쪽 정렬
-                                                child: Text(
-                                                  '${schedule.waitlist}',
-                                                  style: AugustFont.head1(
-                                                      color: Colors.black),
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                    left: 10,
+                                                    top: 5,
+                                                    right: 10),
+                                                child: Align(
+                                                  alignment: Alignment
+                                                      .centerLeft, // 왼쪽 정렬
+                                                  child: Text(
+                                                    '${schedule.waitlist}',
+                                                    style: AugustFont.head1(
+                                                        color: Colors.black),
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                        Spacer(),
-                                        Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Padding(
-                                              padding: EdgeInsets.only(
-                                                  left: 10, top: 20, right: 20),
-                                              child: Align(
-                                                alignment: Alignment
-                                                    .centerLeft, // 왼쪽 정렬
-                                                child: Text(
-                                                  'Holdfile',
-                                                  style: AugustFont.subText5(
-                                                      color: Colors.black),
+                                            ],
+                                          ),
+                                          Spacer(),
+                                          Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                    left: 10,
+                                                    top: 20,
+                                                    right: 20),
+                                                child: Align(
+                                                  alignment: Alignment
+                                                      .centerLeft, // 왼쪽 정렬
+                                                  child: Text(
+                                                    'Holdfile',
+                                                    style: AugustFont.subText5(
+                                                        color: Colors.black),
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                            Padding(
-                                              padding: EdgeInsets.only(
-                                                  left: 10, top: 5, right: 20),
-                                              child: Align(
-                                                alignment: Alignment
-                                                    .centerLeft, // 왼쪽 정렬
-                                                child: Text(
-                                                  '${schedule.holdfile}',
-                                                  style: AugustFont.head1(
-                                                      color: Colors.black),
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                    left: 10,
+                                                    top: 5,
+                                                    right: 20),
+                                                child: Align(
+                                                  alignment: Alignment
+                                                      .centerLeft, // 왼쪽 정렬
+                                                  child: Text(
+                                                    (schedule.holdfile == null)
+                                                        ? '0'
+                                                        : '${schedule.holdfile}',
+                                                    style: AugustFont.head1(
+                                                        color: Colors.black),
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 50)
-                                      ],
-                                    ),
-                                    SizedBox(height: 120)
-                                  ],
+                                            ],
+                                          ),
+                                          SizedBox(height: 50)
+                                        ],
+                                      ),
+                                      SizedBox(height: 120)
+                                    ],
+                                  ),
                                 ),
-                              ))
+                              )
                             : Padding(
                                 padding: const EdgeInsets.only(bottom: 30),
                                 child: Container(

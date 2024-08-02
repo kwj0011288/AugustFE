@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:august/components/friends/number_box.dart';
+import 'package:august/components/profile/profile.dart';
 import 'package:august/const/font/font.dart';
 import 'package:august/get_api/friends/invitation_code.dart';
 import 'package:flutter/material.dart';
@@ -16,20 +17,30 @@ class InvitationCodePage extends StatefulWidget {
   _InvitationCodePageState createState() => _InvitationCodePageState();
 }
 
-class _InvitationCodePageState extends State<InvitationCodePage> {
+class _InvitationCodePageState extends State<InvitationCodePage>
+    with TickerProviderStateMixin {
+  AnimationController? _refreshFriendsController;
   String? formattedTime;
-  Uint8List? profilePhoto;
   String? _code = "00000000";
   String? _expires;
   String? _url;
 
   @override
   void initState() {
+    _refreshFriendsController = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    );
+
     formatExpires();
     super.initState();
     initCode();
+  }
 
-    loadProfilePhoto();
+  @override
+  void dispose() {
+    _refreshFriendsController!.dispose();
+    super.dispose();
   }
 
   Future<void> initCode() async {
@@ -87,14 +98,95 @@ class _InvitationCodePageState extends State<InvitationCodePage> {
     });
   }
 
-  Future<void> loadProfilePhoto() async {
-    final prefs = await SharedPreferences.getInstance();
-    final base64Image = prefs.getString('contactPhoto');
-    if (base64Image != null) {
-      setState(() {
-        profilePhoto = base64Decode(base64Image);
+  Future<void> revokeGeneratedCode(BuildContext context, String code) async {
+    final bool? revoke = await showDialog<bool>(
+      context: context, // Add context parameter
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Are you sure?',
+            textAlign: TextAlign.center,
+            style: AugustFont.head5(
+              color: Theme.of(context).colorScheme.outline,
+            ),
+          ),
+          content: Text(
+            "Previous code (${code}) will be revoked and a new code will be generated.",
+            textAlign: TextAlign.center,
+            style: AugustFont.subText2(
+              color: Theme.of(context).colorScheme.outline,
+            ),
+          ),
+          actions: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pop(true);
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 25),
+                    height: 55,
+                    width: MediaQuery.of(context).size.width / 3.3,
+                    decoration: BoxDecoration(
+                        color: Colors.redAccent,
+                        borderRadius: BorderRadius.circular(60)),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Revoke',
+                          style: AugustFont.head4(
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(width: 5),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pop(false);
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 30),
+                    height: 55,
+                    width: MediaQuery.of(context).size.width / 3.3,
+                    decoration: BoxDecoration(
+                        color: Colors.blueAccent,
+                        borderRadius: BorderRadius.circular(60)),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Keep',
+                          style: AugustFont.head4(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+    if (revoke!) {
+      await FriendRequestService().revokeFriendRequestCode().then((_) async {
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        generateCode();
+        await prefs.remove('codeExpires');
+        await prefs.remove('invitationCode');
+        _refreshFriendsController!.forward(from: 0.0);
       });
-    }
+    } else {}
   }
 
   @override
@@ -132,20 +224,47 @@ class _InvitationCodePageState extends State<InvitationCodePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  CircleAvatar(
-                    maxRadius: 50,
-                    backgroundImage: profilePhoto != null
-                        ? MemoryImage(profilePhoto!)
-                        : null,
-                    child: profilePhoto == null
-                        ? Image.asset('assets/icons/memoji.png')
-                        : null,
+                  ProfileWidget(
+                    isBottomBar: false,
+                    isMyCode: true,
                   ),
                   SizedBox(height: 10),
-                  Text(
-                    "Shareable Code",
-                    style: AugustFont.head2(
-                        color: Theme.of(context).colorScheme.outline),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Shareable Code",
+                        style: AugustFont.head2(
+                            color: Theme.of(context).colorScheme.outline),
+                      ),
+                      SizedBox(width: 10),
+                      GestureDetector(
+                        onTap: () async {
+                          revokeGeneratedCode(context, _code!);
+                        },
+                        child: AnimatedContainer(
+                          duration: Duration(milliseconds: 300),
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          child: Center(
+                            child: RotationTransition(
+                              turns: Tween(begin: 0.0, end: 1.0)
+                                  .animate(_refreshFriendsController!),
+                              child: Icon(
+                                Icons.refresh,
+                                color: Theme.of(context).colorScheme.outline,
+                                size: 23,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   SizedBox(height: 10),
                   Column(

@@ -71,17 +71,19 @@ class UserInfoProvider with ChangeNotifier {
     }
   }
 
-  void updateUserDepartment(int departmentId, String departmentFullname,
-      String departmentNickname, int departmentInstitutionId) {
+  void updateUserDepartment(int? departmentId, String? departmentFullname,
+      String? departmentNickname, int departmentInstitutionId) {
     if (_userInfo != null) {
       _userInfo?.department = Department(
         id: departmentId,
-        fullName: departmentFullname,
-        nickname: departmentNickname,
+        fullName: departmentFullname!,
+        nickname: departmentNickname!,
         institutionId: departmentInstitutionId,
       );
 
       notifyListeners();
+    } else {
+      print('User info is null');
     }
   }
 

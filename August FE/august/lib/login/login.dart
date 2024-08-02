@@ -110,7 +110,6 @@ Future<bool> initApp(BuildContext context) async {
     if (isTokenRefreshed) {
       // 사용자 정보를 가져오고 출력
       await fetchAndPrintUserInfo(context);
-      await fetchUserEmail();
 
       return true; // 로그인 상태가 유효하다고 가정
     } else {
@@ -388,6 +387,45 @@ Future<void> updatePhoto(int userPk, File imageFile) async {
   }
 }
 
+/* --- 유저 이미지 default --- */
+Future<String?> getUserDefaultPhoto() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  final String url = 'https://augustapp.one/users/me/profile-image/reset/';
+  String? accessToken = prefs.getString('accessToken');
+
+  if (accessToken == null) {
+    print('Access token not found. Attempting to refresh token...');
+    accessToken = await refreshTokenForElement();
+    if (accessToken == null) {
+      print('Failed to refresh token. User needs to login again.');
+      return null;
+    }
+  }
+
+  try {
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      var responseData = jsonDecode(response.body);
+      print(responseData['profile_image']);
+      return responseData['profile_image'];
+    } else {
+      print(
+          'Failed to reset profile image. Status code: ${response.statusCode}, Body: ${response.body}');
+      return null;
+    }
+  } catch (e) {
+    print('Exception caught when trying to reset profile image: $e');
+    return null;
+  }
+}
+
 Future<void> updateInstitution(int userPk, int institution) async {
   final String url = 'https://augustapp.one/users/$userPk/';
   final prefs = await SharedPreferences.getInstance();
@@ -401,6 +439,7 @@ Future<void> updateInstitution(int userPk, int institution) async {
       return;
     }
   }
+  print('this is institution: $institution');
 
   final response = await http.patch(
     Uri.parse(url),
@@ -456,7 +495,7 @@ Future<void> updateGrade(int userPk, String yearInSchool) async {
   }
 }
 
-Future<void> updateDepartment(int userPk, int department) async {
+Future<void> updateDepartment(int userPk, int? department) async {
   final String url = 'https://augustapp.one/users/$userPk/';
   final prefs = await SharedPreferences.getInstance();
   String? accessToken = prefs.getString('accessToken');
@@ -469,6 +508,7 @@ Future<void> updateDepartment(int userPk, int department) async {
       return;
     }
   }
+  print('this is department: $department');
 
   final response = await http.patch(
     Uri.parse(url),
@@ -476,7 +516,8 @@ Future<void> updateDepartment(int userPk, int department) async {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $accessToken',
     },
-    body: jsonEncode({'department_id': (department != -1) ? department : null}),
+    body:
+        jsonEncode({'department_id': (department != null) ? department : null}),
   );
 
   if (response.statusCode == 200) {

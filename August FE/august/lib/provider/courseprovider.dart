@@ -60,6 +60,26 @@ class CoursesProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  /* --- get timetable length --- */
+  int _timetableLength = 0;
+
+  int get timetableLength => _timetableLength;
+
+  set timetableLength(int length) {
+    _timetableLength = length;
+    notifyListeners();
+  }
+
+  /* --- get first timetable courses count */
+  int _numCourses = 0;
+
+  int get numCourses => _numCourses;
+
+  set numCourses(int num) {
+    _numCourses = num;
+    notifyListeners();
+  }
+
 /* ---------------------below is for any other thing------------------------ */
 
   List<List<ScheduleList>> _selectedCoursesData = [];

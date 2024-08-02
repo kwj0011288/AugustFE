@@ -18,6 +18,16 @@ import google_mobile_ads
      FLTGoogleMobileAdsPlugin.registerNativeAdFactory(
          self, factoryId: "listTile", nativeAdFactory: listTileFactory)
       
+      let listTileMediumFactory = ListTileNativeMediumFactory()
+      FLTGoogleMobileAdsPlugin.registerNativeAdFactory(
+          self, factoryId: "listTileMedium", nativeAdFactory: listTileMediumFactory)
+      
+      let gridTileFactory = GridTileNativeAdFactory()
+      FLTGoogleMobileAdsPlugin.registerNativeAdFactory(
+          self, factoryId: "gridTile", nativeAdFactory: gridTileFactory)
+      
+   
+      
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }

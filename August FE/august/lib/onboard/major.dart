@@ -120,10 +120,10 @@ class _MajorPageState extends State<MajorPage> {
   Future<void> _saveInfo() async {
     var provider = Provider.of<UserInfoProvider>(context, listen: false);
     provider.updateUserDepartment(
-      selectedMajorIndex!,
+      selectedMajorIndex,
       selectedMajorFullname!,
       selectedMajorNickname!,
-      provider.userInfo!.institution!.id,
+      provider.userInfo!.institution!.id!,
     );
   }
 
@@ -131,7 +131,6 @@ class _MajorPageState extends State<MajorPage> {
     checkAccessToken();
     _saveInfo();
 
-    widget.onboard ? null : Navigator.pop(context);
     int? userPk = await fetchUserPk();
 
     if (userPk == null) {
@@ -139,23 +138,18 @@ class _MajorPageState extends State<MajorPage> {
       return;
     }
 
-    if (selectedMajorIndex != null) {
-      // 백그라운드에서 updateDepartment 호출
-      Future<void> updateFuture = updateDepartment(userPk, selectedMajorIndex!);
-      updateFuture.then((_) {
-        print('Department updated successfully');
-      }).catchError((error) {
-        print('Failed to update department: $error');
-      });
-    } else {
-      print('Invalid or missing major index');
-      // 오류 처리 로직
-      return; // 유효하지 않은 경우 함수 종료
-    }
+    updateDepartment(userPk, selectedMajorIndex).then((_) {
+      print(selectedMajorIndex);
+      print('Department updated successfully with $selectedMajorIndex');
+      widget.onboard ? null : Navigator.pop(context);
+    }).catchError((error) {
+      print('Failed to update department: $error');
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    print('Current selectedMajor value: $selectedMajorNickname');
     return Scaffold(
       body: ColorfulSafeArea(
         child: Center(
@@ -280,6 +274,9 @@ class _MajorPageState extends State<MajorPage> {
                         ),
                       ),
                       onChanged: _filterDepartments,
+                      // onTap: () {
+                      //   _saveAndClose();
+                      // },
                       onSubmitted: (value) {
                         // This is called when the done button is pressed.
                         FocusScope.of(context).unfocus();
@@ -317,8 +314,6 @@ class _MajorPageState extends State<MajorPage> {
                                 onTap: () {
                                   setState(() {
                                     _selectMajor(filteredDepartments[index]);
-                                    selectedMajorNickname = nickname;
-                                    selectedMajorFullname = fullname;
                                   });
                                 },
                               );
@@ -343,6 +338,7 @@ class _MajorPageState extends State<MajorPage> {
                 onTap: () {
                   HapticFeedback.mediumImpact();
                   widget.gonext();
+
                   _saveAndClose();
                 },
                 child: Container(

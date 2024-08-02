@@ -16,7 +16,6 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../provider/courseprovider.dart';
-import 'package:animated_text_kit/animated_text_kit.dart';
 
 class SelectPage extends StatefulWidget {
   final List<List<ScheduleList>> selectedCoursesData;

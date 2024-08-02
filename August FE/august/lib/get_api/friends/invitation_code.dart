@@ -48,4 +48,32 @@ class FriendRequestService {
       throw Exception();
     }
   }
+
+  Future<void> revokeFriendRequestCode() async {
+    final url = Uri.parse('https://augustapp.one/friends/revoke-code/');
+
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString('accessToken');
+    if (accessToken == null) {
+      throw Exception('Access token not found');
+    }
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      print('Successfully deleted the friend request code.');
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      print('Authentication failed. Please check your credentials.');
+      throw Exception();
+    } else {
+      print('Failed to delete friend request code.');
+      throw Exception();
+    }
+  }
 }

@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:august/components/friends/friend_button.dart';
 import 'package:august/components/home/loading.dart';
+import 'package:august/components/profile/profile.dart';
 import 'package:august/components/timetable/timetable.dart';
 import 'package:august/const/colors/tile_color.dart';
 import 'package:august/const/font/font.dart';
@@ -48,6 +49,7 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
   int? selectedSemester;
   int? numberOfClasses = 0;
   bool isLoading = false;
+  bool showText = false;
 
   List<int>? friendSemList;
   List<ScheduleList> scheduleLists = [];
@@ -62,6 +64,7 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
   @override
   void initState() {
     super.initState();
+    checkFriendWithSchedule();
     // selectedSemester = friendSemList!.last;
     // selectedSemester = widget.semesterList!.last;
     _animationController = AnimationController(
@@ -72,6 +75,18 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
     _animationController!.forward();
 
     checkAndLoad();
+  }
+
+  void checkFriendWithSchedule() {
+    if (selectedSemester == null && !isLoading) {
+      Future.delayed(Duration(seconds: 2), () {
+        if (mounted) {
+          setState(() {
+            showText = true;
+          });
+        }
+      });
+    }
   }
 
   void checkAndLoad() async {
@@ -106,85 +121,89 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
 
   Future<void> _loadHangout(semester) async {
     await checkAccessToken();
-    setState(() {
-      isLoading = true; // Start loading
-    });
-    if (widget.friendId != null) {
-      try {
-        ScheduleList hangoutList =
-            await HangoutRequest().fetchHangout(widget.friendId!, semester);
-        setState(() {
-          chillLists.clear();
-          chillLists.add(hangoutList);
-          isLoading = false;
-        });
-      } catch (e) {
-        print("Failed to load semesters: $e");
+    if (mounted) {
+      setState(() {
+        isLoading = true; // Start loading
+      });
+      if (widget.friendId != null) {
+        try {
+          ScheduleList hangoutList =
+              await HangoutRequest().fetchHangout(widget.friendId!, semester);
+          setState(() {
+            chillLists.clear();
+            chillLists.add(hangoutList);
+            isLoading = false;
+          });
+        } catch (e) {
+          print("Failed to load semesters: $e");
+        }
       }
     }
   }
 
   void loadTimetable(int friendId, int semester) async {
     await checkAccessToken();
-    setState(() {
-      isLoading = true; // Start loading
-    });
-
-    FriendTimeTable friendTimeTable = FriendTimeTable();
-    try {
-      var schedules =
-          await friendTimeTable.fetchFriendTimetable(friendId, semester);
+    if (mounted) {
       setState(() {
-        scheduleLists = schedules;
-        numberOfClasses = schedules.length;
-        isLoading = false; // Stop loading after data is fetched
+        isLoading = true; // Start loading
       });
-    } catch (e) {
-      // Log error or show an error message on the UI
-      print('Error fetching schedule: $e');
-      showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: Text(
-            "Can't load Friends Schedules",
-            style:
-                AugustFont.head2(color: Theme.of(context).colorScheme.outline),
-          ),
-          content: Text(
-            'Please restart the app',
-            style: AugustFont.subText2(
-                color: Theme.of(context).colorScheme.outline),
-          ),
-          actions: [
-            GestureDetector(
-              onTap: () {
-                Navigator.of(context).pop(); // 팝업 닫기
-              },
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 30),
-                height: 55,
-                width: MediaQuery.of(context).size.width - 80,
-                decoration: BoxDecoration(
-                    color: Colors.redAccent,
-                    borderRadius: BorderRadius.circular(60)),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'OK',
-                      style: AugustFont.head2(color: Colors.white),
-                    ),
-                  ],
+
+      FriendTimeTable friendTimeTable = FriendTimeTable();
+      try {
+        var schedules =
+            await friendTimeTable.fetchFriendTimetable(friendId, semester);
+        setState(() {
+          scheduleLists = schedules;
+          numberOfClasses = schedules.length;
+          isLoading = false; // Stop loading after data is fetched
+        });
+      } catch (e) {
+        // Log error or show an error message on the UI
+        print('Error fetching schedule: $e');
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text(
+              "Can't load Friends Schedules",
+              style: AugustFont.head2(
+                  color: Theme.of(context).colorScheme.outline),
+            ),
+            content: Text(
+              'Please restart the app',
+              style: AugustFont.subText2(
+                  color: Theme.of(context).colorScheme.outline),
+            ),
+            actions: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pop(); // 팝업 닫기
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 30),
+                  height: 55,
+                  width: MediaQuery.of(context).size.width - 80,
+                  decoration: BoxDecoration(
+                      color: Colors.redAccent,
+                      borderRadius: BorderRadius.circular(60)),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'OK',
+                        style: AugustFont.head2(color: Colors.white),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-      );
-      setState(() {
-        isLoading = false; // Stop loading if an error occurs
-      });
+            ],
+          ),
+        );
+        setState(() {
+          isLoading = false; // Stop loading if an error occurs
+        });
+      }
     }
   }
 
@@ -358,13 +377,10 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                                     Container(
                                       width: 80, // 이미지의 가로 크기를 80으로 설정
                                       height: 80, // 이미지의 세로 크기를 80으로 설정
-                                      child: ClipOval(
-                                        child: widget.photoUrl != null
-                                            ? Image.network(widget.photoUrl!,
-                                                fit: BoxFit.cover)
-                                            : Icon(Icons.person,
-                                                size: 80), // 기본 아이콘 표시
-                                      ),
+                                      child: ProfileWidget(
+                                          isBottomBar: false,
+                                          isFriendsPage: true,
+                                          friendPhoto: widget.photoUrl!),
                                     ),
                                     SizedBox(height: 5),
                                     Text(
@@ -498,83 +514,117 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                         duration: const Duration(
                             milliseconds:
                                 300), // Adjust duration for visual effect
-                        child: scheduleLists.isEmpty || isLoading
-                            ? Center(
-                                child: GroupLoading4(
-                                    context)) // Show loading indicator if empty
-                            : (schedule1
+                        child: (selectedSemester == null && !isLoading)
+                            ? (showText)
                                 ? Column(
                                     children: [
+                                      SizedBox(height: 20),
                                       Text(
-                                        'This is ${widget.name}\'s schedule.',
-                                        style: AugustFont.captionSmallBold(
+                                        '${widget.name} did not set up schedule yet...',
+                                        style: AugustFont.head4(
                                           color: Colors.grey,
                                         ),
                                       ),
-                                      SingleTimetable(
-                                        key: ValueKey<int>(
-                                            1), // Unique key for AnimatedSwitcher when showing schedule
-                                        courses: scheduleLists,
-                                        index: 0,
-                                        forceFixedTimeRange: true,
+                                      ...List.generate(
+                                        3,
+                                        (index) => Padding(
+                                          padding: const EdgeInsets.all(2.0),
+                                          child: Text(
+                                            '.',
+                                            style: AugustFont.subText(
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ),
                                       ),
+                                      SizedBox(height: 5),
+                                      Text(
+                                        'you should ask ${widget.name} to actively use August!',
+                                        style: AugustFont.captionSmallBold(
+                                          color: Colors.grey,
+                                        ),
+                                      )
                                     ],
                                   )
-                                : (chillLists.first.meetings == null)
+                                : Container()
+                            : (scheduleLists.isEmpty || isLoading)
+                                ? Center(child: GroupLoading4(context))
+                                : (schedule1
                                     ? Column(
                                         children: [
-                                          SizedBox(height: 20),
                                           Text(
-                                            'No chill time available',
-                                            style: AugustFont.head4(
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                          ...List.generate(
-                                            3,
-                                            (index) => Padding(
-                                              padding:
-                                                  const EdgeInsets.all(2.0),
-                                              child: Text(
-                                                '.',
-                                                style: AugustFont.subText(
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Text(
-                                            'Maybe',
-                                            style: AugustFont.captionSmallBold(
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                          Text(
-                                            'you or ${widget.name} did not setup schedule yet?',
-                                            style: AugustFont.captionSmallBold(
-                                              color: Colors.grey,
-                                            ),
-                                          )
-                                        ],
-                                      )
-                                    : Column(
-                                        children: [
-                                          Text(
-                                            '${widget.name} and you can hang out at these times!',
+                                            'This is ${widget.name}\'s schedule.',
                                             style: AugustFont.captionSmallBold(
                                               color: Colors.grey,
                                             ),
                                           ),
                                           SingleTimetable(
                                             key: ValueKey<int>(
-                                                2), // Unique key for AnimatedSwitcher when showing chill lists
-                                            courses: chillLists,
+                                                1), // Unique key for AnimatedSwitcher when showing schedule
+                                            courses: scheduleLists,
                                             index: 0,
                                             forceFixedTimeRange: true,
-                                            isFriend: true,
                                           ),
                                         ],
-                                      )),
+                                      )
+                                    : (chillLists.first.meetings == null)
+                                        ? Column(
+                                            children: [
+                                              SizedBox(height: 20),
+                                              Text(
+                                                'No chill time available',
+                                                style: AugustFont.head4(
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                              ...List.generate(
+                                                3,
+                                                (index) => Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(2.0),
+                                                  child: Text(
+                                                    '.',
+                                                    style: AugustFont.subText(
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Text(
+                                                'Maybe',
+                                                style:
+                                                    AugustFont.captionSmallBold(
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                              Text(
+                                                'you or ${widget.name} did not setup schedule yet?',
+                                                style:
+                                                    AugustFont.captionSmallBold(
+                                                  color: Colors.grey,
+                                                ),
+                                              )
+                                            ],
+                                          )
+                                        : Column(
+                                            children: [
+                                              Text(
+                                                '${widget.name} and you can hang out at these times!',
+                                                style:
+                                                    AugustFont.captionSmallBold(
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                              SingleTimetable(
+                                                key: ValueKey<int>(
+                                                    2), // Unique key for AnimatedSwitcher when showing chill lists
+                                                courses: chillLists,
+                                                index: 0,
+                                                forceFixedTimeRange: true,
+                                                isFriend: true,
+                                              ),
+                                            ],
+                                          )),
                       ),
                     ],
                   ),

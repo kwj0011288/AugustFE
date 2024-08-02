@@ -34,14 +34,11 @@ dev_dependencies:
   flutter_feather_icons: ^2.0.0
   modal_bottom_sheet: ^3.0.0-pre
   animated_text_kit:
-  permission_handler:
   flutter_native_contact_picker: ^0.0.5
   contacts_service: ^0.6.1
   auth_buttons:
   google_sign_in: ^6.2.1
   shimmer:
-  flutter_animated_button: ^2.0.3
-  flutter_animated_icons: ^1.0.1
   flutter_bouncing_widgets: ^1.0.3
   flutter_slidable: ^3.1.0
   image_cropper: ^7.0.5
@@ -59,7 +56,7 @@ dev_dependencies:
   custom_sliding_segmented_control:
   cached_network_image:
   google_mobile_ads: 
-
+  flutter_dynamic_icon: ^2.1.0
 flutter:
   fonts:
     - family: Nanum
@@ -77,7 +74,6 @@ flutter:
 
   assets:
   - assets/icons/horizontal-bar.svg
-  - assets/icons/memoji.png
   - assets/icons/option.svg
   - assets/icons/semester.svg
   - assets/icons/grade.svg
@@ -90,17 +86,20 @@ flutter:
   - assets/memoji/Memoji3.png
   - assets/memoji/Memoji4.png
 
-
-  # schools
-  - assets/test/umd.png
-
   # season
   - assets/season/spring.svg
   - assets/season/summer.svg
   - assets/season/fall.svg
   - assets/season/winter.svg
 
+  # splash
+  - assets/icons/splash.png
+
+  # launch icon
+  - assets/launch/
+
   #lottie
   - assets/lottie/magic_wand.json
   - assets/lottie/share.json
+  - assets/lottie/success.json
   uses-material-design: true

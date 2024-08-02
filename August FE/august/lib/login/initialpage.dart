@@ -106,6 +106,10 @@ class _InitialPageState extends State<InitialPage> {
           AppleIDAuthorizationScopes.email,
           AppleIDAuthorizationScopes.fullName,
         ],
+        webAuthenticationOptions: WebAuthenticationOptions(
+            clientId: 'one.august',
+            redirectUri:
+                Uri.parse('https://augustapp.one/users/apple/login/callback/')),
       );
 
       final String? accessToken = appleCredential.authorizationCode;

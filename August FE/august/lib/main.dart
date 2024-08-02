@@ -5,7 +5,6 @@ import 'package:august/const/theme/light_theme.dart';
 import 'package:august/get_api/onboard/get_department.dart';
 import 'package:august/login/initialpage.dart';
 import 'package:august/login/login.dart';
-import 'package:august/onboard/profile.dart';
 import 'package:august/pages/main/no_network_page.dart';
 import 'package:august/pages/main/schedule_page.dart';
 import 'package:august/provider/Institution_provider.dart';
@@ -29,8 +28,8 @@ void main() async {
   bool isOnline = await InternetConnectionChecker().hasConnection;
   List<String> preloadedSemesters;
   List<String> departments;
-  String? email;
   prefs.remove('semester');
+
   //prefs.clear();
 
   if (isOnline) {
@@ -39,7 +38,6 @@ void main() async {
     await refreshToken();
     preloadedSemesters = await fetchAllSemesters();
     departments = await fetchDepartments();
-    email = await fetchUserEmail();
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('loadDone', false);
     await prefs.setString('semester', preloadedSemesters.last);
@@ -50,7 +48,6 @@ void main() async {
   } else {
     preloadedSemesters = ["Error"];
     departments = ["Error"];
-    email = "Error";
   }
 
   runApp(MyApp(
@@ -98,7 +95,6 @@ class MyApp extends StatelessWidget {
 
             /* --- 아래는 정상 ---- */
             ChangeNotifierProvider(create: (_) => CurrentIndexProvider()),
-            ChangeNotifierProvider(create: (_) => ProfilePhotoNotifier()),
             ChangeNotifierProvider(create: (_) => FriendsProvider()),
             /* --- course & personasl info provider ====  */
             ChangeNotifierProvider(create: (_) => SemesterProvider()),

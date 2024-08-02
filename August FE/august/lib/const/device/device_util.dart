@@ -13,3 +13,10 @@ class DeviceUtils {
     return MediaQuery.of(context).orientation == Orientation.landscape;
   }
 }
+
+enum AppIcon {
+  dark_prime,
+  light_prime,
+  dark_pencil,
+  light_pencil,
+}

@@ -41,7 +41,8 @@ class _GradePageState extends State<GradePage> {
     super.initState();
     var infoProvider =
         Provider.of<UserInfoProvider>(context, listen: false).userInfo;
-    selectGrade = convertShortentoFull(infoProvider!.yearInSchool); //JR 이렇게 받아옴
+    selectGrade =
+        convertShortentoFull(infoProvider!.yearInSchool!); //JR 이렇게 받아옴
   }
 
   Future<void> _saveInfo() async {
