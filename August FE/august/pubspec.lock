@@ -416,14 +416,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.12.4+1"
-  hsv_color_pickers:
-    dependency: "direct main"
-    description:
-      name: hsv_color_pickers
-      sha256: "3bfa978ad1ef2d19746c947aae37d4eb1a1dbab3ca4aa35d35005caf6b03560f"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.0"
   html:
     dependency: transitive
     description:

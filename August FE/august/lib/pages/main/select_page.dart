@@ -31,7 +31,7 @@ class _SelectPageState extends State<SelectPage> {
   int currentPageIndex = 0;
   late List<ValueNotifier<bool>> isButtonClicked;
   List<List<ScheduleList>> selectedCoursesData = [];
-  final PageController pageController = PageController(viewportFraction: 0.90);
+  final PageController pageController = PageController(viewportFraction: 0.92);
 
   List<List<ScheduleList>> coursesData = [];
   late String currentSemester;

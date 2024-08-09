@@ -1,5 +1,4 @@
 import 'package:august/components/mepage/color_box.dart';
-import 'package:august/components/mepage/color_picker.dart';
 import 'package:august/const/font/font.dart';
 import 'package:august/provider/course_color_provider.dart';
 import 'package:august/components/timetable/timetable.dart';
@@ -70,7 +69,7 @@ class _ChangeCourseColorPageState extends State<ChangeCourseColorPage> {
               isCustomizeColor: true,
             ),
             Padding(
-              padding: const EdgeInsets.only(right: 10),
+              padding: const EdgeInsets.only(top: 10, right: 10),
               child: Align(
                 alignment: Alignment.centerRight,
                 child: GestureDetector(
@@ -102,28 +101,18 @@ class _ChangeCourseColorPageState extends State<ChangeCourseColorPage> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: List<Widget>.generate(
                       colorProvider.colors.length,
                       (int index) {
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            SizedBox(height: 20),
-                            SelectColorWidget(
-                              title: '${index + 1}',
-                              color: colorProvider.colors[index],
-                            ),
-                            SizedBox(width: 20),
-                            ReusableColorPicker(
-                              initialColor: colorProvider.colors[index],
-                              onColorChanged: (Color newColor) {
-                                colorProvider.setColorAtIndex(index, newColor);
-                              },
-                            ),
-                          ],
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 30),
+                          child: SelectColorWidget(
+                            title: '${index + 1}',
+                            color: colorProvider.colors[index],
+                            onColorChanged: (Color newColor) {
+                              colorProvider.setColorAtIndex(index, newColor);
+                            },
+                          ),
                         );
                       },
                     ),

@@ -1,13 +1,16 @@
+import 'package:august/const/colors/color_slider.dart';
 import 'package:august/const/font/font.dart';
 import 'package:flutter/material.dart';
 
 class SelectColorWidget extends StatefulWidget {
   final String title;
   final Color color;
+  final ValueChanged<Color> onColorChanged;
   const SelectColorWidget({
     Key? key,
     required this.title,
     required this.color,
+    required this.onColorChanged,
   }) : super(key: key);
 
   @override
@@ -27,11 +30,10 @@ class _SelectColorWidgetState extends State<SelectColorWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        SizedBox(height: 10),
         Container(
           decoration: BoxDecoration(
             color: widget.color,
@@ -61,7 +63,11 @@ class _SelectColorWidgetState extends State<SelectColorWidget> {
             ),
           ),
         ),
-        SizedBox(height: 10),
+        SizedBox(width: 20),
+        ColorPicker(
+            width: MediaQuery.of(context).size.width * 0.6,
+            initialColor: widget.color,
+            onColorChanged: widget.onColorChanged)
       ],
     );
   }

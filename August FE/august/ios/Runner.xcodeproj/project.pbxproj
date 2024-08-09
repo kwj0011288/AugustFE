@@ -200,8 +200,8 @@
 			isa = PBXGroup;
 			children = (
 				62741F4D2C540D6200EF4F17 /* AppIcons */,
-				62161ED72C4BDB97005EDEE8 /* Runner.entitlements */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
+				62161ED72C4BDB97005EDEE8 /* Runner.entitlements */,
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
 				97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */,
 				97C147021CF9000F007C117D /* Info.plist */,

@@ -99,6 +99,7 @@ class MyApp extends StatelessWidget {
             /* --- course & personasl info provider ====  */
             ChangeNotifierProvider(create: (_) => SemesterProvider()),
             ChangeNotifierProvider(create: (context) => CourseColorProvider()),
+
             ChangeNotifierProvider(create: (context) => DepartmentProvider()),
             ChangeNotifierProvider(create: (context) => InstitutionProvider()),
             ChangeNotifierProvider(create: (context) => UserInfoProvider()),

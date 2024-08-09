@@ -1,16 +1,16 @@
 import 'package:august/const/font/font.dart';
 import 'package:flutter/material.dart';
 
-class CustomizeIcon extends StatefulWidget {
+class FeedbackTile extends StatefulWidget {
   final VoidCallback onTap;
 
-  CustomizeIcon({required this.onTap});
+  FeedbackTile({required this.onTap});
 
   @override
-  _CustomizeIconState createState() => _CustomizeIconState();
+  _FeedbackTileState createState() => _FeedbackTileState();
 }
 
-class _CustomizeIconState extends State<CustomizeIcon> {
+class _FeedbackTileState extends State<FeedbackTile> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -20,16 +20,9 @@ class _CustomizeIconState extends State<CustomizeIcon> {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            // color: Theme.of(context).colorScheme.outline,
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.grey.withOpacity(0.5),
-                Theme.of(context).colorScheme.outline,
-                //  Color.fromARGB(255, 171, 255, 235),
-              ],
-            ),
+            // color: Color.fromRGBO(147, 52, 74, 1),
+
+            color: Colors.grey,
             boxShadow: [
               BoxShadow(
                 color: Theme.of(context).colorScheme.shadow,
@@ -58,7 +51,7 @@ class _CustomizeIconState extends State<CustomizeIcon> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      'Change App Icon',
+                      'Send Feeback',
                       style: AugustFont.head2(
                           color: Theme.of(context).colorScheme.outline),
                     ),

@@ -17,11 +17,16 @@ Future<String?> getTimetableFromServer(int semester) async {
   );
 
   if (response.statusCode >= 200 && response.statusCode < 300) {
-    // 요청이 성공했다면, 응답 본문을 반환
-    await saveTimetableToLocalStorage(response.body);
-    return response.body;
+    // Convert the response body bytes to a string using UTF-8 encoding
+    String responseBody = utf8.decode(response.bodyBytes);
+
+    // Save the decoded timetable to local storage
+    await saveTimetableToLocalStorage(responseBody);
+
+    // Return the decoded response body
+    return responseBody;
   } else {
-    // 실패한 경우, null을 반환하거나 적절한 예외 처리를 수행
+    // If the request fails, print the error and return null
     print('Failed to fetch timetable with status code: ${response.statusCode}');
     return null;
   }

@@ -298,24 +298,24 @@ class _SingleTimetableState extends State<SingleTimetable> {
       }
     } else {
       if (height < 60 && !widget.isCustomizeColor) {
-        children.add(
-          RichText(
-            text: TextSpan(
-              style: DefaultTextStyle.of(context).style,
-              children: <TextSpan>[
-                TextSpan(
-                  text: schedule.sectionCode!,
-                  style: AugustFont.captionSmallNormal1(color: Colors.black),
-                ),
-              ],
-            ),
+        children.addAll([
+          Text(
+            schedule.sectionCode!,
+            style: AugustFont.captionSmallNormal0(color: Colors.black),
           ),
-        );
+          Text(
+            '${schedule.instructors!.first}',
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+            style: AugustFont.captionSmallNormal2(color: Colors.black),
+          ),
+          // Add other widgets specific to height > 20 condition
+        ]);
       } else if (height > 50 && !widget.isCustomizeColor) {
         children.addAll([
           Text(
             schedule.sectionCode!,
-            style: AugustFont.captionSmallNormal1(color: Colors.black),
+            style: AugustFont.captionSmallNormal0(color: Colors.black),
           ),
           Text(
             '${schedule.instructors!.first}',
@@ -337,12 +337,6 @@ class _SingleTimetableState extends State<SingleTimetable> {
       } else if (dayIndex != null) {
         if (widget.isSelectpage) {
           children.addAll([
-            Text(
-              '${schedule.instructors!.first}',
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-              style: AugustFont.captionSmallNormal2(color: Colors.black),
-            ),
             // Add other widgets specific to height > 20 condition
           ]);
         } else {
@@ -1021,6 +1015,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
   Expanded buildTimeColumn() {
     return Expanded(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           SizedBox(
             height: DeviceUtils.isTablet(context)
@@ -1043,7 +1038,8 @@ class _SingleTimetableState extends State<SingleTimetable> {
               height: DeviceUtils.isTablet(context) ? tabletBoxSize : boxSize,
               child: Text(
                 '$displayedHour',
-                style: TextStyle(fontSize: 13),
+                style: AugustFont.timeAndDayText(
+                    color: Theme.of(context).colorScheme.outline),
               ),
             );
           }),
@@ -1063,9 +1059,13 @@ class _SingleTimetableState extends State<SingleTimetable> {
               children: [
                 SizedBox(
                   height: FirstColumnHeight,
-                  child: Text(
-                    week[dayIndex], // Removed unnecessary string interpolation
-                    style: TextStyle(fontSize: 13),
+                  child: Center(
+                    child: Text(
+                      week[
+                          dayIndex], // Removed unnecessary string interpolation
+                      style: AugustFont.timeAndDayText(
+                          color: Theme.of(context).colorScheme.outline),
+                    ),
                   ),
                 ),
                 ...List.generate(ColumnLength, (i) {

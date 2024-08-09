@@ -710,8 +710,8 @@ class _FriendsPageState extends State<FriendsPage>
                                             ),
                                             SizedBox(height: 10),
                                             Text(
-                                              'Add Friends',
-                                              style: AugustFont.head4(
+                                              'Add Friend',
+                                              style: AugustFont.head6(
                                                 color: Theme.of(context)
                                                     .colorScheme
                                                     .outline,

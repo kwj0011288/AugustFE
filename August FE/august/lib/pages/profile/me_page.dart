@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:august/components/mepage/course_color.dart';
 import 'package:august/components/mepage/customize_icon.dart';
+import 'package:august/components/mepage/feedback.dart';
 import 'package:august/components/mepage/info_box.dart';
 import 'package:august/components/profile/profile.dart';
 import 'package:august/const/font/font.dart';
@@ -305,7 +306,7 @@ class _MypageState extends State<Mypage> {
       builder: (context, userProvider, child) {
         var userDetails = userProvider.userInfo;
         if (userDetails == null) {
-          return CircularProgressIndicator();
+          return Center(child: CircularProgressIndicator());
         }
         print(userDetails.yearInSchool);
         String departmentNickname =
@@ -519,17 +520,20 @@ class _MypageState extends State<Mypage> {
                               color: Theme.of(context).colorScheme.outline),
                         ),
                       ),
-                      CustomizeCourseColor(onTap: () {
-                        HapticFeedback.mediumImpact();
-                        checkAccessToken();
-                        Navigator.push(
-                          context,
-                          CupertinoPageRoute(
-                            fullscreenDialog: true,
-                            builder: (context) => ChangeCourseColorPage(),
-                          ),
-                        );
-                      }),
+                      CustomizeCourseColor(
+                        onTap: () {
+                          HapticFeedback.mediumImpact();
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              fullscreenDialog: true,
+                              builder: (context) => ChangeCourseColorPage(),
+                            ),
+                          );
+                          checkAccessToken();
+                        },
+                      ),
+
                       SizedBox(height: 20),
                       //  PremiumWidget(),
 
@@ -545,7 +549,6 @@ class _MypageState extends State<Mypage> {
                       if (Platform.isIOS)
                         CustomizeIcon(onTap: () {
                           HapticFeedback.mediumImpact();
-                          checkAccessToken();
                           Navigator.push(
                             context,
                             CupertinoPageRoute(
@@ -553,6 +556,7 @@ class _MypageState extends State<Mypage> {
                               builder: (context) => ChangeIconPage(),
                             ),
                           );
+                          checkAccessToken();
                         }),
 
                       SizedBox(height: 20),
@@ -565,63 +569,25 @@ class _MypageState extends State<Mypage> {
                               color: Theme.of(context).colorScheme.outline),
                         ),
                       ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: GestureDetector(
-                              onTap: _launchURL,
-                              child: Container(
-                                width: MediaQuery.sizeOf(context).width,
-                                height: 70.0,
-                                decoration: BoxDecoration(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                    borderRadius: BorderRadius.circular(10)),
-                                child: Center(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'Please send us Feedback',
-                                        style: AugustFont.head2(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .outline),
-                                      ),
-                                      Icon(
-                                        Icons.keyboard_arrow_right,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .outline,
-                                        size: 20,
-                                      )
-                                    ],
-                                  ),
-                                ),
+                      FeedbackTile(
+                        onTap: _launchURL,
+                      ),
+                      SizedBox(height: 20),
+                      Center(
+                        child: SignoutButton(
+                          'Sign out',
+                          Color.fromARGB(255, 243, 154, 168),
+                          () async {
+                            HapticFeedback.lightImpact();
+                            await logoutUser();
+                            Navigator.pushReplacement(
+                              context,
+                              CupertinoPageRoute(
+                                builder: (context) => InitialPage(),
                               ),
-                            ),
-                          ),
-                          SizedBox(height: 20),
-                          SignoutButton(
-                            'Sign out',
-                            Color.fromARGB(255, 243, 154, 168),
-                            () async {
-                              HapticFeedback.lightImpact();
-                              await logoutUser();
-                              Navigator.pushReplacement(
-                                context,
-                                CupertinoPageRoute(
-                                  builder: (context) => InitialPage(),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
+                            );
+                          },
+                        ),
                       ),
                     ],
                   ),

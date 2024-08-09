@@ -34,20 +34,20 @@
                     <nil key="highlightedColor"/>
                 </label>
                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="img_ad_list" translatesAutoresizingMaskIntoConstraints="NO" id="Bnj-qA-14f">
-                    <rect key="frame" x="100" y="20" width="20" height="12"/>
+                    <rect key="frame" x="95" y="20" width="20" height="12"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="12" id="BUH-se-0QT"/>
-                        <constraint firstAttribute="width" constant="20" id="jUw-Re-1Yn"/>
+                        <constraint firstAttribute="width" constant="20" id="aOz-Fe-Crn"/>
+                        <constraint firstAttribute="height" constant="12" id="fG0-9G-R2e"/>
                     </constraints>
                 </imageView>
             </subviews>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
                 <constraint firstItem="aDH-L2-ViC" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="25" id="5RB-ys-5WF"/>
-                <constraint firstItem="Bnj-qA-14f" firstAttribute="trailing" secondItem="aDH-L2-ViC" secondAttribute="trailing" constant="-5" id="Ae6-PM-NsV"/>
                 <constraint firstItem="aDH-L2-ViC" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="15" id="BUY-aQ-BSa"/>
                 <constraint firstAttribute="bottom" secondItem="SqM-pP-iR7" secondAttribute="bottom" constant="15" id="DEe-yB-SaM"/>
-                <constraint firstItem="Bnj-qA-14f" firstAttribute="top" secondItem="aDH-L2-ViC" secondAttribute="top" constant="5" id="Pq5-dY-xfv"/>
+                <constraint firstItem="Bnj-qA-14f" firstAttribute="top" secondItem="aDH-L2-ViC" secondAttribute="top" constant="5" id="Ftt-9Z-olA"/>
+                <constraint firstItem="Bnj-qA-14f" firstAttribute="trailing" secondItem="aDH-L2-ViC" secondAttribute="trailing" constant="-10" id="VI7-gk-mqx"/>
                 <constraint firstAttribute="trailing" secondItem="SqM-pP-iR7" secondAttribute="trailing" constant="10" id="aur-md-cRX"/>
                 <constraint firstAttribute="trailing" secondItem="AF1-3a-kBu" secondAttribute="trailing" constant="10" id="bTT-up-5is"/>
                 <constraint firstItem="AF1-3a-kBu" firstAttribute="top" secondItem="aDH-L2-ViC" secondAttribute="bottom" constant="7" id="h8A-qS-anZ"/>

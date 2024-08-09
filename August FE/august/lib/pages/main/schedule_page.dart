@@ -690,6 +690,7 @@ class _SchedulePageState extends State<SchedulePage>
                   ),
                   child: IconButton(
                     onPressed: () {
+                      HapticFeedback.mediumImpact();
                       checkAccessToken();
                       showDialog(
                         context: context,

@@ -49,8 +49,10 @@ class _InvitationCodePageState extends State<InvitationCodePage>
     if (isCodeExpired()) {
       await generateCode();
     } else {
-      _code = prefs.getString('invitationCode') ?? _code;
-      formattedTime = formatExpires();
+      // get code but still can use the old code
+      await generateCode();
+      // _code = prefs.getString('invitationCode') ?? _code;
+      // formattedTime = formatExpires();
     }
     setState(() {}); // Update UI after verification or generation
   }

@@ -463,61 +463,61 @@ class _GroupSearchPageState extends State<GroupSearchPage>
                                   credits: course.credits,
                                   instructors: [instructor],
                                 ));
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: Text(
-                                          textAlign: TextAlign.center,
-                                          '${course.courseCode} (ONLINE)',
-                                          style: AugustFont.head2(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .outline)),
-                                      content: Text(
-                                          textAlign: TextAlign.center,
-                                          'This course will not appear on the schedule.',
-                                          style: AugustFont.subText2(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .outline)),
-                                      actions: <Widget>[
-                                        GestureDetector(
-                                          onTap: () {
-                                            Navigator.of(context)
-                                                .pop(); // 팝업 닫기
-                                          },
-                                          child: Container(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 30),
-                                            height: 55,
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width -
-                                                80,
-                                            decoration: BoxDecoration(
-                                                color: Colors.redAccent,
-                                                borderRadius:
-                                                    BorderRadius.circular(60)),
-                                            child: Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Text(
-                                                  'OK',
-                                                  style: AugustFont.head2(
-                                                      color: Colors.white),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
+                                // showDialog(
+                                //   context: context,
+                                //   builder: (BuildContext context) {
+                                //     return AlertDialog(
+                                //       title: Text(
+                                //           textAlign: TextAlign.center,
+                                //           '${course.courseCode} (ONLINE)',
+                                //           style: AugustFont.head2(
+                                //               color: Theme.of(context)
+                                //                   .colorScheme
+                                //                   .outline)),
+                                //       content: Text(
+                                //           textAlign: TextAlign.center,
+                                //           'This course will not appear on the schedule.',
+                                //           style: AugustFont.subText2(
+                                //               color: Theme.of(context)
+                                //                   .colorScheme
+                                //                   .outline)),
+                                //       actions: <Widget>[
+                                //         GestureDetector(
+                                //           onTap: () {
+                                //             Navigator.of(context)
+                                //                 .pop(); // 팝업 닫기
+                                //           },
+                                //           child: Container(
+                                //             padding: EdgeInsets.symmetric(
+                                //                 horizontal: 30),
+                                //             height: 55,
+                                //             width: MediaQuery.of(context)
+                                //                     .size
+                                //                     .width -
+                                //                 80,
+                                //             decoration: BoxDecoration(
+                                //                 color: Colors.redAccent,
+                                //                 borderRadius:
+                                //                     BorderRadius.circular(60)),
+                                //             child: Row(
+                                //               crossAxisAlignment:
+                                //                   CrossAxisAlignment.center,
+                                //               mainAxisAlignment:
+                                //                   MainAxisAlignment.center,
+                                //               children: [
+                                //                 Text(
+                                //                   'OK',
+                                //                   style: AugustFont.head2(
+                                //                       color: Colors.white),
+                                //                 ),
+                                //               ],
+                                //             ),
+                                //           ),
+                                //         ),
+                                //       ],
+                                //     );
+                                //   },
+                                // );
                               }
                             },
                             icon: AugustIcons.addCoursetoGroup,
