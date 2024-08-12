@@ -91,12 +91,15 @@
 	<false/>
 
 
+	<key>NSUserTrackingUsageDescription</key>
+	<string>This identifier will be used to deliver personalized ads to you.</string>
+
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-8909142959557772~3875500243</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>It will only fetch name and photo for your profile.</string>
+	<string>It will only access and retrieve profile photo. No other personal information or data will be collected or used.</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>
