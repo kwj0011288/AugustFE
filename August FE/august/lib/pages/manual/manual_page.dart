@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:ui';
+import 'package:august/components/firebase/firebase_analytics.dart';
 import 'package:august/const/font/font.dart';
 import 'package:august/const/icons/icons.dart';
 import 'package:august/get_api/timetable/send_timetable.dart';
@@ -182,6 +183,8 @@ class _ManualPageState extends State<ManualPage> {
                   width: 70,
                   height: 35,
                   onTap: () async {
+                    HapticFeedback.mediumImpact();
+                    await AnalyticsService().manuallyCreate();
                     List<List<ScheduleList>> copiedCoursesData =
                         List.from(provider.selectedCoursesData);
 
@@ -216,6 +219,7 @@ class _ManualPageState extends State<ManualPage> {
         ],
       ),
       body: ColorfulSafeArea(
+        topColor: Colors.red,
         bottomColor: Colors.white.withOpacity(0),
         overflowRules: OverflowRules.all(true),
         child: Stack(
@@ -256,36 +260,6 @@ class _ManualPageState extends State<ManualPage> {
         child: Stack(children: [
           Container(
             height: MediaQuery.of(context).size.height * 0.18,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Theme.of(context)
-                      .colorScheme
-                      .primaryContainer
-                      .withOpacity(0.1),
-                  Theme.of(context)
-                      .colorScheme
-                      .primaryContainer
-                      .withOpacity(0.3),
-                  Theme.of(context)
-                      .colorScheme
-                      .primaryContainer
-                      .withOpacity(0.5),
-                  Theme.of(context)
-                      .colorScheme
-                      .primaryContainer
-                      .withOpacity(0.7),
-                  Theme.of(context)
-                      .colorScheme
-                      .primaryContainer
-                      .withOpacity(1.0),
-                  Theme.of(context).colorScheme.primaryContainer,
-                  Theme.of(context).colorScheme.primaryContainer,
-                ],
-              ),
-            ),
           ),
           Positioned(
             bottom: 50,
@@ -310,17 +284,17 @@ class _ManualPageState extends State<ManualPage> {
   }
 
   void _navigateToPage() async {
+    HapticFeedback.lightImpact();
     var addedCoursesNotifier = ValueNotifier<List<CourseList>>([]);
     showCupertinoModalBottomSheet<Map<String, dynamic>>(
-      topRadius: Radius.circular(30),
+      topRadius: Radius.circular(0), // Set radius to 0 for full-width coverage
       context: context,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () {
-            Navigator.pop(
-                context); // Close the bottom sheet when the area outside the sheet is tapped
+            Navigator.pop(context); // Close the sheet when tapping outside
           },
           child: NotificationListener<ScrollNotification>(
             onNotification: (ScrollNotification notification) {
@@ -331,15 +305,14 @@ class _ManualPageState extends State<ManualPage> {
               return true;
             },
             child: DraggableScrollableSheet(
-              expand: false,
-              initialChildSize: 1,
+              expand: true, // Ensure the sheet is expanded fully
+              initialChildSize: 1, // Start and stay full screen
               maxChildSize: 1,
               minChildSize: 1,
               builder: (BuildContext context,
                   ScrollController sheetScrollController) {
                 return GestureDetector(
-                    onTap:
-                        () {}, // Prevent the inner tap event from propagating to the outer GestureDetector
+                    onTap: () {}, // Prevent tap events from closing the modal
                     child: ManualSearchPage(
                       addedCoursesNotifier: addedCoursesNotifier,
                       onCourseSelected: (CourseList course) {

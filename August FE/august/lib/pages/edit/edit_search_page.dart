@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:animated_hint_textfield/animated_hint_textfield.dart';
 import 'package:august/components/ad/ad_list.dart';
+import 'package:august/components/home/dialog.dart';
+import 'package:august/components/tile/editSimpleCourseTile.dart';
 import 'package:august/const/font/font.dart';
 import 'package:august/const/icons/icons.dart';
 import 'package:august/provider/courseprovider.dart';
@@ -118,9 +120,12 @@ class _EditSearchPageState extends State<EditSearchPage>
     // Check for conflicts with all existing courses
     for (var existingCourse in _courseList) {
       if (_hasTimeConflict(newSchedule, existingCourse)) {
-        Navigator.of(context).pop();
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
         // If a conflict is detected, show dialog and set flag
         conflictDetected = true;
+
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -197,6 +202,11 @@ class _EditSearchPageState extends State<EditSearchPage>
 
     List<CourseList> apiData = await _courses.getClassList(
         querytype: querytype, semester: semester, query: enteredKeyword);
+
+    // Sort each course's sections by section.code
+    for (var course in apiData) {
+      course.sections?.sort((a, b) => a.code!.compareTo(b.code!));
+    }
 
     if (mounted) {
       setState(() {
@@ -338,8 +348,9 @@ class _EditSearchPageState extends State<EditSearchPage>
                     cursorColor: Theme.of(context).colorScheme.outline,
                     hintTexts: const [
                       'CMSC131 ',
+                      'Orchestra ',
+                      'Biology ',
                       'CHEM132 ',
-                      'ENES140 ',
                       'BMGT310 ',
                       'MATH240 ',
                       'KORA201 ',
@@ -551,10 +562,12 @@ class _EditSearchPageState extends State<EditSearchPage>
                                     return '${meeting.days} $formattedStartTime - $formattedEndTime';
                                   }).toList() ??
                                   [];
-                          String meetingTimes =
-                              formattedMeetingTimes.join('\n');
+                          // If no meeting times are available, set to "Online"
+                          String meetingTimes = formattedMeetingTimes.isNotEmpty
+                              ? formattedMeetingTimes.join('\n')
+                              : "Online";
 
-                          widgets.add(SimepleCourseTile(
+                          widgets.add(EditSimepleCourseTile(
                             classes: course,
                             sectionCode:
                                 section.code ?? '', // Pass the section code
@@ -576,7 +589,10 @@ class _EditSearchPageState extends State<EditSearchPage>
                           // 3개보다 많은 섹션이 있을 경우, 5번째 섹션마다 광고 삽입
                           if (sectionsCount > 3 && (i + 1) % 5 == 0) {
                             widgets.add(
-                              googleAdMobContainer(isGroup: false),
+                              googleAdMobContainer(
+                                isGroup: false,
+                                isMedium: true,
+                              ),
                             );
                           }
                         }
@@ -584,10 +600,12 @@ class _EditSearchPageState extends State<EditSearchPage>
                         // 3개 이하의 섹션이 있고, 섹션이 하나 이상 있는 경우, 리스트의 마지막에 광고 삽입
                         if (sectionsCount > 1 && sectionsCount <= 4) {
                           widgets.add(
-                            googleAdMobContainer(isGroup: false),
+                            googleAdMobContainer(
+                              isGroup: false,
+                              isMedium: true,
+                            ),
                           );
                         }
-
                         return Column(children: widgets);
                       },
                     );

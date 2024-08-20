@@ -11,6 +11,7 @@ import 'package:august/provider/Institution_provider.dart';
 import 'package:august/provider/department_provider.dart';
 import 'package:august/provider/semester_provider.dart';
 import 'package:august/provider/user_info_provider.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:provider/provider.dart';
@@ -20,9 +21,16 @@ import 'get_api/timetable/class_grouping.dart';
 import 'get_api/onboard/get_semester.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Add this line
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
+
   MobileAds.instance.initialize();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool isOnline = await InternetConnectionChecker().hasConnection;
@@ -80,10 +88,8 @@ class MyApp extends StatelessWidget {
       builder: (context, Orientation, DeviceType) {
         return MultiProvider(
           providers: [
-            // ChangeNotifierProvider(
-            //   create: (context) => TestSemesterProvider(initialSemester),
-            // ),
             ChangeNotifierProvider(create: (context) => CoursesProvider()),
+
             ChangeNotifierProvider(create: (context) => ClassGrouping()),
 
             // ChangeNotifierProvider(

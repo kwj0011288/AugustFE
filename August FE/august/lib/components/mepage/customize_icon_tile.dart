@@ -30,7 +30,7 @@ String convertIconName(String name) {
   } else if (name == 'light_prime') {
     return 'Default Light Mode';
   } else if (name == 'dark_pencil') {
-    return 'Customize Dark 1';
+    return 'Customize ';
   } else if (name == 'light_pencil') {
     return 'Customize Light 1';
   } else {

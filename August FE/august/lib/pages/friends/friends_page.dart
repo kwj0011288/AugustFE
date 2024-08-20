@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:august/components/ad/ad_grid.dart';
 import 'package:august/components/ad/ad_list.dart';
+import 'package:august/components/firebase/firebase_analytics.dart';
 import 'package:august/components/friends/add_friend.dart';
 import 'package:august/components/friends/number_box.dart';
 import 'package:august/components/profile/profile.dart';
@@ -286,9 +287,13 @@ class _FriendsPageState extends State<FriendsPage>
                 ),
                 SizedBox(width: 10),
                 GestureDetector(
-                  onTap: () {
+                  onTap: () async {
                     Navigator.of(context).pop();
                     addFriend(inviteController.text);
+                    await AnalyticsService().addFriends(
+                      inviteController.text,
+                      DateTime.now().toString(),
+                    );
                     inviteController.clear();
 
                     Future.delayed(Duration(microseconds: 1500), () {
@@ -565,12 +570,42 @@ class _FriendsPageState extends State<FriendsPage>
                 ),
                 if (friends.isNotEmpty)
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
+                    padding: const EdgeInsets.only(left: 30, bottom: 10),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(top: 10, right: 10),
+                          padding: const EdgeInsets.only(
+                            top: 10,
+                            right: 10,
+                          ),
+                          child: RichText(
+                            text: TextSpan(
+                              style: AugustFont.captionSmallBold(
+                                color: Colors.grey,
+                              ),
+                              children: <TextSpan>[
+                                TextSpan(text: 'Only '),
+                                TextSpan(
+                                  text: ' Main Timetable ',
+                                  style: AugustFont.captionSmallBold(
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: ' will be shared with your friends',
+                                  style: AugustFont.captionSmallBold(
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Spacer(),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 10),
                           child: Align(
                             alignment: Alignment.centerRight,
                             child: GestureDetector(
@@ -606,7 +641,7 @@ class _FriendsPageState extends State<FriendsPage>
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(right: 10, top: 10),
+                          padding: const EdgeInsets.only(right: 10),
                           child: Align(
                             alignment: Alignment.centerRight,
                             child: GestureDetector(
@@ -665,14 +700,11 @@ class _FriendsPageState extends State<FriendsPage>
                               childAspectRatio: (10 / 11),
                               //  itemCount: friends.length + 2,
                               children: List.generate(
-                                friends.length + 2,
+                                friends.length + 1,
                                 (index) {
-                                  if (index == friends.length &&
-                                      friends.isNotEmpty) {
-                                    return googleAdMobGridList();
-                                  } else if (index == friends.length + 1) {
+                                  if (index == friends.length) {
                                     return GestureDetector(
-                                      onTap: () {
+                                      onTap: () async {
                                         InvitationInput();
                                         checkAccessToken();
                                       },
@@ -918,6 +950,260 @@ class _FriendsPageState extends State<FriendsPage>
                                   );
                                 },
                               ),
+                              // children: List.generate(
+                              //   friends.length + 2,
+                              //   (index) {
+                              //     if (index == friends.length &&
+                              //         friends.isNotEmpty) {
+                              //       return googleAdMobGridList();
+                              //     } else if (index == friends.length + 1) {
+                              //       return GestureDetector(
+                              //         onTap: () async {
+                              //           InvitationInput();
+                              //           checkAccessToken();
+                              //         },
+                              //         child: Container(
+                              //           decoration: BoxDecoration(
+                              //             boxShadow: [
+                              //               BoxShadow(
+                              //                 color: Theme.of(context)
+                              //                     .colorScheme
+                              //                     .shadow,
+                              //                 blurRadius: 10,
+                              //                 offset: const Offset(6, 4),
+                              //               ),
+                              //               BoxShadow(
+                              //                 color: Theme.of(context)
+                              //                     .colorScheme
+                              //                     .shadow,
+                              //                 blurRadius: 10,
+                              //                 offset: const Offset(-2, 0),
+                              //               ),
+                              //             ],
+                              //             color: Theme.of(context)
+                              //                 .colorScheme
+                              //                 .primaryContainer,
+                              //             borderRadius:
+                              //                 BorderRadius.circular(10),
+                              //           ),
+                              //           child: Column(
+                              //             mainAxisAlignment:
+                              //                 MainAxisAlignment.center,
+                              //             children: [
+                              //               Icon(
+                              //                 FeatherIcons.plus,
+                              //                 size: 40,
+                              //               ),
+                              //               SizedBox(height: 10),
+                              //               Text(
+                              //                 'Add Friend',
+                              //                 style: AugustFont.head6(
+                              //                   color: Theme.of(context)
+                              //                       .colorScheme
+                              //                       .outline,
+                              //                 ),
+                              //               ),
+                              //             ],
+                              //           ),
+                              //         ),
+                              //       );
+                              //     }
+                              //     // dataList에서 각 항목에 대한 정보를 사용하여 UI 구성
+                              //     return GestureDetector(
+                              //       // onTap에서 호출되는 부분
+                              //       onTap: () {
+                              //         HapticFeedback.mediumImpact();
+                              //         if (!isEdit) {
+                              //           showCupertinoModalBottomSheet(
+                              //             context: context,
+                              //             backgroundColor: Colors
+                              //                 .transparent, // BottomSheet 배경을 투명하게 설정
+                              //             topRadius: Radius.circular(30),
+                              //             builder: (BuildContext context) {
+                              //               return Container(
+                              //                 height: MediaQuery.of(context)
+                              //                         .size
+                              //                         .height *
+                              //                     0.93, // BottomSheet의 높이 조정
+                              //                 decoration: BoxDecoration(
+                              //                   color: Theme.of(context)
+                              //                       .colorScheme
+                              //                       .background, // BottomSheet의 배경색
+                              //                   borderRadius: BorderRadius.only(
+                              //                     topLeft: Radius.circular(100),
+                              //                     topRight:
+                              //                         Radius.circular(100),
+                              //                   ),
+                              //                 ),
+                              //                 child: FriendSchedulePage(
+                              //                   photoUrl:
+                              //                       friends[index].profileImage,
+                              //                   name: friends[index].name,
+                              //                   department:
+                              //                       friends[index].department ??
+                              //                           'Undecided',
+                              //                   yearInSchool: convertDepartment(
+                              //                       friends[index]
+                              //                           .yearInSchool),
+                              //                   friendId: friends[index].id,
+                              //                 ),
+                              //               );
+                              //             },
+                              //           );
+                              //           refreshToken().then((_) {
+                              //             checkAccessToken();
+                              //           });
+                              //         } else {
+                              //           deleteFriends(friends[index].id);
+                              //         }
+                              //       },
+                              //       child: AnimatedContainer(
+                              //         duration: Duration(milliseconds: 200),
+                              //         padding: EdgeInsets.all(0), // 내부 여백 추가
+                              //         decoration: BoxDecoration(
+                              //           color: isEdit
+                              //               ? Colors.redAccent
+                              //               : Theme.of(context)
+                              //                   .colorScheme
+                              //                   .primaryContainer,
+                              //           borderRadius: BorderRadius.circular(10),
+                              //           boxShadow: [
+                              //             BoxShadow(
+                              //               color: Theme.of(context)
+                              //                   .colorScheme
+                              //                   .shadow,
+                              //               blurRadius: 10,
+                              //               offset: Offset(6, 4),
+                              //             ),
+                              //             BoxShadow(
+                              //               color: Theme.of(context)
+                              //                   .colorScheme
+                              //                   .shadow,
+                              //               blurRadius: 10,
+                              //               offset: Offset(-2, 0),
+                              //             ),
+                              //           ],
+                              //         ),
+                              //         child: (!isEdit)
+                              //             ? Padding(
+                              //                 padding:
+                              //                     const EdgeInsets.symmetric(
+                              //                         horizontal: 10),
+                              //                 child: Column(
+                              //                   mainAxisAlignment:
+                              //                       MainAxisAlignment.center,
+                              //                   crossAxisAlignment:
+                              //                       CrossAxisAlignment.center,
+                              //                   children: [
+                              //                     ProfileWidget(
+                              //                         isBottomBar: false,
+                              //                         isFriendsPage: true,
+                              //                         friendPhoto:
+                              //                             friends[index]
+                              //                                 .profileImage!),
+                              //                     SizedBox(height: 5),
+                              //                     Text(
+                              //                       friends[index].name,
+                              //                       style: AugustFont.head6(
+                              //                         color: Theme.of(context)
+                              //                             .colorScheme
+                              //                             .outline,
+                              //                       ),
+                              //                       maxLines: 1,
+                              //                       overflow:
+                              //                           TextOverflow.ellipsis,
+                              //                     ),
+                              //                     Row(
+                              //                       mainAxisAlignment:
+                              //                           MainAxisAlignment
+                              //                               .center,
+                              //                       crossAxisAlignment:
+                              //                           CrossAxisAlignment
+                              //                               .center,
+                              //                       children: [
+                              //                         Text(
+                              //                           friends[index]
+                              //                                   .department ??
+                              //                               'Undecided',
+                              //                           style: AugustFont
+                              //                               .captionBold(
+                              //                             color: Colors.grey,
+                              //                           ),
+                              //                         ),
+                              //                         SizedBox(width: 5),
+                              //                         Text(
+                              //                           '|',
+                              //                           style: AugustFont
+                              //                               .captionSmall(
+                              //                             color: Colors.grey,
+                              //                           ),
+                              //                         ),
+                              //                         SizedBox(width: 5),
+                              //                         Text(
+                              //                           friends[index]
+                              //                               .institution!
+                              //                               .nickname,
+                              //                           style: AugustFont
+                              //                               .captionBold(
+                              //                             color: Colors.grey,
+                              //                           ),
+                              //                         ),
+                              //                         SizedBox(width: 5),
+                              //                         Text(
+                              //                           '|',
+                              //                           style: AugustFont
+                              //                               .captionSmall(
+                              //                             color: Colors.grey,
+                              //                           ),
+                              //                         ),
+                              //                         SizedBox(width: 5),
+                              //                         Text(
+                              //                           friends[index]
+                              //                               .yearInSchool,
+                              //                           style: AugustFont
+                              //                               .captionBold(
+                              //                             color: Colors.grey,
+                              //                           ),
+                              //                         ),
+                              //                       ],
+                              //                     ),
+                              //                   ],
+                              //                 ),
+                              //               )
+                              //             : Padding(
+                              //                 padding:
+                              //                     const EdgeInsets.all(8.0),
+                              //                 child: Column(
+                              //                   mainAxisAlignment:
+                              //                       MainAxisAlignment.center,
+                              //                   crossAxisAlignment:
+                              //                       CrossAxisAlignment.center,
+                              //                   children: [
+                              //                     Align(
+                              //                       alignment: Alignment.center,
+                              //                       child: CircleAvatar(
+                              //                           backgroundColor:
+                              //                               Colors.transparent,
+                              //                           maxRadius: 50,
+                              //                           child:
+                              //                               JiggleTrashIcon()),
+                              //                     ),
+                              //                     Text(
+                              //                       friends[index].name,
+                              //                       style: AugustFont.head6(
+                              //                         color: Colors.black,
+                              //                       ),
+                              //                       overflow:
+                              //                           TextOverflow.ellipsis,
+                              //                       maxLines: 1,
+                              //                     ),
+                              //                   ],
+                              //                 ),
+                              //               ),
+                              //       ),
+                              //     );
+                              //   },
+                              // ),
                             ),
                           )
                         : SizedBox(
@@ -941,9 +1227,10 @@ class _FriendsPageState extends State<FriendsPage>
                                   padding: const EdgeInsets.all(10.0),
                                   child: GestureDetector(
                                     onTap: () async {
-                                      (timetableLength == 0)
-                                          ? showNoTimetableDialog(context)
-                                          : InvitationInput();
+                                      InvitationInput();
+                                      // (timetableLength == 0)
+                                      //     ? showNoTimetableDialog(context)
+                                      //     : InvitationInput();
                                       await checkAccessToken();
                                     },
                                     child: Container(

@@ -29,7 +29,7 @@ Widget animationFriend(Color color, String imagePath) {
                 const SizedBox(height: 5),
                 Text(
                   "August",
-                  style: AugustFont.head4(
+                  style: AugustFont.head2(
                     color: Theme.of(context).colorScheme.outline,
                   ),
                 ),
@@ -139,7 +139,7 @@ class _AnimationFriendsState extends State<AnimationFriends>
           Transform.scale(
             scale: scaleFarSide,
             child: animationFriend(Theme.of(context).colorScheme.onSecondary,
-                "assets/memoji/Memoji3.png"),
+                "assets/memoji/Memoji5.png"),
           ),
           0,
           farDistance,
@@ -160,7 +160,7 @@ class _AnimationFriendsState extends State<AnimationFriends>
         Transform.scale(
           scale: scaleCenter,
           child: animationFriend(Theme.of(context).colorScheme.onSecondary,
-              "assets/memoji/Memoji1.png"),
+              "assets/memoji/Memoji3.png"),
         ),
       ],
     );

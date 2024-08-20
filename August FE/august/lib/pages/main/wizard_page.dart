@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:august/components/firebase/firebase_analytics.dart';
+import 'package:august/components/home/dialog.dart';
 import 'package:august/const/customs/customwidget.dart';
 import 'package:august/const/customs/stringwidget.dart';
 import 'package:august/const/font/font.dart';
@@ -90,6 +92,8 @@ class _GeneratePageState extends State<GeneratePage> {
   final _sliderUpdateController = StreamController<double>.broadcast();
   late StreamSubscription<int> _debounceSubscription;
 
+  int counter = 0;
+
   //첫번째 슬라이더
   double _currentSliderValue1 = (9 * 60).toDouble();
   double _slider1Min = (6 * 60).toDouble();
@@ -106,7 +110,7 @@ class _GeneratePageState extends State<GeneratePage> {
   double _slider3Max = (8 * 60).toDouble();
 
   //네번째 슬라이더
-  double _currentSliderValue4 = 3;
+  double _currentSliderValue4 = 4;
   late double _slider4Min = 1;
   double _slider4Max = 4;
 
@@ -363,7 +367,6 @@ class _GeneratePageState extends State<GeneratePage> {
       appBar: AppBar(
         leadingWidth: 80,
         toolbarHeight: 60,
-        elevation: 0,
         backgroundColor: Theme.of(context).colorScheme.background,
         leading: Padding(
           padding: const EdgeInsets.only(left: 10, top: 8, bottom: 8),
@@ -371,6 +374,7 @@ class _GeneratePageState extends State<GeneratePage> {
             onTap: () {
               if (Navigator.canPop(context)) {
                 Navigator.pop(context);
+                AnalyticsService().wizardBack();
               }
             },
             child: Container(
@@ -410,35 +414,7 @@ class _GeneratePageState extends State<GeneratePage> {
                       HapticFeedback.mediumImpact();
                       String jsonData = generateJSON();
 
-                      showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (BuildContext context) {
-                          return Dialog(
-                            elevation: 0,
-                            backgroundColor: Colors.transparent,
-                            child: Center(
-                              child: Container(
-                                width: 100, // Adjust as needed
-                                height: 100, // Adjust as needed
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .primaryContainer,
-                                  borderRadius: BorderRadius.circular(
-                                      100), // Adjust as needed
-                                ),
-                                child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: CircularProgressIndicator(
-                                      color:
-                                          Theme.of(context).colorScheme.outline,
-                                    )),
-                              ),
-                            ),
-                          );
-                        },
-                      );
+                      loadingShowDialog(context);
 
                       int? count = await scheduleCount;
                       if (count! >= 1000) {
@@ -513,7 +489,7 @@ class _GeneratePageState extends State<GeneratePage> {
                                 return AlertDialog(
                                   title: Text(
                                     textAlign: TextAlign.center,
-                                    'No schedules created.',
+                                    '0 Possible Schedules!',
                                     style: AugustFont.head2(
                                         color: Theme.of(context)
                                             .colorScheme
@@ -521,7 +497,7 @@ class _GeneratePageState extends State<GeneratePage> {
                                   ),
                                   content: Text(
                                     textAlign: TextAlign.center,
-                                    'Please try to adjust the options to minimize the possibilities',
+                                    'Please adjust the options to create schedules',
                                     style: AugustFont.subText2(
                                         color: Theme.of(context)
                                             .colorScheme
@@ -616,8 +592,7 @@ class _GeneratePageState extends State<GeneratePage> {
                               convertToGroupLists(fetchedRawData);
 
                           HapticFeedback.mediumImpact();
-
-                          HapticFeedback.mediumImpact();
+                          AnalyticsService().wizardCreate(counter.toString());
                           Navigator.push(
                             context,
                             CupertinoPageRoute(
@@ -908,6 +883,10 @@ class _GeneratePageState extends State<GeneratePage> {
                               },
                               onChangeEnd: (double endVal) {
                                 onSliderEnd(endVal, "start_time");
+                                setState(() {
+                                  counter++;
+                                  print(counter);
+                                });
                               },
                             ),
                           ),
@@ -965,6 +944,10 @@ class _GeneratePageState extends State<GeneratePage> {
                               },
                               onChangeEnd: (double endVal) {
                                 onSliderEnd(endVal, "allow_consec");
+                                setState(() {
+                                  counter++;
+                                  print(counter);
+                                });
                               },
                             ),
                           ),
@@ -1022,6 +1005,10 @@ class _GeneratePageState extends State<GeneratePage> {
                                     },
                                     onChangeEnd: (double endVal) {
                                       onSliderEnd(endVal, "min_interval");
+                                      setState(() {
+                                        counter++;
+                                        print(counter);
+                                      });
                                     },
                                   ),
                                 ),
@@ -1079,6 +1066,10 @@ class _GeneratePageState extends State<GeneratePage> {
                                     },
                                     onChangeEnd: (double endVal) {
                                       onSliderEnd(endVal, "max_interval");
+                                      setState(() {
+                                        counter++;
+                                        print(counter);
+                                      });
                                     },
                                   ),
                                 ),
@@ -1145,6 +1136,10 @@ class _GeneratePageState extends State<GeneratePage> {
                                 ),
                                 onPressed: () {
                                   onButtonPressed("allow_one_class_a_day");
+                                  setState(() {
+                                    counter++;
+                                    print(counter);
+                                  });
                                   HapticFeedback.mediumImpact();
                                 },
                               ),
@@ -1190,8 +1185,8 @@ class _GeneratePageState extends State<GeneratePage> {
                                             ),
                                             Text(
                                               isButton3Pressed
-                                                  ? 'Open Section'
-                                                  : "Available Section",
+                                                  ? 'Open Sections'
+                                                  : "Available Sections",
                                               style: AugustFont.subText(
                                                 color: Theme.of(context)
                                                     .colorScheme
@@ -1205,6 +1200,10 @@ class _GeneratePageState extends State<GeneratePage> {
                                   ),
                                   onPressed: () {
                                     onButtonPressed("allow_only_open_section");
+                                    setState(() {
+                                      counter++;
+                                      print(counter);
+                                    });
                                     HapticFeedback.mediumImpact();
                                   }),
                               SizedBox(height: 15),

@@ -201,7 +201,7 @@ class GroupSection {
   int? openSeats;
   int? waitlist;
   dynamic holdfile;
-  bool? meetingsExist;
+  bool meetingsExist = true; // Now non-nullable
 
   GroupSection({
     this.id,
@@ -210,7 +210,7 @@ class GroupSection {
     this.openSeats,
     this.waitlist,
     this.holdfile,
-    this.meetingsExist,
+    required this.meetingsExist, // Required keyword ensures it must be provided
   });
 
   GroupSection.fromJson(Map<String, dynamic> json) {
@@ -220,7 +220,8 @@ class GroupSection {
     openSeats = json['open_seats'];
     waitlist = json['waitlist'];
     holdfile = json['holdfile'];
-    meetingsExist = json['meetings_exist'];
+    meetingsExist = json['meetings_exist'] ??
+        false; // Provide a default value to handle potential nulls in JSON data
   }
 
   Map<String, dynamic> toJson() {

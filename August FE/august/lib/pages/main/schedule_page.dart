@@ -2,6 +2,9 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'dart:math';
+import 'package:august/components/firebase/firebase_analytics.dart';
 import 'package:august/components/indicator/scrolling_dots_effect.dart';
 import 'package:august/components/indicator/smooth_page_indicator.dart';
 import 'package:august/components/home/loading.dart';
@@ -31,8 +34,11 @@ import '../../components/timetable/timetable.dart';
 import '../edit/edit_page.dart';
 import '../group/group_page.dart';
 import '../manual/manual_page.dart';
-import "package:flutter_feather_icons/flutter_feather_icons.dart";
+import 'package:screenshot/screenshot.dart';
 import 'package:flutter/material.dart' hide ModalBottomSheetRoute;
+import 'dart:typed_data';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 class SchedulePage extends StatefulWidget {
   SchedulePage({
@@ -43,12 +49,15 @@ class SchedulePage extends StatefulWidget {
 
 class _SchedulePageState extends State<SchedulePage>
     with TickerProviderStateMixin {
+  /*  --- for sharing and screenshot --- */
+  final screenshotController = ScreenshotController();
   /* --- semester info handling ---- */
   String? currentSemester;
   int? currentSemesterInt;
 
   /* --- timetable handling ---- */
   List<TimeTables> _timetableCollection = [];
+  List<TimeTables> savedTimeCollection = [];
   int currentIndex = 0;
 
   /* --- loading indicator for the timetable ----- */
@@ -186,6 +195,8 @@ class _SchedulePageState extends State<SchedulePage>
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('timetable', jsonString);
 
+        savedTimeCollection = List<TimeTables>.from(_timetableCollection);
+
         print("저장되었슴");
       }
     } catch (e) {
@@ -262,6 +273,7 @@ class _SchedulePageState extends State<SchedulePage>
               children: <Widget>[
                 Text(
                   "Edit Timetable Name",
+                  //  "Edit Timetable Name index ${index}",
                   style: AugustFont.head1(
                       color: Theme.of(context).colorScheme.outline),
                 ),
@@ -307,8 +319,54 @@ class _SchedulePageState extends State<SchedulePage>
     }
   }
 
+  Future<void> share(int index, BuildContext context) async {
+    try {
+      HapticFeedback.lightImpact();
+      final bytes = await screenshotController.captureFromLongWidget(
+        InheritedTheme.captureAll(
+          context,
+          Material(
+            child: SingleChildScrollView(
+              child: savedTimeCollection.isNotEmpty
+                  ? Screenshot(
+                      controller: screenshotController,
+                      child: Container(
+                        child: SingleTimetable(
+                          courses: savedTimeCollection[0].coursesData[0],
+                          index: 0,
+                          forceFixedTimeRange: false,
+                        ),
+                      ),
+                    )
+                  : Container(
+                      child: Text('No timetable data available.'),
+                    ),
+            ),
+          ),
+        ),
+        delay: Duration(milliseconds: 100),
+        context: context,
+      );
+      await saveAndShare(bytes);
+    } catch (e) {
+      print("Error during screenshot and share: $e");
+    }
+  }
+
+  Future<void> saveAndShare(Uint8List bytes) async {
+    final time = DateTime.now().toIso8601String().replaceAll('.', '-');
+    final directory = Platform.isAndroid
+        ? await getExternalStorageDirectory()
+        : await getApplicationDocumentsDirectory();
+
+    final image = File('${directory!.path}/$time.png');
+    image.writeAsBytesSync(bytes);
+    await Share.shareXFiles([XFile(image.path)]);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final coursesProvider = Provider.of<CoursesProvider>(context);
     final currentIndexProv = Provider.of<CurrentIndexProvider>(context);
 
     return WillPopScope(
@@ -483,6 +541,8 @@ class _SchedulePageState extends State<SchedulePage>
                       Padding(
                         padding: const EdgeInsets.only(top: 7),
                         child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             const SizedBox(width: 20),
                             AnimatedSwitcher(
@@ -503,17 +563,15 @@ class _SchedulePageState extends State<SchedulePage>
                               },
                               child: currentIndex == 0
                                   ? Text(
-                                      "This schedule is for the friends and GPA page.",
-                                      key: ValueKey<int>(
-                                          1), // Unique key to trigger animation
+                                      "Main Schedule        ",
+                                      key: ValueKey<int>(1),
                                       style: AugustFont.captionSmallBold(
                                         color: Colors.grey,
                                       ),
                                     )
                                   : Text(
-                                      "Try to make this schedule the main one.             ",
-                                      key: ValueKey<int>(
-                                          2), // Unique key to trigger animation
+                                      "Personal Schedule",
+                                      key: ValueKey<int>(2),
                                       style: AugustFont.captionSmallBold(
                                         color: Colors.grey,
                                       ),
@@ -581,6 +639,7 @@ class _SchedulePageState extends State<SchedulePage>
           checkAccessToken();
           _editTimetableName(currentIndex);
         },
+        share: () => share(currentIndex, context),
         remove: () async {
           HapticFeedback.lightImpact();
           if (currentIndex < _timetableCollection.length) {
@@ -696,10 +755,14 @@ class _SchedulePageState extends State<SchedulePage>
                         context: context,
                         builder: (BuildContext context) {
                           return Dialog(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.background,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20)),
                             child: GestureDetector(
                               onTap: () {
+                                HapticFeedback.selectionClick();
+                                AnalyticsService().groupCreate();
                                 Navigator.pop(context);
                                 Navigator.push(
                                     context,
@@ -763,10 +826,15 @@ class _SchedulePageState extends State<SchedulePage>
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.center,
                                               children: [
-                                                Icon(AugustIcons.autoCreate,
-                                                    size: 70,
-                                                    color: Colors.blueAccent),
-                                                const SizedBox(height: 5),
+                                                Transform.rotate(
+                                                  angle: -5 * (pi / 180),
+                                                  child: Image.asset(
+                                                    'assets/icons/wand.png',
+                                                    height: 80,
+                                                    width: 80,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 10),
                                                 Text(
                                                   'Auto\nGenerate',
                                                   style: AugustFont.head2(
@@ -783,6 +851,7 @@ class _SchedulePageState extends State<SchedulePage>
                                         Expanded(
                                           child: GestureDetector(
                                             onTap: () {
+                                              HapticFeedback.selectionClick();
                                               Navigator.pop(context);
                                               Navigator.push(
                                                 context,
@@ -826,12 +895,15 @@ class _SchedulePageState extends State<SchedulePage>
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.center,
                                                 children: [
-                                                  Icon(
-                                                    AugustIcons.manuallyCreate,
-                                                    size: 70,
-                                                    color: Colors.amberAccent,
+                                                  Transform.rotate(
+                                                    angle: 1 * (pi / 180),
+                                                    child: Image.asset(
+                                                      'assets/icons/manual.png',
+                                                      height: 80,
+                                                      width: 80,
+                                                    ),
                                                   ),
-                                                  const SizedBox(height: 5),
+                                                  const SizedBox(height: 10),
                                                   Text(
                                                     'Manually\nCreate',
                                                     style: AugustFont.head2(
@@ -873,7 +945,7 @@ class _SchedulePageState extends State<SchedulePage>
                     color: Theme.of(context).colorScheme.outline),
               ),
               Text(
-                'Create your schedules\nTap the plus button to get started',
+                'Tap the plus button to get started',
                 textAlign: TextAlign.center,
                 style: AugustFont.subText(color: Colors.grey),
               ),

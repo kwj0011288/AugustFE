@@ -29,6 +29,7 @@ class AugustIcons {
   /* --- select page --- */
 
   static IconData check = FeatherIcons.check;
+  static IconData deselect = FeatherIcons.xCircle;
   /* -------------- index 2 -------------- */
 
   /* --- friends page --- */

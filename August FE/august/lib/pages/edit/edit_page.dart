@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:ui';
+import 'package:august/components/firebase/firebase_analytics.dart';
 import 'package:august/components/home/button.dart';
 import 'package:august/const/font/font.dart';
 import 'package:august/provider/courseprovider.dart';
@@ -165,6 +166,7 @@ class _EditPageState extends State<EditPage> {
                   height: 35,
                   onTap: () async {
                     sendAddedOrRemovedCourse();
+                    await AnalyticsService().editCreate();
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => HomePage()),

@@ -1,3 +1,4 @@
+import 'package:august/components/firebase/firebase_analytics.dart';
 import 'package:august/components/home/my_bottombar.dart';
 import 'package:august/components/profile/profile.dart';
 import 'package:august/const/device/device_util.dart';
@@ -6,6 +7,7 @@ import 'package:august/get_api/onboard/get_user_info.dart';
 import 'package:august/login/login.dart';
 import 'package:august/onboard/onboard.dart';
 import 'package:august/provider/user_info_provider.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import "package:flutter_feather_icons/flutter_feather_icons.dart";
 import 'package:august/pages/profile/me_page.dart';
 import 'package:august/pages/search/search_page.dart';
@@ -78,6 +80,12 @@ class _HomePageState extends State<HomePage> {
     await userInfoProvider.loadUserInfo();
 
     UserDetails? userDetails = userInfoProvider.userInfo;
+
+    /* --- send user id to firebase --- */
+    FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
+    await FirebaseAnalytics.instance.setUserId(id: userDetails!.id.toString());
+
+    /* --- check if user access it for the first time */
     if (hasCheckedFirst == null) {
       String dateJoined = userDetails?.dateJoined ?? '2021-01-01T00:00:00.000Z';
       print(dateJoined);
@@ -130,7 +138,7 @@ class _HomePageState extends State<HomePage> {
     bool isTodayAndWithin5Minutes = now.year == dateJoined.year &&
         now.month == dateJoined.month &&
         now.day == dateJoined.day &&
-        difference.inMinutes.abs() <= 5;
+        difference.inMinutes.abs() <= 1;
 
     return isTodayAndWithin5Minutes;
   }
@@ -205,7 +213,8 @@ class _HomePageState extends State<HomePage> {
         opacity: _showBottomBar ? 1.0 : 0.0,
         duration: Duration(seconds: 1),
         child: BottomBar(
-          onIndexChanged: (index) {
+          onIndexChanged: (index) async {
+            await AnalyticsService().bottomNavBar(index);
             checkAccessToken();
             if (_currentIndex != index) {
               setState(() {

@@ -12,6 +12,8 @@ dependencies:
   flutter:
     sdk: flutter
   sign_in_with_apple: ^6.1.1
+  firebase_core: ^3.3.0
+  firebase_analytics: ^11.2.1
 
 dev_dependencies:
   flutter_test:
@@ -28,8 +30,7 @@ dev_dependencies:
   animations:
   skeleton_text: 
   shared_preferences:
-  image_picker:
-  path_provider:
+
   flutter_feather_icons: ^2.0.0
   modal_bottom_sheet: ^3.0.0-pre
   animated_text_kit:
@@ -56,6 +57,21 @@ dev_dependencies:
   cached_network_image:
   google_mobile_ads: 
   flutter_dynamic_icon: ^2.1.0
+  app_tracking_transparency: ^2.0.6
+  flutter_email_sender: ^6.0.3
+  flutter_platform_alert: ^0.5.1
+
+  #for the impage
+  image_picker:
+  # save screenshot
+  screenshot: ^3.0.0
+  image_gallery_saver: ^2.0.3
+  permission_handler: ^11.3.1
+
+  # save and share screenshot and more
+  share_plus: ^8.0.2
+  path_provider: ^2.1.2
+  
 flutter:
   fonts:
     - family: Nanum
@@ -80,10 +96,14 @@ flutter:
   - assets/icons/univ.svg
   - assets/icons/profile.svg
   - assets/icons/courses.png
+  - assets/icons/wand.png
+  - assets/icons/manual.png
   - assets/memoji/Memoji1.png
   - assets/memoji/Memoji2.png
   - assets/memoji/Memoji3.png
   - assets/memoji/Memoji4.png
+  - assets/memoji/Memoji5.png
+
 
   # season
   - assets/season/spring.svg
@@ -101,4 +121,5 @@ flutter:
   - assets/lottie/magic_wand.json
   - assets/lottie/share.json
   - assets/lottie/success.json
+  - assets/lottie/cancel.json
   uses-material-design: true

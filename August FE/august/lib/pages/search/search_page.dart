@@ -55,6 +55,10 @@ class _SearchPageState extends State<SearchPage>
             Provider.of<SemesterProvider>(context, listen: false).semester,
         query: enteredKeyword);
 
+    // Sort each course's sections by section.code
+    for (var course in apiData) {
+      course.sections?.sort((a, b) => a.code!.compareTo(b.code!));
+    }
     if (mounted) {
       setState(() {
         _foundCourses = apiData;
@@ -205,8 +209,9 @@ class _SearchPageState extends State<SearchPage>
                     controller: _keywordController,
                     hintTexts: const [
                       'CMSC131 ',
+                      'Orchestra ',
+                      'Biology ',
                       'CHEM132 ',
-                      'ENES140 ',
                       'BMGT310 ',
                       'MATH240 ',
                       'KORA201 ',
@@ -436,7 +441,9 @@ class _SearchPageState extends State<SearchPage>
                                 [];
 
                             String meetingTimes =
-                                formattedMeetingDetails.join('\n');
+                                formattedMeetingDetails.isNotEmpty
+                                    ? formattedMeetingDetails.join('\n')
+                                    : "Online";
 
                             // 섹션 위젯 추가
                             widgets.add(SearchTile(
@@ -445,7 +452,7 @@ class _SearchPageState extends State<SearchPage>
                               instructorName: section.instructors?.first ?? '',
                               backgroundColor: Colors.white, // 배경색 지정 로직 필요
                               index: courseIndex,
-                              meetingTimes: meetingTimes,
+                              meetingTimes: meetingTimes ?? 'Online',
                               fullSeat: section.seats ?? 0,
                               openSeat: section.openSeats ?? 0,
                               waitlist: section.waitlist ?? 0,

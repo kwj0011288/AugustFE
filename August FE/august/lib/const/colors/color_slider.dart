@@ -191,6 +191,8 @@ class _ColorPickerState extends State<ColorPicker> {
             height: 35,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(40),
+              border: Border.all(
+                  color: Theme.of(context).colorScheme.shadow, width: 2),
               gradient: LinearGradient(colors: _colors),
             ),
             child: CustomPaint(
@@ -199,7 +201,7 @@ class _ColorPickerState extends State<ColorPicker> {
             ),
           ),
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         GestureDetector(
           behavior: HitTestBehavior.opaque,
           onHorizontalDragUpdate: (DragUpdateDetails details) {
@@ -213,6 +215,8 @@ class _ColorPickerState extends State<ColorPicker> {
             height: 35,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(30),
+              border: Border.all(
+                  color: Theme.of(context).colorScheme.shadow, width: 2),
               gradient: LinearGradient(
                 colors: [Colors.black, _currentColor, Colors.white],
               ),

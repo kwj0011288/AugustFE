@@ -255,6 +255,33 @@ Future<void> logoutUser() async {
   // Navigator.of(context).pushReplacementNamed('/login');
 }
 
+Future<void> deleteUser() async {
+  final prefs = await SharedPreferences.getInstance();
+  final accessToken = prefs.getString('accessToken');
+  final userPk = prefs.getInt('userPk');
+
+  if (accessToken == null || userPk == null) {
+    print('Access token or user PK not found');
+    return null;
+  }
+
+  final response = await http.post(
+    Uri.parse('https://augustapp.one/users/me/delete/'),
+    headers: {
+      'Authorization': 'Bearer $accessToken',
+      'Content-Type': 'application/json',
+    },
+  );
+
+  if (response.statusCode == 204) {
+    print('User deleted successfully');
+    return null;
+  } else {
+    print('Failed to delete user');
+    return null;
+  }
+}
+
 /* ----------------------- 여기서 부터는 사용자 정보 업데이트 --------------------------*/
 
 Future<String?> refreshTokenForElement() async {

@@ -25,12 +25,15 @@ class ScrollingDotsEffect extends BasicIndicatorEffect {
   /// if True the old center dot style will be used
   final bool fixedCenter;
 
+  final bool isSelectPage;
+
   /// Default constructor
   const ScrollingDotsEffect({
     this.activeStrokeWidth = 1.5,
     this.activeDotScale = 1.3,
     this.maxVisibleDots = 5,
     this.fixedCenter = false,
+    this.isSelectPage = false,
     double offset = 16.0,
     double dotWidth = 16.0,
     double dotHeight = 16.0,

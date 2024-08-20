@@ -8,6 +8,7 @@ class MoreButton extends StatefulWidget {
   final VoidCallback setMain;
   final VoidCallback editSchedule;
   final VoidCallback editName;
+  final VoidCallback share;
   final VoidCallback remove;
   final int currentIndex;
   MoreButton({
@@ -15,6 +16,7 @@ class MoreButton extends StatefulWidget {
     required this.editSchedule,
     required this.editName,
     required this.remove,
+    required this.share,
     required this.setMain,
     required this.currentIndex,
   }) : super(key: key);
@@ -36,6 +38,7 @@ class _MoreButtonState extends State<MoreButton> {
       editSchedule: widget.editSchedule,
       editName: widget.editName,
       remove: widget.remove,
+      share: widget.share,
       currentIndex: widget.currentIndex,
     );
   }
@@ -46,7 +49,9 @@ class MyPopupMenu extends StatefulWidget {
   final VoidCallback setMain;
   final VoidCallback editSchedule;
   final VoidCallback editName;
+  final VoidCallback share;
   final VoidCallback remove;
+
   final int currentIndex;
   MyPopupMenu(
       {Key? key,
@@ -54,6 +59,7 @@ class MyPopupMenu extends StatefulWidget {
       required this.setMain,
       required this.editSchedule,
       required this.editName,
+      required this.share,
       required this.remove,
       required this.currentIndex})
       : assert(child.key != null),
@@ -87,20 +93,20 @@ class _MyPopupMenuState extends State<MyPopupMenu> {
         barrierDismissible: false,
         builder: (context) {
           return PopupMenuContent(
-            position: position,
-            size: renderBox.size,
-            onAction: (x) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                duration: Duration(seconds: 1),
-                content: Text('Action => $x'),
-              ));
-            },
-            setMain: widget.setMain,
-            editSchedule: widget.editSchedule,
-            editName: widget.editName,
-            remove: widget.remove,
-            currentIndex: widget.currentIndex,
-          );
+              position: position,
+              size: renderBox.size,
+              onAction: (x) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  duration: Duration(seconds: 1),
+                  content: Text('Action => $x'),
+                ));
+              },
+              setMain: widget.setMain,
+              editSchedule: widget.editSchedule,
+              editName: widget.editName,
+              remove: widget.remove,
+              currentIndex: widget.currentIndex,
+              share: widget.share);
         });
   }
 }
@@ -112,6 +118,7 @@ class PopupMenuContent extends StatefulWidget {
   final VoidCallback setMain;
   final VoidCallback editSchedule;
   final VoidCallback editName;
+  final VoidCallback share;
   final VoidCallback remove;
   final int currentIndex;
   const PopupMenuContent(
@@ -122,6 +129,7 @@ class PopupMenuContent extends StatefulWidget {
       required this.setMain,
       required this.editSchedule,
       required this.editName,
+      required this.share,
       required this.remove,
       required this.currentIndex})
       : super(key: key);
@@ -269,7 +277,7 @@ class _PopupMenuContentState extends State<PopupMenuContent>
                                         width: 12,
                                       ),
                                       Text(
-                                        "This is Main",
+                                        "Main",
                                         style: AugustFont.subText3(
                                           color: Theme.of(context)
                                               .colorScheme
@@ -350,6 +358,42 @@ class _PopupMenuContentState extends State<PopupMenuContent>
                                 ],
                               ),
                             ),
+                            // //Edit workout
+                            // SizedBox(
+                            //   height: 16,
+                            // ),
+
+                            // GestureDetector(
+                            //   onTap: () {
+                            //     widget.share();
+                            //   },
+                            //   child: Row(
+                            //     children: [
+                            //       Container(
+                            //         padding: EdgeInsets.all(6),
+                            //         decoration: BoxDecoration(
+                            //           color: Color.fromARGB(255, 253, 207, 179),
+                            //           borderRadius: BorderRadius.circular(24),
+                            //         ),
+                            //         child: Icon(
+                            //           size: 20,
+                            //           FeatherIcons.share,
+                            //           color: Color.fromARGB(255, 176, 77, 15),
+                            //         ),
+                            //       ),
+                            //       SizedBox(
+                            //         width: 12,
+                            //       ),
+                            //       Text(
+                            //         "Share",
+                            //         style: AugustFont.subText3(
+                            //           color:
+                            //               Theme.of(context).colorScheme.outline,
+                            //         ),
+                            //       ),
+                            //     ],
+                            //   ),
+                            // ),
                             SizedBox(height: 5),
                             Divider(
                               color: Colors.grey.shade600,
@@ -366,7 +410,7 @@ class _PopupMenuContentState extends State<PopupMenuContent>
                                   Container(
                                     padding: EdgeInsets.all(6),
                                     decoration: BoxDecoration(
-                                      color: Color(0xFFFFF0E3),
+                                      color: Color.fromARGB(255, 255, 227, 227),
                                       borderRadius: BorderRadius.circular(24),
                                     ),
                                     child: Icon(

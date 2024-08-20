@@ -50,6 +50,8 @@ abstract class BasicIndicatorEffect extends IndicatorEffect {
   /// This is ignored if [paintStyle] is PaintStyle.fill
   final double strokeWidth;
 
+  final bool isSelectPage;
+
   /// Default construe
   const BasicIndicatorEffect({
     required this.strokeWidth,
@@ -60,6 +62,7 @@ abstract class BasicIndicatorEffect extends IndicatorEffect {
     required this.dotColor,
     required this.paintStyle,
     required this.activeDotColor,
+    this.isSelectPage = false,
   }) : assert(dotWidth >= 0 &&
             dotHeight >= 0 &&
             spacing >= 0 &&

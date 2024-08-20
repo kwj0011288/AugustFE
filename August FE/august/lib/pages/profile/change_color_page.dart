@@ -22,6 +22,7 @@ class _ChangeCourseColorPageState extends State<ChangeCourseColorPage> {
   Widget build(BuildContext context) {
     var colorProvider = Provider.of<CourseColorProvider>(context);
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       extendBody: true,
       body: ColorfulSafeArea(
         bottom: false,

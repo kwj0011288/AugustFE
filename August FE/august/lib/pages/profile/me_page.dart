@@ -1,9 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:august/components/firebase/firebase_analytics.dart';
+import 'package:august/components/home/dialog.dart';
 import 'package:august/components/mepage/course_color.dart';
 import 'package:august/components/mepage/customize_icon.dart';
 import 'package:august/components/mepage/feedback.dart';
 import 'package:august/components/mepage/info_box.dart';
+import 'package:august/components/mepage/send_email.dart';
 import 'package:august/components/profile/profile.dart';
 import 'package:august/const/font/font.dart';
 import 'package:august/pages/profile/change_icon_page.dart';
@@ -173,6 +176,23 @@ class _MypageState extends State<Mypage> {
 
   void _launchURL() async {
     const url = 'https://forms.gle/2ytdRmXgFps7pK567';
+    await launchUrl(
+      Uri.parse(url),
+      mode: LaunchMode.externalApplication,
+    );
+  }
+
+  void termsOfUse() async {
+    const url =
+        'https://extra-mile.notion.site/Terms-Conditions-c312612c53a141978c3503da5028680f?pvs=4';
+    await launchUrl(
+      Uri.parse(url),
+      mode: LaunchMode.externalApplication,
+    );
+  }
+
+  void privaryPolicy() async {
+    const url = 'http://extra-mile.notion.site';
     await launchUrl(
       Uri.parse(url),
       mode: LaunchMode.externalApplication,
@@ -420,7 +440,7 @@ class _MypageState extends State<Mypage> {
               toolbarHeight: 110,
             ),
             body: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
               child: ColorfulSafeArea(
                 bottomColor: Colors.white.withOpacity(0),
                 overflowRules: OverflowRules.only(bottom: true),
@@ -430,17 +450,21 @@ class _MypageState extends State<Mypage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "About Me",
-                        style: AugustFont.head1(
-                            color: Theme.of(context).colorScheme.outline),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 10),
+                        child: Text(
+                          "About Me",
+                          style: AugustFont.head1(
+                              color: Theme.of(context).colorScheme.outline),
+                        ),
                       ),
                       SingleChildScrollView(
                         controller: ScrollController(),
                         scrollDirection: Axis.horizontal,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 10),
+                              vertical: 10, horizontal: 20),
                           child: Row(
                             children: [
                               InfoWidget(
@@ -465,15 +489,7 @@ class _MypageState extends State<Mypage> {
                                 subInfo: "${friendsCount} friends",
                               ),
                               SizedBox(width: 20),
-                              InfoWidget(
-                                onTap: () {},
-                                isSchool: false,
-                                isFrirend: false,
-                                photo: 'assets/icons/splash.png',
-                                info: "Course",
-                                subInfo: "${numCourses} Courses",
-                              ),
-                              SizedBox(width: 20),
+
                               // InfoWidget(
                               //     onTap: () {},
                               //     isSchool: false,
@@ -513,7 +529,8 @@ class _MypageState extends State<Mypage> {
                       SizedBox(height: 10),
                       //  PremiumWidget(),
                       Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 10),
                         child: Text(
                           "Course Colors ",
                           style: AugustFont.head1(
@@ -539,7 +556,8 @@ class _MypageState extends State<Mypage> {
 
                       if (Platform.isIOS)
                         Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 10),
                           child: Text(
                             "App Icon",
                             style: AugustFont.head1(
@@ -562,7 +580,8 @@ class _MypageState extends State<Mypage> {
                       SizedBox(height: 20),
                       //  PremiumWidget(),
                       Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 10),
                         child: Text(
                           "Feedback",
                           style: AugustFont.head1(
@@ -572,23 +591,111 @@ class _MypageState extends State<Mypage> {
                       FeedbackTile(
                         onTap: _launchURL,
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: 40),
                       Center(
                         child: SignoutButton(
                           'Sign out',
                           Color.fromARGB(255, 243, 154, 168),
                           () async {
+                            showAlertDialog(
+                                context,
+                                'Sign out',
+                                'Are you sure you want to log out?',
+                                'Sign out',
+                                'Stay',
+                                false, () async {
+                              Navigator.of(context).pop(); // Close the dialog
+                              HapticFeedback.lightImpact();
+                              await logoutUser(); // Perform the logout operation
+                              Navigator.pushReplacement(
+                                // Navigate to the initial page
+                                context,
+                                CupertinoPageRoute(
+                                  builder: (context) => InitialPage(),
+                                ),
+                              );
+                            }, () {
+                              Navigator.of(context).pop(false);
+                            }, () {});
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      GestureDetector(
+                        onTap: () {
+                          showAlertDialog(
+                              context,
+                              'Delete Account 😢',
+                              'For Real? 😢',
+                              'DELETE',
+                              'Stay',
+                              false, () async {
+                            Navigator.of(context).pop(); // Close the dialog
                             HapticFeedback.lightImpact();
-                            await logoutUser();
+                            await deleteUser(); // Perform the logout operation
+                            await AnalyticsService().deleteAccount();
                             Navigator.pushReplacement(
+                              // Navigate to the initial page
                               context,
                               CupertinoPageRoute(
                                 builder: (context) => InitialPage(),
                               ),
                             );
-                          },
+                          }, () {
+                            Navigator.of(context).pop(false);
+                          }, () {});
+                        },
+                        child: Center(
+                          child: Container(
+                            width: 100,
+                            height: 25,
+                            decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(40),
+                            ),
+                            child: Text("Delete Account",
+                                style: AugustFont.captionBold(
+                                  color: Colors.black,
+                                )),
+                            alignment: Alignment.center,
+                          ),
                         ),
                       ),
+                      // Center(
+                      //   child: SignoutButton(
+                      //     'Delete Account',
+                      //     Colors.redAccent,
+                      //     () async {
+                      //       showAlertDialog(
+                      //           context,
+                      //           'Delete Account 😢',
+                      //           'For Real? 😢',
+                      //           'DELETE',
+                      //           'Stay',
+                      //           false, () async {
+                      //         Navigator.of(context).pop(); // Close the dialog
+                      //         HapticFeedback.lightImpact();
+                      //         await logoutUser(); // Perform the logout operation
+                      //         Navigator.pushReplacement(
+                      //           // Navigate to the initial page
+                      //           context,
+                      //           CupertinoPageRoute(
+                      //             builder: (context) => InitialPage(),
+                      //           ),
+                      //         );
+                      //       }, () {
+                      //         Navigator.of(context).pop(false);
+                      //       }, () {});
+                      //     },
+                      //   ),
+                      // ),
+                      SizedBox(height: 20),
+                      Divider(
+                        color: Theme.of(context).colorScheme.scrim,
+                      ),
+                      SizedBox(height: 20),
+                      terms(),
+                      SizedBox(height: 20),
                     ],
                   ),
                 ),
@@ -597,6 +704,57 @@ class _MypageState extends State<Mypage> {
           ),
         );
       },
+    );
+  }
+
+  Widget terms() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        GestureDetector(
+          onTap: () {
+            termsOfUse();
+          },
+          child: Text(
+            'Terms of Service',
+            style: AugustFont.captionSmall(color: Colors.grey),
+          ),
+        ),
+        SizedBox(width: 5),
+        Text(
+          '|',
+          style: AugustFont.captionSmall(
+            color: Colors.grey,
+          ),
+        ),
+        SizedBox(width: 5),
+        GestureDetector(
+          onTap: () {
+            privaryPolicy();
+          },
+          child: Text(
+            'Privacy Policy',
+            style: AugustFont.captionSmall(color: Colors.grey),
+          ),
+        ),
+        SizedBox(width: 5),
+        Text(
+          '|',
+          style: AugustFont.captionSmall(
+            color: Colors.grey,
+          ),
+        ),
+        SizedBox(width: 5),
+        GestureDetector(
+          onTap: () {
+            EmailUtils.sendEmail(context);
+          },
+          child: Text(
+            'Error Report',
+            style: AugustFont.captionSmall(color: Colors.grey),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -151,6 +151,7 @@ class _MajorPageState extends State<MajorPage> {
   Widget build(BuildContext context) {
     print('Current selectedMajor value: $selectedMajorNickname');
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: ColorfulSafeArea(
         child: Center(
           child: Container(
@@ -226,7 +227,7 @@ class _MajorPageState extends State<MajorPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: Text(
-                    "Selected Semester is used for\nCourse search, and Schedule Creation.",
+                    "Selected Semester is used for\nCourse Search, and Schedule Creation.",
                     textAlign: TextAlign.center,
                     style: AugustFont.head4(color: Colors.grey),
                   ),
@@ -338,7 +339,7 @@ class _MajorPageState extends State<MajorPage> {
                 onTap: () {
                   HapticFeedback.mediumImpact();
                   widget.gonext();
-
+                  FocusScope.of(context).unfocus();
                   _saveAndClose();
                 },
                 child: Container(
@@ -363,6 +364,7 @@ class _MajorPageState extends State<MajorPage> {
             : GestureDetector(
                 onTap: () {
                   _saveAndClose();
+                  FocusScope.of(context).unfocus();
                   HapticFeedback.mediumImpact();
                 },
                 child: Container(

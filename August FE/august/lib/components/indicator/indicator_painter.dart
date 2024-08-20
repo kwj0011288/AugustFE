@@ -40,12 +40,19 @@ abstract class BasicIndicatorPainter extends IndicatorPainter {
   void paintStillDots(Canvas canvas, Size size) {
     for (var i = 0; i < count; i++) {
       final rect = buildStillDot(i, size);
-      if (i == 0) {
-        drawPlus(canvas, rect.center.dx, rect.center.dy, rect.width, dotPaint);
-      } else if (i == count - 1) {
-        drawPlus(canvas, rect.center.dx, rect.center.dy, rect.width, dotPaint);
+      if (_effect.isSelectPage) {
+        canvas.drawRRect(
+            rect, dotPaint); // Draw normal dot for all if not special
       } else {
-        canvas.drawRRect(rect, dotPaint);
+        if (i == 0) {
+          drawStar(canvas, rect.center.dx, rect.center.dy, rect.width, 5,
+              dotPaint); // Draw star for first dot
+        } else if (i == count - 1) {
+          drawPlus(canvas, rect.center.dx, rect.center.dy, rect.width,
+              dotPaint); // Draw plus for last dot
+        } else {
+          canvas.drawRRect(rect, dotPaint); // Draw normal dot
+        }
       }
     }
   }

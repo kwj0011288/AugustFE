@@ -111,7 +111,16 @@ class ScrollingDotsPainter extends BasicIndicatorPainter {
       final yPos = size.height / 2;
       final xPos = effect.dotWidth / 2 + drawingAnchor + (index * distance);
 
-      if (index == 0) {
+      if (effect.isSelectPage) {
+        final rRect = RRect.fromLTRBR(
+          xPos - scaledWidth / 2 + effect.spacing / 2,
+          yPos - scaledHeight / 2,
+          xPos + scaledWidth / 2 + effect.spacing / 2,
+          yPos + scaledHeight / 2,
+          dotRadius * scale,
+        );
+        canvas.drawRRect(rRect, dotPaint..color = color);
+      } else if (index == 0) {
         drawStar(
             canvas, xPos + 5, yPos, scaledWidth, 5, dotPaint..color = color);
       } else // Example usage within ScrollingDotsPainter

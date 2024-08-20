@@ -6,6 +6,7 @@ import 'package:august/const/theme/light_theme.dart';
 import 'package:flutter/material.dart';
 import '../../get_api/timetable/class.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_bouncing_widgets/custom_bounce_widget.dart';
 
 class SearchTile extends StatefulWidget {
   final CourseList classes;
@@ -105,7 +106,7 @@ class _SearchTileState extends State<SearchTile> {
                       ),
                       SizedBox(height: 2),
                       Text(
-                        widget.meetingTimes,
+                        widget.meetingTimes ?? 'Online',
                         style: AugustFont.searchedTime(color: Colors.black),
                       ),
                       SizedBox(height: 2),
@@ -115,7 +116,7 @@ class _SearchTileState extends State<SearchTile> {
               ),
               Container(
                 width: 100, // 너비 조절
-                height: 113, // 높이 조절
+                height: 100, // 높이 조절
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.5),
                   borderRadius: BorderRadius.circular(12),
@@ -127,21 +128,21 @@ class _SearchTileState extends State<SearchTile> {
                     crossAxisAlignment: CrossAxisAlignment.start, // 수평 방향 중앙 정렬
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(left: 5, bottom: 5),
+                        padding: const EdgeInsets.only(left: 5, bottom: 2),
                         child: Text(
                           'Seats: ${widget.fullSeat}',
                           style: AugustFont.searchedSeat(color: Colors.black),
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(left: 5, bottom: 5),
+                        padding: const EdgeInsets.only(left: 5, bottom: 2),
                         child: Text(
                           'Open: ${widget.openSeat}',
                           style: AugustFont.searchedSeat(color: Colors.black),
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(left: 5, bottom: 5),
+                        padding: const EdgeInsets.only(left: 5, bottom: 2),
                         child: Text(
                           'Waitlist: ${widget.waitlist}',
                           style: AugustFont.searchedSeat(color: Colors.black),

@@ -156,8 +156,8 @@ class _UnivPageState extends State<UnivPage> {
 
   @override
   Widget build(BuildContext context) {
-    var selectedCoursesData = Provider.of<CoursesProvider>(context);
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: ColorfulSafeArea(
         child: Center(
           child: Container(
@@ -237,7 +237,7 @@ class _UnivPageState extends State<UnivPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: Text(
-                    "Your university choice determines\ncourse availability.",
+                    "Your university choice determines\ncourse availabilities.",
                     textAlign: TextAlign.center,
                     style: AugustFont.head4(color: Colors.grey),
                   ),

@@ -1,3 +1,4 @@
+import 'package:august/components/firebase/firebase_analytics.dart';
 import 'package:august/components/mepage/customize_icon_tile.dart';
 import 'package:august/const/device/device_util.dart';
 import 'package:august/const/font/font.dart';
@@ -44,6 +45,7 @@ class _ChangeIconPageState extends State<ChangeIconPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       extendBody: true,
       body: ColorfulSafeArea(
         bottom: false,
@@ -83,13 +85,21 @@ class _ChangeIconPageState extends State<ChangeIconPage> {
                   ),
                 ],
               ),
-
+              SizedBox(height: 10),
+              Text(
+                "Change the August App icon on your home screen to match your style or mood.",
+                style: AugustFont.head4(color: Colors.grey),
+              ),
               SizedBox(height: 30),
               for (AppIcon appIcon in AppIcon.values) ...[
                 CustomIconTile(
                     iconAsset: 'assets/launch/${appIcon.name}.png',
                     name: appIcon.name,
-                    onTap: () => changeAppIcon(appIcon),
+                    onTap: () {
+                      HapticFeedback.mediumImpact();
+                      AnalyticsService().changeIcon(appIcon.name);
+                      changeAppIcon(appIcon);
+                    },
                     tileColor: (currentIcon!.name == appIcon.name)
                         ? Theme.of(context).colorScheme.primary
                         : Theme.of(context).colorScheme.primaryContainer,

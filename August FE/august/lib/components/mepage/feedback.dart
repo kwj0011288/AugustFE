@@ -16,7 +16,7 @@ class _FeedbackTileState extends State<FeedbackTile> {
     return GestureDetector(
       onTap: widget.onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
@@ -51,7 +51,7 @@ class _FeedbackTileState extends State<FeedbackTile> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      'Send Feeback',
+                      'Send Feedback',
                       style: AugustFont.head2(
                           color: Theme.of(context).colorScheme.outline),
                     ),

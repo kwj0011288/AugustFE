@@ -1,3 +1,4 @@
+import 'package:august/const/font/font.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -31,15 +32,11 @@ class _AddCourseToGroupState extends State<AddCourseToGroup> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.addedCourses[widget.index] == null
-                    ? 'No Course Yet'
-                    : widget.addedCourses[widget.index]!.courseCode ??
-                        'unknown',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black),
-              ),
+                  widget.addedCourses[widget.index] == null
+                      ? 'No Course Yet'
+                      : widget.addedCourses[widget.index]!.courseCode ??
+                          'unknown',
+                  style: AugustFont.textField2(color: Colors.black)),
               ..._buildInstructorList(
                   widget.addedCourses[widget.index]?.instructors),
               SizedBox(height: 10),

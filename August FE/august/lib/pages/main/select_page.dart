@@ -1,10 +1,14 @@
 import 'dart:convert';
 
+import 'package:august/components/firebase/firebase_analytics.dart';
 import 'package:august/components/home/button.dart';
+import 'package:august/components/home/dialog.dart';
+import 'package:august/components/indicator/scrolling_dots_effect.dart';
+import 'package:august/components/indicator/smooth_page_indicator.dart';
 import 'package:august/components/timetable/timetable.dart';
 import 'package:august/const/font/font.dart';
 import 'package:august/const/icons/icons.dart';
-import 'package:august/get_api/onboard/get_semester.dart';
+import 'package:lottie/lottie.dart';
 import 'package:august/get_api/timetable/send_timetable.dart';
 import 'package:august/get_api/timetable/schedule.dart';
 import 'package:august/pages/main/homepage.dart';
@@ -126,7 +130,8 @@ class _SelectPageState extends State<SelectPage> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
-        elevation: 0,
+        leadingWidth: 80,
+        toolbarHeight: 60,
         backgroundColor: Theme.of(context).colorScheme.background,
         leading: Padding(
           padding: const EdgeInsets.only(left: 10, top: 8, bottom: 8),
@@ -138,6 +143,7 @@ class _SelectPageState extends State<SelectPage> {
                 coursesProvider.resetSelectedCoursesData();
                 coursesProvider.setzero(0);
                 Navigator.pop(context);
+                AnalyticsService().selectBack();
               }
             },
             child: Container(
@@ -232,35 +238,7 @@ class _SelectPageState extends State<SelectPage> {
 
                     int intCurrentSemester = int.parse(currentSemester);
 
-                    showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (BuildContext context) {
-                        return Dialog(
-                          elevation: 0,
-                          backgroundColor: Colors.transparent,
-                          child: Center(
-                            child: Container(
-                              width: 100, // Adjust as needed
-                              height: 100, // Adjust as needed
-                              decoration: BoxDecoration(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .primaryContainer,
-                                borderRadius: BorderRadius.circular(
-                                    100), // Adjust as needed
-                              ),
-                              child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: CircularProgressIndicator(
-                                    color:
-                                        Theme.of(context).colorScheme.outline,
-                                  )),
-                            ),
-                          ),
-                        );
-                      },
-                    );
+                    loadingShowDialog(context);
 
                     if (coursesProvider.addedCoursesCount != 0) {
                       // 모든 선택된 타임테이블에 대해 반복
@@ -290,7 +268,7 @@ class _SelectPageState extends State<SelectPage> {
                       coursesProvider.setCurrentPageIndex(0);
                       coursesProvider.setzero(0);
                       coursesProvider.resetSelectedCoursesData();
-
+                      await AnalyticsService().selectDone();
                       Navigator.pushAndRemoveUntil(
                           context,
                           CupertinoPageRoute(
@@ -372,6 +350,38 @@ class _SelectPageState extends State<SelectPage> {
                           coursesData: coursesData,
                           pageController: pageController,
                           isSelectpage: true,
+                        ),
+                      ),
+                    ),
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 5),
+                        child: Container(
+                          height: 20,
+                          width: 90,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primary,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Center(
+                            child: SmoothPageIndicator(
+                              controller: pageController,
+                              count: coursesData.length,
+                              effect: ScrollingDotsEffect(
+                                activeStrokeWidth: 2,
+                                activeDotScale: 1.3,
+                                maxVisibleDots: 5,
+                                isSelectPage: true,
+                                radius: 8,
+                                spacing: 8,
+                                dotHeight: 8,
+                                dotWidth: 8,
+                                dotColor: Colors.grey,
+                                activeDotColor:
+                                    Theme.of(context).colorScheme.outline,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -496,7 +506,7 @@ class _SelectPageState extends State<SelectPage> {
                                 coursesProvider
                                     .deSelectCourse(coursesData[currentIndex]);
                                 isButtonClicked[currentIndex].value = false;
-
+                                await AnalyticsService().deselect();
                                 showDialog(
                                   context: context,
                                   builder: (context) {
@@ -505,27 +515,28 @@ class _SelectPageState extends State<SelectPage> {
                                       Navigator.of(context).pop(true);
                                     });
                                     return AlertDialog(
-                                      backgroundColor: Theme.of(context)
-                                          .colorScheme
-                                          .background
-                                          .withOpacity(0.8), // 투명도 적용
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                      ),
+                                      backgroundColor: Colors.transparent,
+
                                       // AlertDialog를 정사각형 형태로 만들기 위해 Container 사용
                                       content: Container(
                                         width:
-                                            150, // 정사각형 형태를 유지하기 위해 가로와 세로 크기를 동일하게 설정
-                                        height: 150,
+                                            250, // 정사각형 형태를 유지하기 위해 가로와 세로 크기를 동일하게 설정
+                                        height: 250,
+                                        decoration: BoxDecoration(
+                                            color: Colors.transparent,
+                                            borderRadius:
+                                                BorderRadius.circular(100000)),
                                         child: Column(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
                                           crossAxisAlignment:
                                               CrossAxisAlignment.center,
                                           children: [
-                                            Icon(AugustIcons.check,
-                                                size: 100), // 아이콘 크기 조정
+                                            Icon(
+                                              AugustIcons.deselect,
+                                              size: 80,
+                                              color: Colors.redAccent,
+                                            ), // 아이콘 크기 조정
                                             Text(
                                               'Deselected',
                                               textAlign: TextAlign.center,
@@ -547,7 +558,7 @@ class _SelectPageState extends State<SelectPage> {
                                 coursesProvider
                                     .addCourse(coursesData[currentIndex]);
                                 isButtonClicked[currentIndex].value = true;
-
+                                await AnalyticsService().select();
                                 showDialog(
                                   context: context,
                                   builder: (context) {
@@ -556,27 +567,28 @@ class _SelectPageState extends State<SelectPage> {
                                       Navigator.of(context).pop(true);
                                     });
                                     return AlertDialog(
-                                      backgroundColor: Theme.of(context)
-                                          .colorScheme
-                                          .background
-                                          .withOpacity(0.8), // 투명도 적용
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                      ),
+                                      backgroundColor: Colors.transparent,
+
                                       // AlertDialog를 정사각형 형태로 만들기 위해 Container 사용
                                       content: Container(
                                         width:
-                                            150, // 정사각형 형태를 유지하기 위해 가로와 세로 크기를 동일하게 설정
-                                        height: 150,
+                                            250, // 정사각형 형태를 유지하기 위해 가로와 세로 크기를 동일하게 설정
+                                        height: 250,
+                                        decoration: BoxDecoration(
+                                            color: Colors.transparent,
+                                            borderRadius:
+                                                BorderRadius.circular(100000)),
                                         child: Column(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
                                           crossAxisAlignment:
                                               CrossAxisAlignment.center,
                                           children: [
-                                            Icon(AugustIcons.check,
-                                                size: 100), // 아이콘 크기 조정
+                                            Icon(
+                                              AugustIcons.check,
+                                              size: 80,
+                                              color: Colors.greenAccent,
+                                            ), // 아이콘 크기 조정
                                             Text(
                                               'Selected',
                                               textAlign: TextAlign.center,

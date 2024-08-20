@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:august/components/firebase/firebase_analytics.dart';
 import 'package:august/components/friends/friend_button.dart';
 import 'package:august/components/home/loading.dart';
 import 'package:august/components/profile/profile.dart';
@@ -104,6 +105,7 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
             await FriendSemester().fetchFriendSemester(widget.friendId!);
 
         setState(() {
+          semesters.sort();
           friendSemList = semesters;
           if (friendSemList != null && friendSemList!.isNotEmpty) {
             selectedSemester =
@@ -486,8 +488,9 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                                 'Schedule',
                                 schedule1
                                     ? Colors.blueAccent.shade400
-                                    : Colors.grey.shade700, () {
+                                    : Colors.grey.shade700, () async {
                               HapticFeedback.mediumImpact();
+                              await AnalyticsService().checkFriendSchedule();
                               setState(() {
                                 schedule1 = true;
                                 schedule2 = false;
@@ -498,8 +501,9 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                                 'Hang out',
                                 schedule2
                                     ? Colors.blueAccent.shade400
-                                    : Colors.grey.shade700, () {
+                                    : Colors.grey.shade700, () async {
                               HapticFeedback.mediumImpact();
+                              await AnalyticsService().checkFriendHangout();
                               setState(() {
                                 schedule1 = false;
                                 schedule2 = true;
@@ -539,7 +543,7 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                                       ),
                                       SizedBox(height: 5),
                                       Text(
-                                        'you should ask ${widget.name} to actively use August!',
+                                        'You should ask ${widget.name} to actively use August!',
                                         style: AugustFont.captionSmallBold(
                                           color: Colors.grey,
                                         ),
@@ -609,7 +613,7 @@ class _FriendSchedulePageState extends State<FriendSchedulePage>
                                         : Column(
                                             children: [
                                               Text(
-                                                '${widget.name} and you can hang out at these times!',
+                                                '${widget.name} and you can both free to hang out at these times!',
                                                 style:
                                                     AugustFont.captionSmallBold(
                                                   color: Colors.grey,

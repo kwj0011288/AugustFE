@@ -52,15 +52,18 @@ class _GroupSearchPageState extends State<GroupSearchPage>
     widget.addedCoursesNotifier.value.remove(course);
   }
 
-  bool hasMeetings(GroupList course) {
-    for (var instructor in course.instructors!) {
-      for (var section in instructor.sections!) {
-        if (section.meetingsExist == false) {
-          return false;
-        }
+  /* 
+  _foundCourses[0].instructors![0].sections![0].meetingsExist
+  */
+
+  bool hasMeetings(List<GroupSection> sections) {
+    for (var section in sections) {
+      if (!section.meetingsExist) {
+        print("Section without meetings found: ${section.fullCode}");
+        return false; // Return false immediately if any section does not have meetings
       }
     }
-    return true;
+    return true; // Return true only if all sections have meetings
   }
 
   Future<List<GroupList>> _runSearch(String enteredKeyword) async {
@@ -70,14 +73,18 @@ class _GroupSearchPageState extends State<GroupSearchPage>
 
     List<GroupList> apiData = await _courses.getGroupList(
         querytype: querytype, semester: currentSemetser, query: enteredKeyword);
-    print("API Response: $apiData");
 
     if (mounted) {
       setState(() {
         _foundCourses = apiData;
       });
     }
+    print(
+        'foudned courses meeting info ${_foundCourses[0].instructors![0].sections![0].meetingsExist}');
     await _storeSearchKeyword(enteredKeyword);
+
+    //sort the courses by course code
+    apiData.sort((a, b) => a.courseCode!.compareTo(b.courseCode!));
     return apiData;
   }
 
@@ -179,6 +186,7 @@ class _GroupSearchPageState extends State<GroupSearchPage>
 
                   onPressed: () {
                     if (Navigator.canPop(context)) {
+                      HapticFeedback.lightImpact();
                       Navigator.pop(context);
                     }
                   },
@@ -206,8 +214,9 @@ class _GroupSearchPageState extends State<GroupSearchPage>
                     controller: _keywordController,
                     hintTexts: const [
                       'CMSC131 ',
+                      'Orchestra ',
+                      'Biology ',
                       'CHEM132 ',
-                      'ENES140 ',
                       'BMGT310 ',
                       'MATH240 ',
                       'KORA201 ',
@@ -368,7 +377,7 @@ class _GroupSearchPageState extends State<GroupSearchPage>
                     // 사용자 인터페이스에서 에러 메시지 표시
                     return Center(
                       child: Text(
-                        'Error... Try to restart the app',
+                        'No courses found.\nPlease try another keyword.',
                         style: AugustFont.head2(
                           color: Theme.of(context).colorScheme.outline,
                         ),
@@ -443,13 +452,10 @@ class _GroupSearchPageState extends State<GroupSearchPage>
                             ),
                             onPressed: (context) {
                               Navigator.pop(context);
-                              // addToGroup(GroupList(
-                              //   name: course.name,
-                              //   courseCode: course.courseCode,
-                              //   credits: course.credits,
-                              //   instructors: [instructor],
-                              // ));
-                              if (hasMeetings(course)) {
+
+                              if (hasMeetings(section)) {
+                                print(
+                                    'check this course has meeting ${course.courseCode.toString()}');
                                 addToGroup(GroupList(
                                   name: course.name,
                                   courseCode: course.courseCode,
@@ -457,67 +463,69 @@ class _GroupSearchPageState extends State<GroupSearchPage>
                                   instructors: [instructor],
                                 ));
                               } else {
+                                print(
+                                    'check this course does not have meeting ${course.courseCode.toString()}');
                                 addToGroup(GroupList(
                                   name: course.name,
                                   courseCode: course.courseCode,
                                   credits: course.credits,
                                   instructors: [instructor],
                                 ));
-                                // showDialog(
-                                //   context: context,
-                                //   builder: (BuildContext context) {
-                                //     return AlertDialog(
-                                //       title: Text(
-                                //           textAlign: TextAlign.center,
-                                //           '${course.courseCode} (ONLINE)',
-                                //           style: AugustFont.head2(
-                                //               color: Theme.of(context)
-                                //                   .colorScheme
-                                //                   .outline)),
-                                //       content: Text(
-                                //           textAlign: TextAlign.center,
-                                //           'This course will not appear on the schedule.',
-                                //           style: AugustFont.subText2(
-                                //               color: Theme.of(context)
-                                //                   .colorScheme
-                                //                   .outline)),
-                                //       actions: <Widget>[
-                                //         GestureDetector(
-                                //           onTap: () {
-                                //             Navigator.of(context)
-                                //                 .pop(); // 팝업 닫기
-                                //           },
-                                //           child: Container(
-                                //             padding: EdgeInsets.symmetric(
-                                //                 horizontal: 30),
-                                //             height: 55,
-                                //             width: MediaQuery.of(context)
-                                //                     .size
-                                //                     .width -
-                                //                 80,
-                                //             decoration: BoxDecoration(
-                                //                 color: Colors.redAccent,
-                                //                 borderRadius:
-                                //                     BorderRadius.circular(60)),
-                                //             child: Row(
-                                //               crossAxisAlignment:
-                                //                   CrossAxisAlignment.center,
-                                //               mainAxisAlignment:
-                                //                   MainAxisAlignment.center,
-                                //               children: [
-                                //                 Text(
-                                //                   'OK',
-                                //                   style: AugustFont.head2(
-                                //                       color: Colors.white),
-                                //                 ),
-                                //               ],
-                                //             ),
-                                //           ),
-                                //         ),
-                                //       ],
-                                //     );
-                                //   },
-                                // );
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text(
+                                          textAlign: TextAlign.center,
+                                          '${course.courseCode} (ONLINE)',
+                                          style: AugustFont.head2(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .outline)),
+                                      content: Text(
+                                          textAlign: TextAlign.center,
+                                          'This course will not appear on the schedule.',
+                                          style: AugustFont.subText2(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .outline)),
+                                      actions: <Widget>[
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.of(context)
+                                                .pop(); // 팝업 닫기
+                                          },
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 30),
+                                            height: 55,
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width -
+                                                80,
+                                            decoration: BoxDecoration(
+                                                color: Colors.redAccent,
+                                                borderRadius:
+                                                    BorderRadius.circular(60)),
+                                            child: Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  'OK',
+                                                  style: AugustFont.head2(
+                                                      color: Colors.white),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
                               }
                             },
                             icon: AugustIcons.addCoursetoGroup,

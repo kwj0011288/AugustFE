@@ -1,3 +1,4 @@
+import 'package:august/components/firebase/firebase_analytics.dart';
 import 'package:august/components/home/button.dart';
 import 'package:august/const/font/font.dart';
 import 'package:august/const/icons/icons.dart';
@@ -15,6 +16,7 @@ import '../../get_api/timetable/add_course_to_group.dart';
 import 'package:flutter/material.dart' hide ModalBottomSheetRoute;
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 @override
 class GroupPage extends StatefulWidget {
@@ -27,6 +29,7 @@ class GroupPage extends StatefulWidget {
 }
 
 class _GroupPageState extends State<GroupPage> {
+  final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
   List<List<GroupList?>> containers = List.generate(10, (index) => []);
   ValueNotifier<List<GroupList>> addedCoursesNotifier = ValueNotifier([]);
   String? currentSemester;
@@ -34,6 +37,7 @@ class _GroupPageState extends State<GroupPage> {
   @override
   void initState() {
     super.initState();
+
     currentSemester =
         Provider.of<SemesterProvider>(context, listen: false).semester;
   }
@@ -98,23 +102,21 @@ class _GroupPageState extends State<GroupPage> {
                           barrierDismissible: false,
                           builder: (BuildContext context) {
                             return AlertDialog(
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.background,
                               title: Text(
                                 textAlign: TextAlign.center,
                                 'No courses selected',
-                                style: TextStyle(
+                                style: AugustFont.head2(
                                     color:
-                                        Theme.of(context).colorScheme.outline,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold),
+                                        Theme.of(context).colorScheme.outline),
                               ),
                               content: Text(
                                 textAlign: TextAlign.center,
                                 "Please add course(s) to class block.",
-                                style: TextStyle(
+                                style: AugustFont.subText2(
                                     color:
-                                        Theme.of(context).colorScheme.outline,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.normal),
+                                        Theme.of(context).colorScheme.outline),
                               ),
                               actions: [
                                 GestureDetector(
@@ -139,10 +141,8 @@ class _GroupPageState extends State<GroupPage> {
                                       children: [
                                         Text(
                                           'OK',
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 20),
+                                          style: AugustFont.head4(
+                                              color: Colors.white),
                                         ),
                                       ],
                                     ),
@@ -192,7 +192,7 @@ class _GroupPageState extends State<GroupPage> {
 
                           //확인해봐야함
                           HapticFeedback.mediumImpact();
-
+                          await AnalyticsService().groupCreate();
                           Navigator.push(
                             context,
                             CupertinoPageRoute(
@@ -245,7 +245,7 @@ class _GroupPageState extends State<GroupPage> {
                       child: Padding(
                         padding: const EdgeInsets.only(left: 22, bottom: 10),
                         child: Text(
-                          'Add at least one course in each class block.\nOne course will be selected out of each block,\nthen we will create all possible schedules,\nbased on the selections you made.',
+                          'Select at least one course per block.\nA course will be chosen from each block to generate\nall possible schedules based on your selections.',
                           style: AugustFont.captionNormal(
                               color: Theme.of(context).colorScheme.outline),
                         ),

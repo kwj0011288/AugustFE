@@ -58,8 +58,8 @@ class _InfoWidgetState extends State<InfoWidget> {
             widget.isFrirend
                 ? StackedPhoto(
                     imagePaths: [
-                      'assets/memoji/Memoji3.png',
                       'assets/memoji/Memoji2.png',
+                      'assets/memoji/Memoji3.png',
                       'assets/memoji/Memoji1.png',
                     ],
                   )

@@ -820,7 +820,7 @@ class _SingleTimetableState extends State<SingleTimetable> {
                                           alignment:
                                               Alignment.centerLeft, // 왼쪽 정렬
                                           child: Text(
-                                            'Duration',
+                                            'Time',
                                             style: AugustFont.head7(
                                                 color: Colors.black),
                                           ),

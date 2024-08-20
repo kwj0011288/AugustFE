@@ -3,8 +3,10 @@ import 'package:august/const/font/font.dart';
 import 'package:august/provider/course_color_provider.dart';
 import 'package:august/const/colors/modify_color.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../get_api/timetable/class.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_bouncing_widgets/custom_bounce_widget.dart';
 
 class ClassTile extends StatefulWidget {
   final GroupList classes;
@@ -40,32 +42,22 @@ class _ClassTileState extends State<ClassTile> {
   bool check = false;
 
   Widget seatButton(String text, Color buttonColor, final VoidCallback onTap) {
-    TextStyle buttonTextStyle = TextStyle(
-      // Define your text style here
-      fontSize: 12,
-      fontWeight: FontWeight.bold,
-    );
-
-    double textWidth = calculateTextWidth(text, buttonTextStyle, context);
-    double buttonWidth = textWidth; // Add some padding to the text width
-
-    return Container(
-      width: buttonWidth,
-      height: 18,
-      decoration: BoxDecoration(
-        color: buttonColor,
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          child: Container(
-            child: Center(
-              child: Text(text,
-                  style: AugustFont.captionBold(color: Colors.black)),
-            ),
-          ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+        decoration: BoxDecoration(
+          color: buttonColor,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(text, style: AugustFont.subText(color: Colors.black)),
+            Text('Sections',
+                style: AugustFont.captionSmallNormal2(color: Colors.black)),
+          ],
         ),
       ),
     );
@@ -80,89 +72,83 @@ class _ClassTileState extends State<ClassTile> {
                 Provider.of<CourseColorProvider>(context).colors, 0.102),
             0.05)
         : lightenColors(Provider.of<CourseColorProvider>(context).colors, 0.05);
-    return Container(
-      decoration: BoxDecoration(
-        color: tileColors[widget.index % tileColors.length],
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).colorScheme.shadow,
-            blurRadius: 10,
-            offset: Offset(
-              4,
-              8,
-            ),
-          )
-        ],
-      ),
-      margin: const EdgeInsets.only(bottom: 15.0, right: 15.0, left: 15.0),
-      child: Column(
-        children: [
-          GestureDetector(
-            onTap: widget.onTap != null ? () => widget.onTap!(context) : null,
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-              child: ListTile(
-                title: Row(
-                  children: [
-                    Text(
-                      widget.classes.courseCode!,
-                      style: AugustFont.searchedTitle(color: Colors.black),
-                    ),
-                    SizedBox(width: 10),
-                    seatButton('Check Seats', Colors.white.withOpacity(0.6),
-                        () {
-                      _showSeatInfoBottomSheet(context, widget.classes,
-                          widget.sections, widget.index); // Add this line
-                    })
-                  ],
-                ),
-                subtitle: Padding(
-                  padding: const EdgeInsets.only(top: 0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+    return CustomBounceWidget(
+      onPressed: () {
+        HapticFeedback.mediumImpact();
+        widget.onPressed!(context);
+      },
+      isScrollable: true,
+      duration: Duration(milliseconds: 100),
+      child: Container(
+        decoration: BoxDecoration(
+          color: tileColors[widget.index % tileColors.length],
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).colorScheme.shadow,
+              blurRadius: 10,
+              offset: Offset(
+                4,
+                8,
+              ),
+            )
+          ],
+        ),
+        margin: const EdgeInsets.only(bottom: 15.0, right: 15.0, left: 15.0),
+        child: Column(
+          children: [
+            GestureDetector(
+              onTap: widget.onTap != null ? () => widget.onTap!(context) : null,
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 5, horizontal: 0),
+                child: ListTile(
+                  title: Row(
                     children: [
                       Text(
-                        widget.classes.name!,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style:
-                            AugustFont.searchedCourseTitle(color: Colors.black),
+                        widget.classes.courseCode!,
+                        style: AugustFont.searchedTitle(color: Colors.black),
                       ),
-                      SizedBox(
-                        height: 2,
-                      ),
-                      Text(
-                        widget.classes.instructors!
-                            .map((instructor) => instructor.name)
-                            .join(', '),
-                        style: AugustFont.searchedProf(color: Colors.black),
-                      ),
-                      SizedBox(
-                        height: 5,
-                      ),
+                      SizedBox(width: 10),
                     ],
                   ),
-                ),
-                trailing: GestureDetector(
-                  onTap: widget.onPressed == null || check
-                      ? null
-                      : () {
-                          widget.onPressed!(context);
-                          setState(() {
-                            check = !check; // 상태 변경
-                            //widget.onIconToggled?.call(); // 콜백 호출
-                          });
-                        },
-                  child: Icon(
-                    check ? widget.toggledIcon ?? Icons.check : widget.icon,
-                    color: Colors.black,
+                  subtitle: Padding(
+                    padding: const EdgeInsets.only(top: 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.classes.name!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AugustFont.searchedCourseTitle(
+                              color: Colors.black),
+                        ),
+                        SizedBox(
+                          height: 2,
+                        ),
+                        Text(
+                          widget.classes.instructors!
+                              .map((instructor) => instructor.name)
+                              .join(', '),
+                          style: AugustFont.searchedProf(color: Colors.black),
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                      ],
+                    ),
                   ),
+                  trailing: seatButton(' + ${widget.sections.length}',
+                      Colors.white.withOpacity(0.6), () {
+                    HapticFeedback.selectionClick();
+                    _showSeatInfoBottomSheet(context, widget.classes,
+                        widget.sections, widget.index); // Add this line
+                  }),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

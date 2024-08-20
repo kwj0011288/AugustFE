@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:august/components/firebase/firebase_analytics.dart';
 import 'package:august/components/friends/number_box.dart';
 import 'package:august/components/profile/profile.dart';
 import 'package:august/const/font/font.dart';
@@ -236,7 +237,7 @@ class _InvitationCodePageState extends State<InvitationCodePage>
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        "Shareable Code",
+                        "My Code",
                         style: AugustFont.head2(
                             color: Theme.of(context).colorScheme.outline),
                       ),
@@ -289,8 +290,10 @@ class _InvitationCodePageState extends State<InvitationCodePage>
                   ),
                   Spacer(),
                   GestureDetector(
-                    onTap: () {
+                    onTap: () async {
                       Clipboard.setData(ClipboardData(text: "$_code"));
+                      await AnalyticsService()
+                          .copyMyCode(DateTime.now().toString());
                       ToastService.showToast(
                         context,
                         isClosable: true,

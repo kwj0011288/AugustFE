@@ -1,9 +1,11 @@
 import 'dart:io';
 
+import 'package:august/components/home/dialog.dart';
 import 'package:august/const/device/device_util.dart';
 import 'package:august/const/font/font.dart';
 import 'package:august/login/login.dart';
 import 'package:august/pages/main/homepage.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +16,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:lottie/lottie.dart';
 import 'dart:math';
@@ -158,6 +161,7 @@ class _InitialPageState extends State<InitialPage> {
 
   @override
   void initState() {
+    FirebaseAnalytics.instance.logAppOpen();
     super.initState();
   }
 
@@ -170,31 +174,7 @@ class _InitialPageState extends State<InitialPage> {
   Future<void> _checkLoginStatusAndNavigate() async {
     // Show loading indicator
     Future.microtask(
-      () => showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return Dialog(
-            elevation: 0,
-            backgroundColor: Colors.transparent,
-            child: Center(
-              child: Container(
-                width: 100, // Adjust as needed
-                height: 100, // Adjust as needed
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(100), // Adjust as needed
-                ),
-                child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: CircularProgressIndicator(
-                      color: Theme.of(context).colorScheme.outline,
-                    )),
-              ),
-            ),
-          );
-        },
-      ),
+      () => loadingShowDialog(context),
     );
 
     final isLoggedIn = await checkLoginStatus(); // Check current login status
@@ -380,6 +360,31 @@ class _InitialPageState extends State<InitialPage> {
     );
   }
 
+  void privaryPolicy() async {
+    const url = 'http://extra-mile.notion.site';
+    await launchUrl(
+      Uri.parse(url),
+      mode: LaunchMode.externalApplication,
+    );
+  }
+
+  void termsOfUse() async {
+    const url =
+        'https://extra-mile.notion.site/Terms-Conditions-c312612c53a141978c3503da5028680f?pvs=4';
+    await launchUrl(
+      Uri.parse(url),
+      mode: LaunchMode.externalApplication,
+    );
+  }
+
+  void _launchURL() async {
+    const url = 'https://forms.gle/2ytdRmXgFps7pK567';
+    await launchUrl(
+      Uri.parse(url),
+      mode: LaunchMode.externalApplication,
+    );
+  }
+
   /* --- widges --- */
 
   Widget signInText() {
@@ -419,11 +424,11 @@ class _InitialPageState extends State<InitialPage> {
                   color: Theme.of(context).colorScheme.outline),
             ),
             TextSpan(
-              text: 'With ',
+              text: 'with ',
               style: AugustFont.intial(color: Colors.grey),
             ),
             TextSpan(
-              text: ' Autocreated ',
+              text: ' Auto created ',
               style: AugustFont.intial(
                   color: Theme.of(context).colorScheme.outline),
             ),
@@ -510,7 +515,7 @@ class _InitialPageState extends State<InitialPage> {
             style: AugustFont.captionSmallUnderline(color: Colors.grey),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                print('Terms of Use clicked');
+                termsOfUse();
               },
           ),
           TextSpan(
@@ -522,7 +527,7 @@ class _InitialPageState extends State<InitialPage> {
             style: AugustFont.captionSmallUnderline(color: Colors.grey),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                print('Policy clicked');
+                privaryPolicy();
               },
           ),
         ],

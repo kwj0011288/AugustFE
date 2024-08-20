@@ -49,7 +49,10 @@ class _SemesterPageState extends State<SemesterPage> {
     List<String> semestersList =
         Provider.of<SemesterProvider>(context).semestersList;
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: ColorfulSafeArea(
+        topColor: Theme.of(context).colorScheme.background,
+        bottomColor: Theme.of(context).colorScheme.background,
         child: Container(
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.background,
@@ -123,7 +126,7 @@ class _SemesterPageState extends State<SemesterPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Text(
-                  "Selected Semester is used for\nCourse search, and Schedule Creation.",
+                  "Selected Semester will be used for\nCourse Search, and Schedule Creation.",
                   textAlign: TextAlign.center,
                   style: AugustFont.head4(color: Colors.grey),
                 ),

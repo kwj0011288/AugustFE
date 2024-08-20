@@ -138,6 +138,7 @@ class _GradePageState extends State<GradePage> {
       'Graduated'
     ];
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: ColorfulSafeArea(
         child: Container(
           decoration: BoxDecoration(

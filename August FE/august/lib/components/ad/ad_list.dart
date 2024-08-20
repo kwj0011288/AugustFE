@@ -29,6 +29,7 @@ class _googleAdMobContainerState extends State<googleAdMobContainer> {
       factoryId: widget.isMedium ? 'listTileMedium' : 'listTile',
       adUnitId: AdHelper.nativeAdUnitId,
       request: const AdRequest(),
+
       listener: NativeAdListener(
         onAdLoaded: (_) {
           if (!isAdsLoaded) {

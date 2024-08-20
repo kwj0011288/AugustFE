@@ -19,7 +19,7 @@ class _CustomizeCourseColorState extends State<CustomizeCourseColor> {
     return GestureDetector(
       onTap: widget.onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),

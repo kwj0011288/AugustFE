@@ -1,15 +1,7 @@
-import 'dart:typed_data';
-import 'dart:convert';
 import 'dart:io';
 import 'package:august/provider/user_info_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter/services.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:image_cropper/image_cropper.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:contacts_service/contacts_service.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:http/http.dart' as http;
 
 // UserInfoProvider remains the same, but ensure it is capable of handling new image data.
@@ -67,10 +59,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                     ? 100
                     : widget.isMyCode
                         ? 50
-                        : 30,
+                        : 20,
         backgroundColor: Colors.grey,
         backgroundImage: widget.isFriendsPage
-            ? CachedNetworkImageProvider(widget.friendPhoto)
+            ? NetworkImage(widget.friendPhoto) as ImageProvider
             : profileImageUrl.startsWith('http')
                 ? NetworkImage(profileImageUrl) as ImageProvider
                 : FileImage(File(profileImageUrl)),

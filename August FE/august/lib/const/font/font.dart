@@ -263,6 +263,13 @@ class AugustFont {
       height: 1.5,
       letterSpacing: -1.5,
       color: color);
+  static TextStyle intialSmall({Color? color}) => TextStyle(
+      fontFamily: 'Nanum',
+      fontWeight: FontWeight.w800,
+      fontSize: 30,
+      height: 1.5,
+      letterSpacing: -1.5,
+      color: color);
 //   static TextStyle body1({Color? color}) => TextStyle(
 //       fontWeight: FontWeight.normal,
 //       fontSize: 18,

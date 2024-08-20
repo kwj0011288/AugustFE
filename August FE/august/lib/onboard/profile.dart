@@ -112,35 +112,33 @@ class _NamePageState extends State<NamePage> {
   Future<void> pickFromContact() async {
     try {
       Contact? contact = await ContactsService.openDeviceContactPicker();
-
       if (contact != null) {
-        // Concatenate givenName and familyName to get the full name
         String fullName = '';
-        if (contact.givenName != null) {
-          fullName += contact.givenName!;
-        }
+        if (contact.givenName != null) fullName += contact.givenName!;
         if (contact.familyName != null) {
-          // Add a space before the family name if the given name is not null
-          if (fullName.isNotEmpty) {
-            fullName += ' ';
-          }
+          if (fullName.isNotEmpty) fullName += ' ';
           fullName += contact.familyName!;
         }
+
         Provider.of<UserInfoProvider>(context, listen: false)
             .updateUserName(fullName);
         _nameController.text = fullName;
-      }
 
-      if (contact != null &&
-          contact.avatar != null &&
-          contact.avatar!.isNotEmpty) {
-        final directory = await getApplicationDocumentsDirectory();
-        File imgFile = File('${directory.path}/contact_image.png');
-        imgFile.writeAsBytesSync(contact.avatar!);
-        setState(() {
-          imagePath = imgFile.path;
-        });
-        updateProfileImage(imagePath!);
+        if (contact.avatar != null && contact.avatar!.isNotEmpty) {
+          final directory = await getApplicationDocumentsDirectory();
+          String newPath =
+              '${directory.path}/contact_image_${DateTime.now().millisecondsSinceEpoch}.png';
+          File imgFile = File(newPath);
+          await imgFile.writeAsBytes(contact.avatar!);
+
+          // Ensure imagePath is updated and UI is refreshed
+          setState(() {
+            imagePath = imgFile.path;
+          });
+
+          updateProfileImage(imagePath!);
+          print('Contact image updated successfully');
+        }
       }
     } catch (e) {
       print("Failed to pick contact: $e");
@@ -185,6 +183,7 @@ class _NamePageState extends State<NamePage> {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else {
           return Scaffold(
+            backgroundColor: Theme.of(context).colorScheme.background,
             body: ColorfulSafeArea(
               child: SingleChildScrollView(
                 physics: NeverScrollableScrollPhysics(),
@@ -194,7 +193,7 @@ class _NamePageState extends State<NamePage> {
                     color: Theme.of(context).colorScheme.background,
                   ),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Row(
@@ -213,40 +212,37 @@ class _NamePageState extends State<NamePage> {
                       Text(
                         widget.onboard
                             ? "Set name and profile\nthat will be shown to others."
-                            : "Change name and profile\nthat will be shown to others.",
+                            : "Personalize your profile\nthat will be shown to others.",
                         textAlign: TextAlign.center,
                         style: AugustFont.head4(color: Colors.grey),
                       ),
                       SizedBox(height: 40),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            ProfileWidget(
-                              isBottomBar: false,
-                              isProfilePage: true,
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          ProfileWidget(
+                            isBottomBar: false,
+                            isProfilePage: true,
+                          ),
+                          Positioned(
+                            right: 10,
+                            bottom: 0,
+                            child: ContactButton(
+                              getMemoji: () {
+                                pickFromContact();
+                                HapticFeedback.mediumImpact();
+                              },
+                              openPhoto: () {
+                                getImage();
+                                HapticFeedback.mediumImpact();
+                              },
+                              defaultImage: () {
+                                useDefaultImage();
+                                HapticFeedback.mediumImpact();
+                              },
                             ),
-                            Positioned(
-                              right: 10,
-                              bottom: 0,
-                              child: ContactButton(
-                                getMemoji: () {
-                                  pickFromContact();
-                                  HapticFeedback.mediumImpact();
-                                },
-                                openPhoto: () {
-                                  getImage();
-                                  HapticFeedback.mediumImpact();
-                                },
-                                defaultImage: () {
-                                  useDefaultImage();
-                                  HapticFeedback.mediumImpact();
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                       SizedBox(height: 40),
                       Padding(

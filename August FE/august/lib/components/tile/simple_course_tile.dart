@@ -5,8 +5,10 @@ import 'package:august/const/colors/modify_color.dart';
 import 'package:august/const/theme/dark_theme.dart';
 import 'package:august/const/theme/light_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../get_api/timetable/class.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_bouncing_widgets/custom_bounce_widget.dart';
 
 class SimepleCourseTile extends StatefulWidget {
   final CourseList classes;
@@ -97,110 +99,122 @@ class _ClassTileState extends State<SimepleCourseTile> {
                 Provider.of<CourseColorProvider>(context).colors, 0.102),
             0.05)
         : lightenColors(Provider.of<CourseColorProvider>(context).colors, 0.05);
-    return Container(
-      decoration: BoxDecoration(
-        color: tileColors[widget.index % tileColors.length],
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).colorScheme.shadow,
-            blurRadius: 10,
-            offset: Offset(
-              4,
-              8,
-            ),
-          )
-        ],
-      ),
-      margin: const EdgeInsets.only(bottom: 15.0, right: 15.0, left: 15.0),
-      child: Column(
-        children: [
-          GestureDetector(
-            onTap: widget.onTap != null ? () => widget.onTap!(context) : null,
-            child: Padding(
-              padding: EdgeInsets.only(
-                top: 5,
-                bottom: 5,
+    return CustomBounceWidget(
+      onPressed: () {
+        HapticFeedback.mediumImpact();
+        widget.onPressed!(context);
+      },
+      isScrollable: true,
+      duration: Duration(milliseconds: 100),
+      child: Container(
+        decoration: BoxDecoration(
+          color: tileColors[widget.index % tileColors.length],
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).colorScheme.shadow,
+              blurRadius: 10,
+              offset: Offset(
+                4,
+                8,
               ),
-              child: ListTile(
-                title: Padding(
-                  padding: const EdgeInsets.only(left: 5),
-                  child: Text(
-                    widget.sectionCode,
-                    style: AugustFont.searchedTitle(color: Colors.black),
-                  ),
-                ),
-                subtitle: Padding(
-                  padding: const EdgeInsets.only(top: 0),
+            )
+          ],
+        ),
+        margin: const EdgeInsets.only(bottom: 15.0, right: 15.0, left: 15.0),
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      SizedBox(height: 2),
+                      Text(
+                        widget.sectionCode,
+                        style: AugustFont.searchedTitle(color: Colors.black),
+                      ),
+                      SizedBox(height: 2),
+                      Text(
+                        (widget.classes.name ?? '').length > 30
+                            ? '${(widget.classes.name ?? '').substring(0, 30)}...'
+                            : (widget.classes.name ?? ''),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style:
+                            AugustFont.searchedCourseTitle(color: Colors.black),
+                      ),
+                      SizedBox(height: 2),
+                      Text(
+                        widget.instructorName,
+                        style: AugustFont.searchedProf(color: Colors.black),
+                        // style: TextStyle(
+                        //     fontSize: 16,
+                        //     color: Colors.black,
+                        //     fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 2),
+                      Text(
+                        widget.meetingTimes ?? 'Online',
+                        style: AugustFont.searchedTime(color: Colors.black),
+                      ),
+                      SizedBox(height: 2),
+                    ],
+                  ),
+                ),
+              ),
+              Container(
+                width: 100, // 너비 조절
+                height: 100, // 높이 조절
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center, // 수직 방향 중앙 정렬
+                    crossAxisAlignment: CrossAxisAlignment.start, // 수평 방향 중앙 정렬
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 5, bottom: 2),
+                        child: Text(
+                          'Seats: ${widget.fullSeat}',
+                          style: AugustFont.searchedSeat(color: Colors.black),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 5, bottom: 2),
+                        child: Text(
+                          'Open: ${widget.openSeat}',
+                          style: AugustFont.searchedSeat(color: Colors.black),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 5, bottom: 2),
+                        child: Text(
+                          'Waitlist: ${widget.waitlist}',
+                          style: AugustFont.searchedSeat(color: Colors.black),
+                        ),
+                      ),
                       Padding(
                         padding: const EdgeInsets.only(left: 5),
                         child: Text(
-                          widget.classes.name ?? '', // 수업 이름을 추가합니다.
-                          maxLines: 1, // 최대 라인을 한 줄로 제한합니다.
-                          overflow:
-                              TextOverflow.ellipsis, // 긴 텍스트는 ...으로 생략되게 합니다.
-                          style: AugustFont.searchedCourseTitle(
-                              color: Colors.black),
+                          'Holdfile: ${widget.holdfile}',
+                          style: AugustFont.searchedSeat(color: Colors.black),
                         ),
-                      ),
-                      SizedBox(
-                        height: 2,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 5),
-                        child: Text(
-                          widget.instructorName,
-                          style: AugustFont.searchedProf(color: Colors.black),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 2,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 5),
-                        child: Text(
-                          widget.meetingTimes,
-                          style: AugustFont.searchedTime(color: Colors.black),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 3, top: 2),
-                        child: seatButton(
-                            'Seats: ${widget.fullSeat.toString()}' +
-                                ",  "
-                                    'Open Seats: ${widget.openSeat.toString()}' +
-                                ",  "
-                                    'Waitlist: ${widget.waitlist.toString()}' +
-                                ",  "
-                                    'Holdfile: ${widget.holdfile.toString()}',
-                            Colors.white.withOpacity(0.7),
-                            () {}),
                       ),
                     ],
                   ),
                 ),
-                trailing: GestureDetector(
-                  onTap: widget.onPressed == null || check
-                      ? null
-                      : () {
-                          widget.onPressed!(context);
-                          setState(() {
-                            check = !check; // 상태 변경
-                            //widget.onIconToggled?.call(); // 콜백 호출
-                          });
-                        },
-                  child: Icon(
-                    check ? widget.toggledIcon ?? Icons.check : widget.icon,
-                    color: Colors.black,
-                  ),
-                ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

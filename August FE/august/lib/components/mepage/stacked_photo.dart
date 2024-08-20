@@ -12,8 +12,14 @@ class StackedPhoto extends StatelessWidget {
       stackedImages.add(
         Positioned(
           right: i * 15.0, // Incremental offset for each image
-          child:
-              Image.asset(imagePaths[i], width: 50), // Adjust width as needed
+          child: ClipOval(
+            child: Image.asset(
+              imagePaths[i],
+              width: 50,
+              height: 50, // Ensure the height is the same as the width
+              fit: BoxFit.cover,
+            ),
+          ),
         ),
       );
     }

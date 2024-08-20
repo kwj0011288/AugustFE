@@ -128,11 +128,12 @@ class _NoNetworkPageState extends State<NoNetworkPage> {
                   height: 10,
                 ),
                 Expanded(
-                    child: SingleTimetable(
-                  courses: _firstTimetableCourses,
-                  index: 0,
-                  forceFixedTimeRange: false,
-                )),
+                  child: SingleTimetable(
+                    courses: _firstTimetableCourses,
+                    index: 0,
+                    forceFixedTimeRange: false,
+                  ),
+                ),
               ],
             ),
           ),

@@ -5,6 +5,7 @@ ThemeData dartTheme = ThemeData(
   splashColor: Colors.transparent,
   highlightColor: Colors.transparent,
   hoverColor: Colors.transparent,
+  scaffoldBackgroundColor: Color.fromRGBO(37, 37, 37, 1),
   fontFamily: 'Nanum',
   brightness: Brightness.dark,
   colorScheme: ColorScheme.dark(
