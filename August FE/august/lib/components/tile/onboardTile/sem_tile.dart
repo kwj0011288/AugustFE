@@ -33,6 +33,7 @@ class _SemesterTileState extends State<SemesterTile> {
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 5),
       child: CustomBounceWidget(
+        isScrollable: true,
         duration: Duration(milliseconds: 100),
         onPressed: widget.onTap,
         child: Padding(

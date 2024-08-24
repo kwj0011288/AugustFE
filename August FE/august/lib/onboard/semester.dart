@@ -132,39 +132,67 @@ class _SemesterPageState extends State<SemesterPage> {
                 ),
               ),
               SizedBox(height: 40),
-              SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: Container(
-                  child: Form(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: semestersList.map((semester) {
-                        String formattedSemester = formatSemester(semester);
-                        return SemesterTile(
-                          semester: semester,
-                          semesterIcon:
-                              "assets/season/${extractSeason(formattedSemester)}.svg",
-                          backgroundColor: determineColor(formattedSemester),
-                          tileColor: currentSemetser == semester
-                              ? Theme.of(context)
-                                  .colorScheme
-                                  .primary // Selected color
-                              : Theme.of(context)
-                                  .colorScheme
-                                  .primaryContainer, // Default color
-                          isShadow: currentSemetser == semester,
-                          onTap: () {
-                            setState(() {
-                              currentSemetser = semester;
-                            });
-                          },
-                        );
-                      }).toList(),
-                    ),
-                  ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: semestersList.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    String formattedSemester =
+                        formatSemester(semestersList[index]);
+                    return SemesterTile(
+                      semester: semestersList[index],
+                      semesterIcon:
+                          "assets/season/${extractSeason(formattedSemester)}.svg",
+                      backgroundColor: determineColor(formattedSemester),
+                      tileColor: currentSemetser == semestersList[index]
+                          ? Theme.of(context)
+                              .colorScheme
+                              .primary // Selected color
+                          : Theme.of(context)
+                              .colorScheme
+                              .primaryContainer, // Default color
+                      isShadow: currentSemetser == semestersList[index],
+                      onTap: () {
+                        setState(() {
+                          currentSemetser = semestersList[index];
+                        });
+                      },
+                    );
+                  },
                 ),
               ),
+              // SingleChildScrollView(
+              //   scrollDirection: Axis.vertical,
+              //   child: Container(
+              //     child: Form(
+              //       child: Column(
+              //         mainAxisAlignment: MainAxisAlignment.center,
+              //         crossAxisAlignment: CrossAxisAlignment.center,
+              //         children: semestersList.map((semester) {
+              //           String formattedSemester = formatSemester(semester);
+              //           return SemesterTile(
+              //             semester: semester,
+              //             semesterIcon:
+              //                 "assets/season/${extractSeason(formattedSemester)}.svg",
+              //             backgroundColor: determineColor(formattedSemester),
+              //             tileColor: currentSemetser == semester
+              //                 ? Theme.of(context)
+              //                     .colorScheme
+              //                     .primary // Selected color
+              //                 : Theme.of(context)
+              //                     .colorScheme
+              //                     .primaryContainer, // Default color
+              //             isShadow: currentSemetser == semester,
+              //             onTap: () {
+              //               setState(() {
+              //                 currentSemetser = semester;
+              //               });
+              //             },
+              //           );
+              //         }).toList(),
+              //       ),
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         ),
@@ -178,9 +206,59 @@ class _SemesterPageState extends State<SemesterPage> {
         child: widget.onboard
             ? GestureDetector(
                 onTap: () {
-                  HapticFeedback.mediumImpact();
-                  widget.gonext();
-                  _saveAndClose();
+                  if (currentSemetser != "" || currentSemetser != null) {
+                    HapticFeedback.mediumImpact();
+                    widget.gonext();
+                    _saveAndClose();
+                  } else {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text(
+                            'Please select your current semester',
+                            textAlign: TextAlign.center,
+                            style: AugustFont.head2(
+                                color: Theme.of(context).colorScheme.outline),
+                          ),
+                          content: Text(
+                            'You must select your current semester to proceed',
+                            textAlign: TextAlign.center,
+                            style: AugustFont.subText2(
+                                color: Theme.of(context).colorScheme.outline),
+                          ),
+                          actions: <Widget>[
+                            GestureDetector(
+                              onTap: () async {
+                                Navigator.of(context).pop();
+                                HapticFeedback.lightImpact();
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 20),
+                                height: 55,
+                                width: MediaQuery.of(context).size.width - 80,
+                                decoration: BoxDecoration(
+                                  color: Colors.redAccent,
+                                  borderRadius: BorderRadius.circular(60),
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'OK',
+                                      style:
+                                          AugustFont.head4(color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          ],
+                        );
+                      },
+                    );
+                  }
                 },
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 20),

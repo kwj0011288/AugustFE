@@ -320,7 +320,7 @@ class _SelectPageState extends State<SelectPage> {
                                 ),
                               ),
                               Text(
-                                'NEW\nSCHEDULES',
+                                'POSSIBLE\nSCHEDULES',
                                 style: AugustFont.head1(
                                     color:
                                         Theme.of(context).colorScheme.outline),
@@ -494,7 +494,7 @@ class _SelectPageState extends State<SelectPage> {
                                 currentIndex = currentPage.floor();
                               } else {
                                 // Otherwise, use floor() to determine the current page
-                                currentIndex = currentPage.ceil();
+                                currentIndex = currentPage.floor();
                               }
                               final coursesProvider =
                                   Provider.of<CoursesProvider>(context,
@@ -509,6 +509,7 @@ class _SelectPageState extends State<SelectPage> {
                                 await AnalyticsService().deselect();
                                 showDialog(
                                   context: context,
+                                  barrierDismissible: false,
                                   builder: (context) {
                                     Future.delayed(Duration(milliseconds: 500),
                                         () {
@@ -541,9 +542,7 @@ class _SelectPageState extends State<SelectPage> {
                                               'Deselected',
                                               textAlign: TextAlign.center,
                                               style: AugustFont.head1(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .outline),
+                                                  color: Colors.white),
                                             ),
                                           ],
                                         ),
@@ -561,6 +560,7 @@ class _SelectPageState extends State<SelectPage> {
                                 await AnalyticsService().select();
                                 showDialog(
                                   context: context,
+                                  barrierDismissible: false,
                                   builder: (context) {
                                     Future.delayed(Duration(milliseconds: 500),
                                         () {
@@ -593,9 +593,7 @@ class _SelectPageState extends State<SelectPage> {
                                               'Selected',
                                               textAlign: TextAlign.center,
                                               style: AugustFont.head1(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .outline),
+                                                  color: Colors.white),
                                             ),
                                           ],
                                         ),

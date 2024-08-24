@@ -317,6 +317,7 @@ class _GroupSearchPageState extends State<GroupSearchPage>
                                     (index) {
                                   return GestureDetector(
                                     onTap: () {
+                                      FocusScope.of(context).unfocus();
                                       // Update the TextEditingController to display the keyword
                                       _keywordController.text =
                                           _searchKeywords[index];

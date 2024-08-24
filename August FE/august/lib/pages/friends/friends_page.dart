@@ -6,6 +6,7 @@ import 'package:august/components/friends/add_friend.dart';
 import 'package:august/components/friends/number_box.dart';
 import 'package:august/components/profile/profile.dart';
 import 'package:august/const/font/font.dart';
+import 'package:august/pages/friends/add_friends.dart';
 import 'package:august/provider/courseprovider.dart';
 import 'package:august/provider/friends_provider.dart';
 import 'package:august/get_api/friends/delete_friend.dart';
@@ -184,19 +185,6 @@ class _FriendsPageState extends State<FriendsPage>
     return department;
   }
 
-  Future<void> InvitationInput() async {
-    final result = await showModalBottomSheet<Map<String, dynamic>>(
-      context: context,
-      builder: (BuildContext context) {
-        return weightModal(context);
-      },
-    );
-
-    if (result != null) {
-      print(result);
-    }
-  }
-
   void addFriend(String input) async {
     // Assuming VerifyFriendService is properly imported and initialized
     var response = await VerifyFriendService().acceptFriendRequest(input);
@@ -235,91 +223,6 @@ class _FriendsPageState extends State<FriendsPage>
         message: "You have successfully added a friend!",
       );
     }
-  }
-
-  Widget weightModal(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-      child: Container(
-        color: Theme.of(context).colorScheme.background,
-        padding: EdgeInsets.all(20),
-        child: Column(
-          children: <Widget>[
-            Text(
-              "Invitation Code?",
-              style: AugustFont.head1(
-                color: Theme.of(context).colorScheme.outline,
-              ),
-            ),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: CupertinoTextField(
-                    inputFormatters: [
-                      UpperCaseTextFormatter(),
-                      LengthLimitingTextInputFormatter(8),
-                    ],
-                    autofocus: true,
-                    controller: inviteController,
-                    placeholder: 'Type Invitation Code',
-                    placeholderStyle: AugustFont.textField2(
-                        color: Theme.of(context).colorScheme.outline),
-                    style: AugustFont.textField2(
-                        color: Theme.of(context).colorScheme.outline),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.inversePrimary,
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    cursorColor: Theme.of(context).colorScheme.outline,
-                    padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-                    onSubmitted: (value) {
-                      // 이벤트 처리기 추가
-                      Navigator.of(context).pop();
-                      addFriend(inviteController.text);
-                      inviteController.clear();
-
-                      Future.delayed(Duration(seconds: 3), () {
-                        loadFriends();
-                      });
-                    },
-                  ),
-                ),
-                SizedBox(width: 10),
-                GestureDetector(
-                  onTap: () async {
-                    Navigator.of(context).pop();
-                    addFriend(inviteController.text);
-                    await AnalyticsService().addFriends(
-                      inviteController.text,
-                      DateTime.now().toString(),
-                    );
-                    inviteController.clear();
-
-                    Future.delayed(Duration(microseconds: 1500), () {
-                      loadFriends();
-                    });
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 18, horizontal: 15),
-                    decoration: BoxDecoration(
-                      color: Colors.blueAccent,
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Text(
-                      'Done',
-                      style: AugustFont.head6(
-                        color: Theme.of(context).colorScheme.outline,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   Future showNoTimetableDialog(BuildContext context) {
@@ -474,6 +377,7 @@ class _FriendsPageState extends State<FriendsPage>
       HapticFeedback.mediumImpact();
       await loadFriends();
       _refreshController.refreshCompleted();
+      print('Refreshed');
     } catch (error) {
       _refreshController.refreshFailed();
       print("Error during refresh: $error");
@@ -482,6 +386,9 @@ class _FriendsPageState extends State<FriendsPage>
 
   @override
   Widget build(BuildContext context) {
+    Size screenSize = MediaQuery.of(context).size;
+    double minHeightForLargeDevice = 812.0;
+    bool isLargeDevice = screenSize.height > minHeightForLargeDevice;
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       body: Padding(
@@ -570,39 +477,40 @@ class _FriendsPageState extends State<FriendsPage>
                 ),
                 if (friends.isNotEmpty)
                   Padding(
-                    padding: const EdgeInsets.only(left: 30, bottom: 10),
+                    padding: const EdgeInsets.only(left: 20, bottom: 10),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(
-                            top: 10,
-                            right: 10,
-                          ),
-                          child: RichText(
-                            text: TextSpan(
-                              style: AugustFont.captionSmallBold(
-                                color: Colors.grey,
+                        if (isLargeDevice)
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              top: 10,
+                              right: 10,
+                            ),
+                            child: RichText(
+                              text: TextSpan(
+                                style: AugustFont.captionSmallBold(
+                                  color: Colors.grey,
+                                ),
+                                children: <TextSpan>[
+                                  TextSpan(text: 'Only '),
+                                  TextSpan(
+                                    text: 'Main Timetable',
+                                    style: AugustFont.captionSmallBold(
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: ' will be shared with your friends',
+                                    style: AugustFont.captionSmallBold(
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              children: <TextSpan>[
-                                TextSpan(text: 'Only '),
-                                TextSpan(
-                                  text: ' Main Timetable ',
-                                  style: AugustFont.captionSmallBold(
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: ' will be shared with your friends',
-                                  style: AugustFont.captionSmallBold(
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ],
                             ),
                           ),
-                        ),
                         Spacer(),
                         Padding(
                           padding: const EdgeInsets.only(right: 10),
@@ -705,8 +613,22 @@ class _FriendsPageState extends State<FriendsPage>
                                   if (index == friends.length) {
                                     return GestureDetector(
                                       onTap: () async {
-                                        InvitationInput();
-                                        checkAccessToken();
+                                        HapticFeedback.mediumImpact();
+                                        final codeValue = await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            fullscreenDialog: true,
+                                            builder: (context) =>
+                                                AddFriendsPage(
+                                              onRefresh: _onRefresh,
+                                            ),
+                                          ),
+                                        );
+
+                                        if (codeValue != null) {
+                                          addFriend(codeValue);
+                                        }
+                                        await checkAccessToken();
                                       },
                                       child: Container(
                                         decoration: BoxDecoration(
@@ -1227,10 +1149,20 @@ class _FriendsPageState extends State<FriendsPage>
                                   padding: const EdgeInsets.all(10.0),
                                   child: GestureDetector(
                                     onTap: () async {
-                                      InvitationInput();
-                                      // (timetableLength == 0)
-                                      //     ? showNoTimetableDialog(context)
-                                      //     : InvitationInput();
+                                      HapticFeedback.mediumImpact();
+                                      final codeValue = await Navigator.push(
+                                        context,
+                                        CupertinoPageRoute(
+                                          fullscreenDialog: true,
+                                          builder: (context) => AddFriendsPage(
+                                            onRefresh: _onRefresh,
+                                          ),
+                                        ),
+                                      );
+
+                                      if (codeValue != null) {
+                                        addFriend(codeValue);
+                                      }
                                       await checkAccessToken();
                                     },
                                     child: Container(

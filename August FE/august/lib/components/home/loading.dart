@@ -71,6 +71,7 @@ class SkeletonContainer extends StatelessWidget {
   }
 }
 
+// search page for grouping
 Widget GroupLoading1(BuildContext context) {
   return Stack(
     children: [
@@ -79,28 +80,25 @@ Widget GroupLoading1(BuildContext context) {
         child: Skelton(height: 100, width: MediaQuery.of(context).size.width),
       ),
       const Padding(
-        padding: EdgeInsets.symmetric(vertical: 23, horizontal: 34),
+        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
         child: Row(
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SkeletonContainer.rounded(height: 25, width: 95),
-                SizedBox(
-                  height: 5,
-                ),
-                SkeletonContainer.rounded(height: 25, width: 140),
-                SizedBox(
-                  width: 28,
-                ),
+                SkeletonContainer.rounded(height: 20, width: 95),
+                SizedBox(height: 5),
+                SkeletonContainer.rounded(height: 20, width: 200),
+                SizedBox(height: 5),
+                SkeletonContainer.rounded(height: 20, width: 140),
               ],
             ),
             Spacer(),
             Padding(
-              padding: EdgeInsets.only(right: 12),
-              child: SkeletonContainer.circular(
-                height: 30,
-                width: 30,
+              padding: EdgeInsets.only(right: 10, bottom: 10),
+              child: SkeletonContainer.rounded(
+                height: 50,
+                width: 50,
               ),
             ),
           ],
@@ -110,43 +108,58 @@ Widget GroupLoading1(BuildContext context) {
   );
 }
 
+// search page for other
 Widget GroupLoading2(BuildContext context) {
   return Stack(
     children: [
       Padding(
         padding: const EdgeInsets.only(left: 10, right: 10, top: 5),
-        child: Skelton(height: 105, width: MediaQuery.of(context).size.width),
+        child: Skelton(height: 120, width: MediaQuery.of(context).size.width),
       ),
       Padding(
-        padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 25),
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
         child: Row(
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SkeletonContainer.rounded(
-                    color: Theme.of(context).colorScheme.tertiary,
-                    height: 25,
-                    width: 95),
-                const SizedBox(
-                  height: 5,
-                ),
-                SkeletonContainer.rounded(
-                    color: Theme.of(context).colorScheme.tertiary,
-                    height: 25,
-                    width: 140),
-                const SizedBox(
-                  width: 28,
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.only(left: 5),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SkeletonContainer.rounded(
+                      color: Theme.of(context).colorScheme.tertiary,
+                      height: 20,
+                      width: 100),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  SkeletonContainer.rounded(
+                      color: Theme.of(context).colorScheme.tertiary,
+                      height: 20,
+                      width: 200),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  SkeletonContainer.rounded(
+                      color: Theme.of(context).colorScheme.tertiary,
+                      height: 20,
+                      width: 140),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  SkeletonContainer.rounded(
+                      color: Theme.of(context).colorScheme.tertiary,
+                      height: 20,
+                      width: 170),
+                ],
+              ),
             ),
             const Spacer(),
             Padding(
               padding: const EdgeInsets.only(right: 5),
-              child: SkeletonContainer.circular(
+              child: SkeletonContainer.rounded(
                 color: Theme.of(context).colorScheme.tertiary,
-                height: 30,
-                width: 30,
+                height: 100,
+                width: 100,
               ),
             ),
           ],
@@ -156,6 +169,7 @@ Widget GroupLoading2(BuildContext context) {
   );
 }
 
+// loading for the timetable
 Widget GroupLoading3(BuildContext context) {
   return Stack(
     children: [

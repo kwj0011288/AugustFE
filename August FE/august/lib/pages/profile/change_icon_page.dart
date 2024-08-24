@@ -50,17 +50,20 @@ class _ChangeIconPageState extends State<ChangeIconPage> {
       body: ColorfulSafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Row(
                 children: [
-                  Text(
-                    'Customize App Icon',
-                    style: AugustFont.head1(
-                        color: Theme.of(context).colorScheme.outline),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Text(
+                      'Customize App Icon',
+                      style: AugustFont.head1(
+                          color: Theme.of(context).colorScheme.outline),
+                    ),
                   ),
                   Spacer(),
                   Padding(
@@ -86,30 +89,57 @@ class _ChangeIconPageState extends State<ChangeIconPage> {
                 ],
               ),
               SizedBox(height: 10),
-              Text(
-                "Change the August App icon on your home screen to match your style or mood.",
-                style: AugustFont.head4(color: Colors.grey),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Text(
+                  "Change the August App icon on your home screen to match your style or mood.",
+                  style: AugustFont.head4(color: Colors.grey),
+                ),
               ),
               SizedBox(height: 30),
-              for (AppIcon appIcon in AppIcon.values) ...[
-                CustomIconTile(
-                    iconAsset: 'assets/launch/${appIcon.name}.png',
-                    name: appIcon.name,
-                    onTap: () {
-                      HapticFeedback.mediumImpact();
-                      AnalyticsService().changeIcon(appIcon.name);
-                      changeAppIcon(appIcon);
-                    },
-                    tileColor: (currentIcon!.name == appIcon.name)
-                        ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).colorScheme.primaryContainer,
-                    isShadow: (currentIcon!.name == appIcon.name)),
-                // GestureDetector(
-                //   onTap: () => changeAppIcon(appIcon),
-                //   child: launchIcon(appIcon.name),
-                // ),
-                const SizedBox(height: 20),
-              ],
+              Expanded(
+                child: ListView.builder(
+                  itemCount: AppIcon.values.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return CustomIconTile(
+                      iconAsset:
+                          'assets/launch/${AppIcon.values[index].name}.png',
+                      name: AppIcon.values[index].name,
+                      onTap: () {
+                        HapticFeedback.mediumImpact();
+                        AnalyticsService()
+                            .changeIcon(AppIcon.values[index].name);
+                        changeAppIcon(AppIcon.values[index]);
+                      },
+                      tileColor:
+                          (currentIcon!.name == AppIcon.values[index].name)
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).colorScheme.primaryContainer,
+                      isShadow:
+                          (currentIcon!.name == AppIcon.values[index].name),
+                    );
+                  },
+                ),
+              ),
+              // for (AppIcon appIcon in AppIcon.values) ...[
+              //   CustomIconTile(
+              //       iconAsset: 'assets/launch/${appIcon.name}.png',
+              //       name: appIcon.name,
+              //       onTap: () {
+              //         HapticFeedback.mediumImpact();
+              //         AnalyticsService().changeIcon(appIcon.name);
+              //         changeAppIcon(appIcon);
+              //       },
+              //       tileColor: (currentIcon!.name == appIcon.name)
+              //           ? Theme.of(context).colorScheme.primary
+              //           : Theme.of(context).colorScheme.primaryContainer,
+              //       isShadow: (currentIcon!.name == appIcon.name)),
+              //   // GestureDetector(
+              //   //   onTap: () => changeAppIcon(appIcon),
+              //   //   child: launchIcon(appIcon.name),
+              //   // ),
+              //   const SizedBox(height: 20),
+              // ],
               // for the bottom margin
               SizedBox(height: 20),
             ],

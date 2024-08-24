@@ -326,8 +326,10 @@ class _SearchPageState extends State<SearchPage>
                                       _searchKeywords.length, (index) {
                                     return InkWell(
                                       onTap: () {
+                                        //  FocusScope.of(context).unfocus();
                                         _keywordController.text =
                                             _searchKeywords[index];
+
                                         // Trigger search with the keyword when the chip is tapped
                                         setState(() {
                                           _coursesFuture = _runSearch(

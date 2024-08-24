@@ -227,7 +227,7 @@ class _MajorPageState extends State<MajorPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: Text(
-                    "Selected Semester is used for\nCourse Search, and Schedule Creation.",
+                    'Selected major will be displayed on your profile and visible to your friends.',
                     textAlign: TextAlign.center,
                     style: AugustFont.head4(color: Colors.grey),
                   ),
@@ -285,41 +285,37 @@ class _MajorPageState extends State<MajorPage> {
                       textInputAction: TextInputAction.done),
                 ),
                 isLoading
-                    ? CircularProgressIndicator()
+                    ? Center(child: CircularProgressIndicator())
                     : Expanded(
-                        child: Scrollbar(
-                          thumbVisibility: true,
-                          child: ListView.builder(
-                            itemCount: filteredDepartments.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              final parts =
-                                  filteredDepartments[index].split(', ');
-                              final fullnameAndNickname =
-                                  parts.sublist(1).join(", ");
-                              final fullname =
-                                  fullnameAndNickname.split(" (")[0];
-                              final nickname = fullnameAndNickname.contains("(")
-                                  ? fullnameAndNickname
-                                      .split(" (")[1]
-                                      .replaceAll(")", "")
-                                  : '';
-                              return MajorTile(
-                                fullname: fullname,
-                                nickname: nickname,
-                                tileColor: selectedMajorNickname == nickname
-                                    ? Theme.of(context).colorScheme.primary
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .primaryContainer,
-                                isShadow: selectedMajorNickname == nickname,
-                                onTap: () {
-                                  setState(() {
-                                    _selectMajor(filteredDepartments[index]);
-                                  });
-                                },
-                              );
-                            },
-                          ),
+                        child: ListView.builder(
+                          itemCount: filteredDepartments.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            final parts =
+                                filteredDepartments[index].split(', ');
+                            final fullnameAndNickname =
+                                parts.sublist(1).join(", ");
+                            final fullname = fullnameAndNickname.split(" (")[0];
+                            final nickname = fullnameAndNickname.contains("(")
+                                ? fullnameAndNickname
+                                    .split(" (")[1]
+                                    .replaceAll(")", "")
+                                : '';
+                            return MajorTile(
+                              fullname: fullname,
+                              nickname: nickname,
+                              tileColor: selectedMajorNickname == nickname
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(context)
+                                      .colorScheme
+                                      .primaryContainer,
+                              isShadow: selectedMajorNickname == nickname,
+                              onTap: () {
+                                setState(() {
+                                  _selectMajor(filteredDepartments[index]);
+                                });
+                              },
+                            );
+                          },
                         ),
                       ),
               ],
@@ -337,10 +333,60 @@ class _MajorPageState extends State<MajorPage> {
         child: widget.onboard
             ? GestureDetector(
                 onTap: () {
-                  HapticFeedback.mediumImpact();
-                  widget.gonext();
-                  FocusScope.of(context).unfocus();
-                  _saveAndClose();
+                  if (selectedMajorIndex != null) {
+                    HapticFeedback.mediumImpact();
+                    widget.gonext();
+                    FocusScope.of(context).unfocus();
+                    _saveAndClose();
+                  } else {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text(
+                            'Please Select a Major',
+                            textAlign: TextAlign.center,
+                            style: AugustFont.head2(
+                                color: Theme.of(context).colorScheme.outline),
+                          ),
+                          content: Text(
+                            'You must select your major to continue.',
+                            textAlign: TextAlign.center,
+                            style: AugustFont.subText2(
+                                color: Theme.of(context).colorScheme.outline),
+                          ),
+                          actions: <Widget>[
+                            GestureDetector(
+                              onTap: () async {
+                                Navigator.of(context).pop();
+                                HapticFeedback.lightImpact();
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 20),
+                                height: 55,
+                                width: MediaQuery.of(context).size.width - 80,
+                                decoration: BoxDecoration(
+                                  color: Colors.redAccent,
+                                  borderRadius: BorderRadius.circular(60),
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'OK',
+                                      style:
+                                          AugustFont.head4(color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          ],
+                        );
+                      },
+                    );
+                  }
                 },
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 20),

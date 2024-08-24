@@ -1,4 +1,4 @@
-package com.august
+package com.august.android
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine

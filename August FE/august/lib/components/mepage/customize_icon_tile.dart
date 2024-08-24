@@ -30,7 +30,7 @@ String convertIconName(String name) {
   } else if (name == 'light_prime') {
     return 'Default Light Mode';
   } else if (name == 'dark_pencil') {
-    return 'Customize ';
+    return 'Customize Dark 1';
   } else if (name == 'light_pencil') {
     return 'Customize Light 1';
   } else {
@@ -41,51 +41,55 @@ String convertIconName(String name) {
 class _CustomIconTileState extends State<CustomIconTile> {
   @override
   Widget build(BuildContext context) {
-    return CustomBounceWidget(
-      duration: Duration(milliseconds: 100),
-      onPressed: widget.onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        height: 120,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: widget.tileColor,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            if (!widget.isShadow)
-              BoxShadow(
-                color: Theme.of(context).colorScheme.shadow,
-                blurRadius: 10, // 블러 효과를 줄여서 그림자를 더 세밀하게
-                offset: Offset(4, -1), // 좌우 그림자의 길이를 줄임
+    return Padding(
+      padding: const EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 10),
+      child: CustomBounceWidget(
+        duration: Duration(milliseconds: 100),
+        isScrollable: true,
+        onPressed: widget.onTap,
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          height: 120,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: widget.tileColor,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              if (!widget.isShadow)
+                BoxShadow(
+                  color: Theme.of(context).colorScheme.shadow,
+                  blurRadius: 10, // 블러 효과를 줄여서 그림자를 더 세밀하게
+                  offset: Offset(4, -1), // 좌우 그림자의 길이를 줄임
+                ),
+              if (!widget.isShadow)
+                BoxShadow(
+                  color: Theme.of(context).colorScheme.shadow,
+                  blurRadius: 10,
+                  offset: Offset(-1, 0), // 좌우 그림자의 길이를 줄임
+                ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(20), // 원하는 반경 값으로 설정
+                child: Image.asset(
+                  widget.iconAsset,
+                  width: 90,
+                  height: 90,
+                ),
               ),
-            if (!widget.isShadow)
-              BoxShadow(
-                color: Theme.of(context).colorScheme.shadow,
-                blurRadius: 10,
-                offset: Offset(-1, 0), // 좌우 그림자의 길이를 줄임
+              const SizedBox(width: 20),
+              Text(
+                convertIconName(widget.name),
+                style: AugustFont.head2(
+                  color: Theme.of(context).colorScheme.outline,
+                ),
               ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(20), // 원하는 반경 값으로 설정
-              child: Image.asset(
-                widget.iconAsset,
-                width: 90,
-                height: 90,
-              ),
-            ),
-            const SizedBox(width: 20),
-            Text(
-              convertIconName(widget.name),
-              style: AugustFont.head2(
-                color: Theme.of(context).colorScheme.outline,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -6,6 +6,9 @@ ThemeData lightTheme = ThemeData(
   hoverColor: Colors.transparent,
   fontFamily: 'Nanum',
   brightness: Brightness.light,
+  bottomSheetTheme: BottomSheetThemeData(
+    backgroundColor: Color(0xFFffffff),
+  ),
   colorScheme: ColorScheme.light(
     background: Color(0xFFffffff), //백그라운드 색 (가장 밝음)
     primaryContainer: Colors.white, // 타임테이블 색 (2번째 밝음)

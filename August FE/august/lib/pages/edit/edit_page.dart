@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:august/components/firebase/firebase_analytics.dart';
 import 'package:august/components/home/button.dart';
 import 'package:august/const/font/font.dart';
+import 'package:august/get_api/timetable/set_timetable_name.dart';
 import 'package:august/provider/courseprovider.dart';
 import 'package:august/components/timetable/timetable.dart';
 import 'package:august/get_api/timetable/edit_timetable.dart';
@@ -41,6 +42,7 @@ class EditPage extends StatefulWidget {
 
 class _EditPageState extends State<EditPage> {
   List<ScheduleList> _courses = [];
+  TextEditingController _nameController = TextEditingController();
 
   Future<void> loadCourseDataAtIndex(int index) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -187,14 +189,39 @@ class _EditPageState extends State<EditPage> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 20),
-                  child: Text(
-                    "Edit \"${widget.name}\"",
-                    style: AugustFont.head3(
-                      color: Theme.of(context).colorScheme.outline,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: CupertinoTextField(
+                        textAlign: TextAlign.center,
+                        controller: _nameController,
+                        padding: EdgeInsets.all(10),
+                        placeholder: "${widget.name}",
+                        placeholderStyle: AugustFont.profileName(
+                          color: Theme.of(context).colorScheme.inversePrimary,
+                        ),
+                        style: AugustFont.profileName(
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        cursorColor: Theme.of(context).colorScheme.outline,
+                        cursorHeight: 40,
+                        onChanged: (text) {
+                          setState(() {}); // 텍스트 필드의 내용이 변경될 때마다 UI 업데이트
+                        },
+                        onSubmitted: (text) {
+                          updateTimetableName(widget.semester, widget.index!,
+                              _nameController.text);
+                        },
+                        maxLength: 12,
+                      ),
                     ),
-                  ),
+                  ],
                 ),
                 Flexible(
                   child: Consumer<CoursesProvider>(

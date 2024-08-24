@@ -104,6 +104,13 @@ class AugustFont {
       letterSpacing: -1,
       overflow: TextOverflow.ellipsis,
       color: color);
+  static TextStyle captionBoldUniv({Color? color}) => TextStyle(
+      fontFamily: 'Nanum',
+      fontWeight: FontWeight.w800,
+      fontSize: 12,
+      overflow: TextOverflow.ellipsis,
+      letterSpacing: -0.5,
+      color: color);
   static TextStyle captionBold({Color? color}) => TextStyle(
       fontFamily: 'Nanum',
       fontWeight: FontWeight.w800,
@@ -212,6 +219,13 @@ class AugustFont {
       fontFamily: 'Nanum',
       fontWeight: FontWeight.w400,
       fontSize: 12,
+      letterSpacing: -0.5,
+      color: color);
+
+  static TextStyle addFriends({Color? color}) => TextStyle(
+      fontFamily: 'Nanum',
+      fontWeight: FontWeight.w800,
+      fontSize: 30,
       letterSpacing: -0.5,
       color: color);
 

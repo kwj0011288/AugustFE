@@ -18,10 +18,13 @@ class DigitBoxes extends StatelessWidget {
   }
 
   Widget _buildDigitBox(String digit, BuildContext context) {
+    Size screenSize = MediaQuery.of(context).size;
+    double minHeightForLargeDevice = 812.0;
+    bool isLargeDevice = screenSize.height > minHeightForLargeDevice;
     return Padding(
       padding: const EdgeInsets.all(5.0),
       child: Container(
-        width: 35,
+        width: isLargeDevice ? 35 : 32,
         height: 50,
         alignment: Alignment.center,
         decoration: BoxDecoration(

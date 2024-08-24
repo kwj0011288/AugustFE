@@ -219,33 +219,59 @@ class _GradePageState extends State<GradePage> {
                   style: AugustFont.head4(color: Colors.grey),
                 ),
                 SizedBox(height: 40),
-                Container(
-                  child: Form(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: grades.map((grade) {
-                        return GradeTile(
-                          grade: grade,
-                          tileColor: selectGrade == grade
-                              ? Theme.of(context)
-                                  .colorScheme
-                                  .primary // Selected color
-                              : Theme.of(context)
-                                  .colorScheme
-                                  .primaryContainer, // Non-selected color
-                          isShadow: selectGrade == grade,
-                          onTap: () {
-                            _onGradeChanged(grade);
-                            setState(() {
-                              selectGrade = grade;
-                            });
-                          },
-                        );
-                      }).toList(),
-                    ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: grades.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return GradeTile(
+                        grade: grades[index],
+                        tileColor: selectGrade == grades[index]
+                            ? Theme.of(context)
+                                .colorScheme
+                                .primary // Selected color
+                            : Theme.of(context)
+                                .colorScheme
+                                .primaryContainer, // Non-selected color
+                        isShadow: selectGrade == grades[index],
+                        onTap: () {
+                          _onGradeChanged(grades[index]);
+                          setState(() {
+                            selectGrade = grades[index];
+                          });
+                        },
+                      );
+                    },
                   ),
                 ),
+                // Container(
+                //   child: Form(
+                //     child: SingleChildScrollView(
+                //       child: Column(
+                //         mainAxisAlignment: MainAxisAlignment.center,
+                //         crossAxisAlignment: CrossAxisAlignment.center,
+                //         children: grades.map((grade) {
+                //           return GradeTile(
+                //             grade: grade,
+                //             tileColor: selectGrade == grade
+                //                 ? Theme.of(context)
+                //                     .colorScheme
+                //                     .primary // Selected color
+                //                 : Theme.of(context)
+                //                     .colorScheme
+                //                     .primaryContainer, // Non-selected color
+                //             isShadow: selectGrade == grade,
+                //             onTap: () {
+                //               _onGradeChanged(grade);
+                //               setState(() {
+                //                 selectGrade = grade;
+                //               });
+                //             },
+                //           );
+                //         }).toList(),
+                //       ),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),
@@ -260,9 +286,59 @@ class _GradePageState extends State<GradePage> {
         child: widget.onboard
             ? GestureDetector(
                 onTap: () {
-                  HapticFeedback.mediumImpact();
-                  widget.gonext();
-                  _saveAndClose();
+                  if (selectGrade != null) {
+                    HapticFeedback.mediumImpact();
+                    widget.gonext();
+                    _saveAndClose();
+                  } else {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text(
+                            'Please select a university',
+                            textAlign: TextAlign.center,
+                            style: AugustFont.head2(
+                                color: Theme.of(context).colorScheme.outline),
+                          ),
+                          content: Text(
+                            'You must select a university to continue.',
+                            textAlign: TextAlign.center,
+                            style: AugustFont.subText2(
+                                color: Theme.of(context).colorScheme.outline),
+                          ),
+                          actions: <Widget>[
+                            GestureDetector(
+                              onTap: () async {
+                                Navigator.of(context).pop();
+                                HapticFeedback.lightImpact();
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 20),
+                                height: 55,
+                                width: MediaQuery.of(context).size.width - 80,
+                                decoration: BoxDecoration(
+                                  color: Colors.redAccent,
+                                  borderRadius: BorderRadius.circular(60),
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'OK',
+                                      style:
+                                          AugustFont.head4(color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          ],
+                        );
+                      },
+                    );
+                  }
                 },
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 20),

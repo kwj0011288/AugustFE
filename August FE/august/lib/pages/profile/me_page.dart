@@ -178,7 +178,7 @@ class _MypageState extends State<Mypage> {
     const url = 'https://forms.gle/2ytdRmXgFps7pK567';
     await launchUrl(
       Uri.parse(url),
-      mode: LaunchMode.externalApplication,
+      mode: LaunchMode.inAppBrowserView,
     );
   }
 
@@ -193,6 +193,15 @@ class _MypageState extends State<Mypage> {
 
   void privaryPolicy() async {
     const url = 'http://extra-mile.notion.site';
+    await launchUrl(
+      Uri.parse(url),
+      mode: LaunchMode.externalApplication,
+    );
+  }
+
+  void AugustSupport() async {
+    const url =
+        'https://extra-mile.notion.site/August-386d285ad6ee4ec19a3cdfcd4faa3309';
     await launchUrl(
       Uri.parse(url),
       mode: LaunchMode.externalApplication,
@@ -620,7 +629,11 @@ class _MypageState extends State<Mypage> {
                           },
                         ),
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: 10),
+                      Divider(
+                        color: Theme.of(context).colorScheme.scrim,
+                      ),
+                      SizedBox(height: 10),
                       GestureDetector(
                         onTap: () {
                           showAlertDialog(
@@ -646,54 +659,15 @@ class _MypageState extends State<Mypage> {
                           }, () {});
                         },
                         child: Center(
-                          child: Container(
-                            width: 100,
-                            height: 25,
-                            decoration: BoxDecoration(
-                              color: Colors.grey,
-                              borderRadius: BorderRadius.circular(40),
+                          child: Text(
+                            "Delete Account",
+                            style: AugustFont.captionBold(
+                              color: Colors.red,
                             ),
-                            child: Text("Delete Account",
-                                style: AugustFont.captionBold(
-                                  color: Colors.black,
-                                )),
-                            alignment: Alignment.center,
                           ),
                         ),
                       ),
-                      // Center(
-                      //   child: SignoutButton(
-                      //     'Delete Account',
-                      //     Colors.redAccent,
-                      //     () async {
-                      //       showAlertDialog(
-                      //           context,
-                      //           'Delete Account 😢',
-                      //           'For Real? 😢',
-                      //           'DELETE',
-                      //           'Stay',
-                      //           false, () async {
-                      //         Navigator.of(context).pop(); // Close the dialog
-                      //         HapticFeedback.lightImpact();
-                      //         await logoutUser(); // Perform the logout operation
-                      //         Navigator.pushReplacement(
-                      //           // Navigate to the initial page
-                      //           context,
-                      //           CupertinoPageRoute(
-                      //             builder: (context) => InitialPage(),
-                      //           ),
-                      //         );
-                      //       }, () {
-                      //         Navigator.of(context).pop(false);
-                      //       }, () {});
-                      //     },
-                      //   ),
-                      // ),
-                      SizedBox(height: 20),
-                      Divider(
-                        color: Theme.of(context).colorScheme.scrim,
-                      ),
-                      SizedBox(height: 20),
+                      SizedBox(height: 10),
                       terms(),
                       SizedBox(height: 20),
                     ],
@@ -734,6 +708,23 @@ class _MypageState extends State<Mypage> {
           },
           child: Text(
             'Privacy Policy',
+            style: AugustFont.captionSmall(color: Colors.grey),
+          ),
+        ),
+        SizedBox(width: 5),
+        Text(
+          '|',
+          style: AugustFont.captionSmall(
+            color: Colors.grey,
+          ),
+        ),
+        SizedBox(width: 5),
+        GestureDetector(
+          onTap: () {
+            AugustSupport();
+          },
+          child: Text(
+            'Support',
             style: AugustFont.captionSmall(color: Colors.grey),
           ),
         ),

@@ -1,4 +1,4 @@
-package com.august
+package com.august.android
 
 import android.content.Context
 import android.view.LayoutInflater

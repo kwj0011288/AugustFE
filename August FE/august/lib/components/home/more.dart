@@ -7,14 +7,12 @@ import "package:flutter_feather_icons/flutter_feather_icons.dart";
 class MoreButton extends StatefulWidget {
   final VoidCallback setMain;
   final VoidCallback editSchedule;
-  final VoidCallback editName;
   final VoidCallback share;
   final VoidCallback remove;
   final int currentIndex;
   MoreButton({
     Key? key,
     required this.editSchedule,
-    required this.editName,
     required this.remove,
     required this.share,
     required this.setMain,
@@ -36,7 +34,6 @@ class _MoreButtonState extends State<MoreButton> {
       ),
       setMain: widget.setMain,
       editSchedule: widget.editSchedule,
-      editName: widget.editName,
       remove: widget.remove,
       share: widget.share,
       currentIndex: widget.currentIndex,
@@ -48,7 +45,6 @@ class MyPopupMenu extends StatefulWidget {
   final Widget child;
   final VoidCallback setMain;
   final VoidCallback editSchedule;
-  final VoidCallback editName;
   final VoidCallback share;
   final VoidCallback remove;
 
@@ -58,7 +54,6 @@ class MyPopupMenu extends StatefulWidget {
       required this.child,
       required this.setMain,
       required this.editSchedule,
-      required this.editName,
       required this.share,
       required this.remove,
       required this.currentIndex})
@@ -103,7 +98,6 @@ class _MyPopupMenuState extends State<MyPopupMenu> {
               },
               setMain: widget.setMain,
               editSchedule: widget.editSchedule,
-              editName: widget.editName,
               remove: widget.remove,
               currentIndex: widget.currentIndex,
               share: widget.share);
@@ -117,7 +111,6 @@ class PopupMenuContent extends StatefulWidget {
   final ValueChanged<String>? onAction;
   final VoidCallback setMain;
   final VoidCallback editSchedule;
-  final VoidCallback editName;
   final VoidCallback share;
   final VoidCallback remove;
   final int currentIndex;
@@ -128,7 +121,6 @@ class PopupMenuContent extends StatefulWidget {
       this.onAction,
       required this.setMain,
       required this.editSchedule,
-      required this.editName,
       required this.share,
       required this.remove,
       required this.currentIndex})
@@ -322,42 +314,9 @@ class _PopupMenuContentState extends State<PopupMenuContent>
                                 ],
                               ),
                             ),
+                            SizedBox(height: 5),
                             //Share workout
-                            SizedBox(
-                              height: 16,
-                            ),
 
-                            GestureDetector(
-                              onTap: () {
-                                widget.editName();
-                              },
-                              child: Row(
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.all(6),
-                                    decoration: BoxDecoration(
-                                      color: Color(0xFFDDF3FD),
-                                      borderRadius: BorderRadius.circular(24),
-                                    ),
-                                    child: Icon(
-                                      size: 20,
-                                      FeatherIcons.type,
-                                      color: Color(0xFF0586C0),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 12,
-                                  ),
-                                  Text(
-                                    "Edit Name",
-                                    style: AugustFont.subText3(
-                                      color:
-                                          Theme.of(context).colorScheme.outline,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
                             // //Edit workout
                             // SizedBox(
                             //   height: 16,

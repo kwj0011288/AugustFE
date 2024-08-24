@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:august/const/font/font.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

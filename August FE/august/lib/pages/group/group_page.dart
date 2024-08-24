@@ -233,7 +233,7 @@ class _GroupPageState extends State<GroupPage> {
               Padding(
                 padding: const EdgeInsets.only(left: 20, bottom: 0),
                 child: Text(
-                  'Group',
+                  'Class Blocks',
                   style: AugustFont.head3(
                       color: Theme.of(context).colorScheme.outline),
                 ),
@@ -301,6 +301,8 @@ class _GroupPageState extends State<GroupPage> {
                                                     index: containers[entry.key]
                                                         .indexOf(course),
                                                     onRemove: () {
+                                                      HapticFeedback
+                                                          .mediumImpact();
                                                       setState(() {
                                                         containers[entry.key]
                                                             .remove(course);
@@ -308,27 +310,80 @@ class _GroupPageState extends State<GroupPage> {
                                                     },
                                                   ))
                                               .toList(),
+                                          SizedBox(height: 5),
+                                          GestureDetector(
+                                            onTap: () {
+                                              HapticFeedback.mediumImpact();
+                                              _navigateToPage(entry.key);
+                                            },
+                                            child: Center(
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 10,
+                                                            vertical: 5),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white
+                                                          .withOpacity(0.6),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Icon(
+                                                          AugustIcons
+                                                              .addCourses,
+                                                          color: Colors.black,
+                                                          size: 15,
+                                                        ),
+                                                        SizedBox(width: 5),
+                                                        Text(
+                                                          'Add Courses',
+                                                          style: AugustFont
+                                                              .subText2(
+                                                                  color: Colors
+                                                                      .black),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  SizedBox(width: 5),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
-                                    Positioned(
-                                      top: 10,
-                                      right: 40,
-                                      child: IconButton(
-                                        onPressed: () {
-                                          HapticFeedback.mediumImpact();
-                                          _navigateToPage(entry.key);
-                                        },
-                                        icon: Icon(
-                                          AugustIcons.addCourses,
-                                          color: Colors.black,
-                                          size: 20,
-                                        ),
-                                      ),
-                                    ),
+                                    // Positioned(
+                                    //   top: 10,
+                                    //   right: 40,
+                                    //   child: IconButton(
+                                    //     onPressed: () {
+                                    //       HapticFeedback.mediumImpact();
+                                    //       _navigateToPage(entry.key);
+                                    //     },
+                                    //     icon: Icon(
+                                    //       AugustIcons.addCourses,
+                                    //       color: Colors.black,
+                                    //       size: 20,
+                                    //     ),
+                                    //   ),
+                                    // ),
                                     Positioned(
                                       top: 9,
-                                      right: 8,
+                                      right: 15,
                                       child: IconButton(
                                         onPressed: () {
                                           HapticFeedback.mediumImpact();

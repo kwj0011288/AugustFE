@@ -39,6 +39,7 @@ import 'package:flutter/material.dart' hide ModalBottomSheetRoute;
 import 'dart:typed_data';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SchedulePage extends StatefulWidget {
   SchedulePage({
@@ -258,67 +259,6 @@ class _SchedulePageState extends State<SchedulePage>
     print("Timetable data cleared successfully.");
   }
 
-  Future<void> _editTimetableName(int index) async {
-    TextEditingController nameController =
-        TextEditingController(text: _timetableCollection[index].name);
-    final newName = await showModalBottomSheet<String>(
-      context: context,
-      builder: (BuildContext context) {
-        return ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
-          child: Container(
-            color: Theme.of(context).colorScheme.background,
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              children: <Widget>[
-                Text(
-                  "Edit Timetable Name",
-                  //  "Edit Timetable Name index ${index}",
-                  style: AugustFont.head1(
-                      color: Theme.of(context).colorScheme.outline),
-                ),
-                const SizedBox(height: 10),
-                CupertinoTextField(
-                  inputFormatters: [
-                    LengthLimitingTextInputFormatter(15),
-                  ],
-                  autofocus: true,
-                  controller: nameController,
-                  placeholder: "Change Timetable Name",
-                  placeholderStyle: AugustFont.textField2(
-                      color: Theme.of(context).colorScheme.outline),
-                  style: AugustFont.textField2(
-                      color: Theme.of(context).colorScheme.outline),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.inversePrimary,
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  cursorColor: Theme.of(context).colorScheme.outline,
-                  padding: const EdgeInsets.all(15),
-                  onSubmitted: (value) {
-                    // 'Done' 버튼을 눌렀을 때의 동작
-                    checkAccessToken();
-                    HapticFeedback.mediumImpact();
-                    Navigator.of(context).pop(value);
-                  },
-                ),
-                const SizedBox(height: 20),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-
-    if (newName != null && newName.isNotEmpty) {
-      setState(() {
-        _timetableCollection[index].name = newName;
-      });
-
-      updateTimetableName(currentSemester!, index, newName);
-    }
-  }
-
   Future<void> share(int index, BuildContext context) async {
     try {
       HapticFeedback.lightImpact();
@@ -399,7 +339,8 @@ class _SchedulePageState extends State<SchedulePage>
           children: [
             timeTableTitleAndSemester(),
             Spacer(),
-            if (_timetableCollection.isNotEmpty) countTimeTable(),
+            getHelp(context),
+            // if (_timetableCollection.isNotEmpty) countTimeTable(),
           ],
         ),
         timeTableBuilder(currentIndexProv),
@@ -634,11 +575,6 @@ class _SchedulePageState extends State<SchedulePage>
             );
           }
         },
-        editName: () {
-          HapticFeedback.lightImpact();
-          checkAccessToken();
-          _editTimetableName(currentIndex);
-        },
         share: () => share(currentIndex, context),
         remove: () async {
           HapticFeedback.lightImpact();
@@ -702,6 +638,7 @@ class _SchedulePageState extends State<SchedulePage>
               }
             });
 
+            reorderTimetableIndex(serverIndex, timetableOrder);
             _pageController.animateToPage(
               currentIndex,
               duration:
@@ -709,9 +646,9 @@ class _SchedulePageState extends State<SchedulePage>
               curve: Curves.easeInOut, // 애니메이션의 속도 곡선을 설정합니다.
             );
             print("this is the order from the pageview $currentIndex");
-            reorderTimetableIndex(serverIndex, timetableOrder);
 
             currentIndexProv.setCurrentIndex(currentIndex);
+            print("this is the order from the pageview $currentIndex");
           }
         },
         currentIndex: currentIndex,
@@ -1070,16 +1007,28 @@ class _SchedulePageState extends State<SchedulePage>
           Consumer<CurrentIndexProvider>(
             builder: (context, currentIndexProvider, child) {
               int currentIndex = currentIndexProvider.currentIndex;
-              return Row(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      if (currentIndex == _timetableCollection.length) {
-                      } else {
-                        _editTimetableName(serverIndex);
-                      }
-                    },
-                    child: Text(
+              return GestureDetector(
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  if (currentIndex < _timetableCollection.length) {
+                    checkAccessToken();
+                    HapticFeedback.mediumImpact();
+                    Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                        fullscreenDialog: true,
+                        builder: (context) => EditPage(
+                          index: currentIndex,
+                          semester: currentSemester!,
+                          name: _timetableCollection[currentIndex].name,
+                        ),
+                      ),
+                    );
+                  }
+                },
+                child: Row(
+                  children: [
+                    Text(
                       isLoading
                           ? "Loading..."
                           : currentIndex >= _timetableCollection.length
@@ -1099,8 +1048,8 @@ class _SchedulePageState extends State<SchedulePage>
                       style: AugustFont.head1(
                           color: Theme.of(context).colorScheme.outline),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               );
             },
           ),
@@ -1172,6 +1121,38 @@ class _SchedulePageState extends State<SchedulePage>
       ),
     );
   }
+}
+
+void directToHelp() async {
+  const url =
+      'https://extra-mile.notion.site/August-Support-62cf34cf67954640b71f96b4af8eeda8?pvs=4';
+  await launchUrl(
+    Uri.parse(url),
+    mode: LaunchMode.inAppWebView,
+  );
+}
+
+Widget getHelp(BuildContext context) {
+  return GestureDetector(
+    onTap: () {
+      directToHelp();
+    },
+    child: Padding(
+      padding: const EdgeInsets.only(right: 15),
+      child: CircleAvatar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.background,
+        child: Center(
+          child: Image.asset(
+            'assets/icons/help.png',
+            height: 25,
+            width: 25,
+            color: Theme.of(context).colorScheme.outline,
+          ),
+        ),
+      ),
+    ),
+  );
 }
 
 class CurrentIndexProvider with ChangeNotifier {

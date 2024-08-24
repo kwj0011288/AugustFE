@@ -399,7 +399,7 @@ class _GeneratePageState extends State<GeneratePage> {
         ),
         titleSpacing: 0.0,
         title: Text(
-          "Wizard",
+          "Filters",
           style: AugustFont.head4(color: Theme.of(context).colorScheme.outline),
         ),
         actions: [
@@ -1115,18 +1115,14 @@ class _GeneratePageState extends State<GeneratePage> {
                                                   ? 'Disallow'
                                                   : 'Allow',
                                               style: AugustFont.head2(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .outline,
+                                                color: Colors.white,
                                               ),
                                             ),
                                           ),
                                           Text(
                                             'One Class In a Day',
                                             style: AugustFont.subText(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .outline,
+                                              color: Colors.white,
                                             ),
                                           ),
                                         ],
@@ -1177,9 +1173,7 @@ class _GeneratePageState extends State<GeneratePage> {
                                                     ? 'Only'
                                                     : 'All',
                                                 style: AugustFont.head2(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .outline,
+                                                  color: Colors.white,
                                                 ),
                                               ),
                                             ),
@@ -1188,9 +1182,7 @@ class _GeneratePageState extends State<GeneratePage> {
                                                   ? 'Open Sections'
                                                   : "Available Sections",
                                               style: AugustFont.subText(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .outline,
+                                                color: Colors.white,
                                               ),
                                             ),
                                           ],

@@ -54,8 +54,10 @@ class _NamePageState extends State<NamePage> {
       print("Failed to fetch userPk");
       return;
     }
-    Provider.of<UserInfoProvider>(context, listen: false)
-        .updateUserProfileImage(imagePath);
+    if (mounted) {
+      Provider.of<UserInfoProvider>(context, listen: false)
+          .updateUserProfileImage(imagePath);
+    }
 
     File imageFile = File(imagePath);
     updatePhoto(userPk, imageFile).then((_) {
@@ -72,7 +74,11 @@ class _NamePageState extends State<NamePage> {
       print("Failed to fetch userPk");
       return;
     }
-    Provider.of<UserInfoProvider>(context, listen: false).updateUserName(name);
+    if (mounted) {
+      Provider.of<UserInfoProvider>(context, listen: false)
+          .updateUserName(name);
+    }
+
     updateName(userPk, name).then((_) {
       print('Name updated successfully with $name');
       _saveInfo();
@@ -122,7 +128,10 @@ class _NamePageState extends State<NamePage> {
 
         Provider.of<UserInfoProvider>(context, listen: false)
             .updateUserName(fullName);
-        _nameController.text = fullName;
+        setState(() {
+          _nameController.text = fullName;
+        });
+        updateUserName(fullName);
 
         if (contact.avatar != null && contact.avatar!.isNotEmpty) {
           final directory = await getApplicationDocumentsDirectory();

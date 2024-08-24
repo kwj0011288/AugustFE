@@ -28,6 +28,7 @@ class _GradeTileState extends State<GradeTile> {
     return Padding(
       padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
       child: CustomBounceWidget(
+        isScrollable: true,
         duration: Duration(milliseconds: 100),
         onPressed: widget.onTap,
         child: Container(

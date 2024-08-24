@@ -114,9 +114,14 @@ class _InfoWidgetState extends State<InfoWidget> {
             ),
             Text(
               widget.subInfo,
-              style: AugustFont.captionBold(
-                color: Colors.grey,
-              ),
+              style: widget.isSchool
+                  ? AugustFont.captionBoldUniv(
+                      color: Colors.grey,
+                    )
+                  : AugustFont.captionBold(
+                      color: Colors.grey,
+                    ),
+              maxLines: 1,
             ),
           ],
         ),

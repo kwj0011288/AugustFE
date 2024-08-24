@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import "package:flutter_feather_icons/flutter_feather_icons.dart";
 
@@ -15,6 +16,7 @@ class AugustIcons {
   static IconData add = FeatherIcons.plus;
   static IconData autoCreate = FeatherIcons.layout;
   static IconData manuallyCreate = FeatherIcons.edit;
+  static IconData question = FeatherIcons.helpCircle;
 
   static IconData bottomLeft = Icons.keyboard_arrow_left;
   static IconData bottomRight = Icons.keyboard_arrow_right;
@@ -23,6 +25,7 @@ class AugustIcons {
 
   static IconData addCourses = FeatherIcons.plusSquare;
   static IconData deleteCourses = FeatherIcons.trash;
+  static IconData removeAllCourses = FeatherIcons.xSquare;
 
   /* --- manual page --- */
 

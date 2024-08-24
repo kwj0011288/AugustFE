@@ -26,9 +26,15 @@ import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Add this line
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    // shows error for the web here. need to be fixed soon
+    print(e);
+  }
+
   FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
 
   MobileAds.instance.initialize();

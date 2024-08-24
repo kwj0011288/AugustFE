@@ -1,4 +1,6 @@
 // ignore_for_file: prefer_const_constructors
+import 'dart:io';
+
 import 'package:animations/animations.dart';
 import 'package:august/const/device/device_util.dart';
 import 'package:august/const/font/font.dart';
@@ -252,6 +254,10 @@ class _SingleTimetableState extends State<SingleTimetable> {
     var boxColor =
         Provider.of<CourseColorProvider>(context).getColorByIndex(courseIndex);
 
+    Size screenSize = MediaQuery.of(context).size;
+    double minHeightForLargeDevice = 812.0;
+    bool isLargeDevice = screenSize.height > minHeightForLargeDevice;
+
 //isSelectpage
     if (widget.isCustomizeColor) {
       children.add(
@@ -303,12 +309,13 @@ class _SingleTimetableState extends State<SingleTimetable> {
             schedule.sectionCode!,
             style: AugustFont.captionSmallNormal0(color: Colors.black),
           ),
-          Text(
-            '${schedule.instructors!.first}',
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-            style: AugustFont.captionSmallNormal2(color: Colors.black),
-          ),
+          if (isLargeDevice && Platform.isIOS)
+            Text(
+              '${schedule.instructors!.first}',
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              style: AugustFont.captionSmallNormal2(color: Colors.black),
+            ),
           // Add other widgets specific to height > 20 condition
         ]);
       } else if (height > 50 && !widget.isCustomizeColor) {

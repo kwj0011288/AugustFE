@@ -1,4 +1,5 @@
 import 'package:august/components/home/button.dart';
+import 'package:august/components/home/dialog.dart';
 import 'package:august/components/home/loading.dart';
 import 'package:august/const/font/font.dart';
 import 'package:august/provider/courseprovider.dart';
@@ -113,6 +114,7 @@ class _UnivPageState extends State<UnivPage> {
 
 // 'Done' 버튼이 클릭될 때 _saveInfo 호출
   Future<void> _saveAndClose() async {
+    if (!mounted) return;
     checkAccessToken();
     await _saveInfo();
 
@@ -137,6 +139,7 @@ class _UnivPageState extends State<UnivPage> {
   }
 
   void _onSchoolChanged(String? value) {
+    if (!mounted) return;
     var selectedInstitution = schoolsList.firstWhere(
       (institution) => institution.fullName == value,
     );
@@ -291,7 +294,7 @@ class _UnivPageState extends State<UnivPage> {
                       textInputAction: TextInputAction.done),
                 ),
                 isLoading
-                    ? CircularProgressIndicator()
+                    ? Center(child: CircularProgressIndicator())
                     : Expanded(
                         child: ListView.builder(
                           itemCount: filteredSchoolList.length,
@@ -342,9 +345,63 @@ class _UnivPageState extends State<UnivPage> {
         child: widget.onboard
             ? GestureDetector(
                 onTap: () {
-                  HapticFeedback.mediumImpact();
-                  widget.gonext();
-                  _saveAndClose();
+                  if (selectedSchoolFullname != null &&
+                      selectedSchoolFullname!.isNotEmpty) {
+                    HapticFeedback.mediumImpact();
+                    widget.gonext();
+                    _saveAndClose();
+                  } else {
+                    if (mounted) {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text(
+                              'Please select a university',
+                              textAlign: TextAlign.center,
+                              style: AugustFont.head2(
+                                  color: Theme.of(context).colorScheme.outline),
+                            ),
+                            content: Text(
+                              'You must select a university to continue.',
+                              textAlign: TextAlign.center,
+                              style: AugustFont.subText2(
+                                  color: Theme.of(context).colorScheme.outline),
+                            ),
+                            actions: <Widget>[
+                              GestureDetector(
+                                onTap: () async {
+                                  Navigator.of(context).pop();
+                                  HapticFeedback.lightImpact();
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 20),
+                                  height: 55,
+                                  width: MediaQuery.of(context).size.width - 80,
+                                  decoration: BoxDecoration(
+                                    color: Colors.redAccent,
+                                    borderRadius: BorderRadius.circular(60),
+                                  ),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'OK',
+                                        style: AugustFont.head4(
+                                            color: Colors.white),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            ],
+                          );
+                        },
+                      );
+                    }
+                  }
                 },
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 20),
@@ -368,6 +425,7 @@ class _UnivPageState extends State<UnivPage> {
             : GestureDetector(
                 onTap: () {
                   _saveAndClose();
+
                   HapticFeedback.mediumImpact();
                 },
                 child: Container(
